@@ -4,7 +4,7 @@
   "description": "A Discord bot for scheduling events",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon --ignore data/"
   },
   "repository": {
     "type": "git",
@@ -23,5 +23,8 @@
     "glob": "^7.1.2",
     "jsonfile": "^3.0.0",
     "moment-timezone": "^0.5.13"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
   }
 }
