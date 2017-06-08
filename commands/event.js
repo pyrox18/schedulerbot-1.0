@@ -34,16 +34,19 @@ module.exports = (bot) => {
         inputString = inputString.trim();
 
         let eventName = inputString;
-        let startDate = results[0].start.date();
+        let startDate = moment(results[0].start.date());
         let endDate;
         try {
-          endDate = results[0].end.date();
+          endDate = moment(results[0].end.date());
         }
         catch (err) {
-          endDate = new Date(results[0].start.date().getTime() + 3600000);
+          endDate = startDate.add(1, 'h');
         }
 
-        i.events.push(new CalendarEvent(eventName, startDate, endDate));
+        let actualStartDate = moment.tz(startDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, i.timezone);
+        let actualEndDate = moment.tz(endDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, i.timezone);
+
+        i.events.push(new CalendarEvent(eventName, actualStartDate, actualEndDate));
         try {
           jsonfile.writeFileSync(file, calendars)
         }
@@ -55,8 +58,8 @@ module.exports = (bot) => {
         embed.title("New Event");
         embed.color(0x7caeff);
         embed.field("Event Name", eventName, false);
-        embed.field("Start Date", startDate.toString(), false);
-        embed.field("End Date", endDate.toString(), false);
+        embed.field("Start Date", actualStartDate.format('MMM D YYYY, h:mm:ss a z'), false);
+        embed.field("End Date", actualEndDate.format('MMM D YYYY, h:mm:ss a z'), false);
         
         embed.send(bot, msg.channel.id);
         return "New event created.";
