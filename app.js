@@ -18,6 +18,12 @@ bot.on("ready", () => {
     const actualCommand = require(path.resolve(file));
     actualCommand(bot);
   });
+
+  // Set bot's Playing text
+  bot.editStatus({
+    name: "+help | In development"
+  });
+
   console.log("Bot ready!");
 });
 
