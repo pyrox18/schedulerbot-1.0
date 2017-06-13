@@ -70,16 +70,18 @@ class Calendars {
 
   deleteEvent(guildId, eventIndex) {
     let index = this.findIndexOfCalendar(guildId);
-    if (index < 0) {
-      return -1;
-    }
-    else if (eventIndex < 0 || eventIndex >= this.calendars[index].events.length) {
-      return 0;
+    if (index < 0 || eventIndex < 0 || eventIndex >= this.calendars[index].events.length) {
+      return null;
     }
     else {
       let result = this.calendars[index].events.splice(eventIndex, 1);
       this.writeCalendars();
-      return 1;
+
+      return {
+        eventName: result[0].name,
+        actualStartDate: moment.tz(result[0].startDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, this.calendars[index].timezone),
+        actualEndDate: moment.tz(result[0].endDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, this.calendars[index].timezone)
+      };
     }
   }
 

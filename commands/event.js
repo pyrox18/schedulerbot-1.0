@@ -83,15 +83,20 @@ module.exports = (bot) => {
     }
     index = index - 1;
 
-    let resultCode = calendars.deleteEvent(msg.channel.guild.id, index);
-    switch (resultCode) {
-      case -1:
-        return "Calendar not initialized. Please run `" + prefix + "calendar` to initialize the calendar first.";
-      case 0:
-        return "Event not found.";
-      default:
-        return "Event successfully deleted.";
+    let resultObject = calendars.deleteEvent(msg.channel.guild.id, index);
+    if (resultObject === null) {
+      return "Event not found.";
     }
+    
+    let embed = bot.createEmbed(msg.channel.id);
+    embed.title("Delete Event");
+    embed.color(0xff2b2b);
+    embed.field("Event Name", resultObject.eventName, false);
+    embed.field("Start Date", resultObject.actualStartDate.format('MMM D YYYY, h:mm:ss a z'), false);
+    embed.field("End Date", resultObject.actualEndDate.format('MMM D YYYY, h:mm:ss a z'), false);
+
+    embed.send(bot, msg.channel.id);
+    return "Event deleted.";
   }, {
     description: "Delete an event.",
     fullDescription: "Delete an event from the existing event list.",
