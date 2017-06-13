@@ -1,12 +1,10 @@
-const Calendars = require('../models/calendars');
+let calendars = require('../modules/calendars');
 
 module.exports = (bot) => {
   bot.registerCommand("calendar", (msg, args) =>  {
     if (args.length > 1 || args.length < 1) {
       return "Invalid input.";
     }
-
-    let calendars = new Calendars();
 
     let addCalStatus = calendars.addCalendar(msg.channel.guild.id, args[0]);
     switch (addCalStatus) {

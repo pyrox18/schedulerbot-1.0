@@ -1,8 +1,6 @@
 const path = require('path');
 const jsonfile = require('jsonfile');
 const moment = require('moment-timezone');
-const Calendar = require('./calendar');
-const CalendarEvent = require('./calendar-event');
 
 const config = require('../config/bot');
 
@@ -138,4 +136,20 @@ class Calendars {
   }
 }
 
-module.exports = Calendars;
+class Calendar {
+  constructor(guildId, timezone) {
+    this.guildId = guildId;
+    this.timezone = timezone;
+    this.events = [];
+  }
+}
+
+class CalendarEvent {
+  constructor(name, startDate, endDate) {
+    this.name = name;
+    this.startDate = startDate;
+    this.endDate = endDate;
+  }
+}
+
+module.exports = calendars = new Calendars();

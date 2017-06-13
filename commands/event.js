@@ -2,7 +2,7 @@ const chrono = require('chrono-node');
 const moment = require('moment-timezone');
 require('eris-embed-builder');
 
-const Calendars = require('../models/calendars');
+let calendars = require('../modules/calendars');
 
 const config = require('../config/bot');
 const prefix = config.prefix;
@@ -12,8 +12,6 @@ module.exports = (bot) => {
     if (args.length < 1) {
       return "Invalid input.";
     }
-
-    let calendars = new Calendars();
 
     let inputString = args.join(" ");
     let results = chrono.parse(inputString);
@@ -54,8 +52,6 @@ module.exports = (bot) => {
     if (args.length > 0) {
       return "Invalid input.";
     }
-    
-    let calendars = new Calendars();
 
     events = calendars.getEventsForCalendar(msg.channel.guild.id);
 
@@ -80,8 +76,6 @@ module.exports = (bot) => {
     if (args.length < 1 || args.length > 1) {
       return "Invalid input.";
     }
-    
-    let calendars = new Calendars();
 
     let index = parseInt(args[0]);
     if (isNaN(index)) {
@@ -108,8 +102,6 @@ module.exports = (bot) => {
     if (args.length < 2) {
       return "Invalid input.";
     }
-
-    let calendars = new Calendars();
 
     let index = parseInt(args[0]);
     if (isNaN(index)) {
