@@ -19,6 +19,7 @@ module.exports = (bot) => {
     }
   }, {
     description: "Initialise calendar.",
-    fullDescription: "Initialises a calendar for the guild."
+    fullDescription: "Initialises a calendar for the guild in the specified timezone.",
+    usage: "`<timezone>`"
   });
 }

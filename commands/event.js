@@ -46,6 +46,7 @@ module.exports = (bot) => {
     }
   }, {
     description: "Add a new event.",
-    fullDescription: "Adds a new event to the guild calendar."
+    fullDescription: "Adds a new event to the guild calendar. Type the event details naturally (e.g. 'CS:GO scrims tomorrow from 6pm to 9pm') and the bot will interpret it for you.",
+    usage: "`<event details>`"
   });
 }

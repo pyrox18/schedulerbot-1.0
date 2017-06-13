@@ -10,6 +10,7 @@ module.exports = (bot) => {
 
   bot.registerCommand("prefix", "`" + prefix + "`", {
     description: "Show prefix.",
-    fullDescription: "Shows the bot's current prefix."
+    fullDescription: "Shows the bot's current prefix.",
+    usage: "(or `@SchedulerBot prefix` if you forgot what the prefix is)"
   });
 }
