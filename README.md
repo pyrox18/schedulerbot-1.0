@@ -49,3 +49,7 @@ $ npm start
 nodemon is used to run the bot, which will auto-restart the bot when changes are made to the project files.
 
 To invite the bot to your server, generate an invite link at https://discordapi.com/permissions.html. To make things easy, just give the bot the Administrator permission so it automatically has the permission to do everything on your server. You can get your bot's client ID from your Discord Developer App page.
+
+## Collaborating
+
+Ideas for this project are tracked on a Trello board. Click [here](https://trello.com/invite/b/rHxsRYxW/908ddea37aa6122f15dcfa803c7cdc2a/schedulerbot) to get an invite to the board.
