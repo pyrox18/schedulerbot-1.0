@@ -137,7 +137,7 @@ module.exports = (bot) => {
     }
     else {
       let embed = bot.createEmbed(msg.channel.id);
-      embed.title("New Event");
+      embed.title("Update Event");
       embed.color(0xfff835);
       embed.field("Event Name", eventName, false);
       embed.field("Start Date", updateSuccessObject.actualStartDate.format('MMM D YYYY, h:mm:ss a z'), false);
