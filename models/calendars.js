@@ -70,6 +70,21 @@ class Calendars {
     }
   }
 
+  deleteEvent(guildId, eventIndex) {
+    let index = this.findIndexOfCalendar(guildId);
+    if (index < 0) {
+      return -1;
+    }
+    else if (eventIndex < 0 || eventIndex >= this.calendars[index].events.length) {
+      return 0;
+    }
+    else {
+      let result = this.calendars[index].events.splice(eventIndex, 1);
+      this.writeCalendars();
+      return 1;
+    }
+  }
+
   findIndexOfCalendar(guildId) {
     let index = this.calendars.findIndex((calendar) => {
       return calendar.guildId == guildId;
