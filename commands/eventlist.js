@@ -19,11 +19,12 @@ module.exports = (bot) => {
       return "Calendar not initialized. Please run `" + prefix + "calendar` to initialize the calendar first.";
     }
     else {
-      resultString = "**[Events]**\n\n";
+      resultString = "```css\n[Events]\n\n";
       for (let i = 0; i < events.length; i++) {
-        resultString = resultString + `${i+1} : ${events[i].name} - ${events[i].startDate} to ${events[i].endDate}\n`;
+        resultString = resultString + `${i+1} : ${events[i].name} /* ${events[i].startDate} to ${events[i].endDate} */\n`;
       }
 
+      resultString = resultString + "```";
       return resultString;
     }
   }, {
