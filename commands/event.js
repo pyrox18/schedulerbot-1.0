@@ -44,5 +44,8 @@ module.exports = (bot) => {
       embed.send(bot, msg.channel.id);
       return "New event created.";
     }
+  }, {
+    description: "Add a new event.",
+    fullDescription: "Adds a new event to the guild calendar."
   });
 }
