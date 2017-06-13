@@ -24,15 +24,13 @@ Before running the bot, you will have to create a Discord Developer App at https
 4. Uncheck "Public Bot" under the app bot user if you don't want anyone else inviting your bot to the server.
 5. Take note of the app bot user's token, which will be used in the bot's config.
 
-Next, create a `config` folder in the root, and a `bot.js` file inside it. This will be the configuration that you will pass to the bot. Copy the following into the `bot.js` file.
+Next, copy `data/bot-example.js` into `data/bot.js`.
 
-```javascript
-module.exports = {
-  botToken: "copyAndPasteYourEntireAppBotUserTokenHere", // Replace the string with your token
-  calendarJsonFile: './data/calendars.json', // No need to touch this
-  prefix: '+' // You can change this to something else to not conflict with other bots in your server
-}
+```bash
+$ cp data/bot-example.js data/bot.js
 ```
+
+Replace the botToken string with your app bot user's token, and change the prefix if necessary.
 
 Finally, create a `data` folder in the root, and a `calendars.json` file inside it. The contents of the file should just be an empty array:
 
