@@ -1,11 +1,16 @@
+const moment = require('moment-timezone');
+
 const config = require('../config/bot');
 
 let prefix = config.prefix;
 
 module.exports = (bot) => {
-  bot.registerCommand("ping", "Pong!", {
-    description: "Pong!",
-    fullDescription: "Checks to see if the bot is alive."
+  bot.registerCommand("ping", (msg, args) => {
+    let diff = moment().diff(msg.timestamp);
+    return `Pong! Time: ${diff}ms`;
+  }, {
+    description: "Ping the bot.",
+    fullDescription: "Pings the bot to check if the bot is available."
   });
 
   bot.registerCommand("prefix", "`" + prefix + "`", {
