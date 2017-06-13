@@ -85,6 +85,26 @@ class Calendars {
     }
   }
 
+  updateEvent(guildId, eventIndex, eventName, localStartDate, localEndDate) {
+    let index = this.findIndexOfCalendar(guildId);
+
+    if (index < 0 || eventIndex < 0 || eventIndex >= this.calendars[index].events.length) {
+      return null;
+    }
+    else {
+      let actualStartDate = moment.tz(localStartDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, this.calendars[index].timezone);
+      let actualEndDate = moment.tz(localEndDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, this.calendars[index].timezone);
+
+      this.calendars[index].events[eventIndex] = new CalendarEvent(eventName, actualStartDate, actualEndDate);
+      this.writeCalendars();
+      return {
+        eventName: eventName,
+        actualStartDate: actualStartDate,
+        actualEndDate: actualEndDate
+      };
+    }
+  }
+
   findIndexOfCalendar(guildId) {
     let index = this.calendars.findIndex((calendar) => {
       return calendar.guildId == guildId;
