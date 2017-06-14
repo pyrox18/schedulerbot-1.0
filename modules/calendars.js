@@ -93,8 +93,8 @@ class Calendars {
 
       return {
         eventName: result[0].name,
-        actualStartDate: moment.tz(result[0].startDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, this.calendars[index].timezone),
-        actualEndDate: moment.tz(result[0].endDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, this.calendars[index].timezone)
+        actualStartDate: moment.tz(moment(result[0].startDate).format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, this.calendars[index].timezone),
+        actualEndDate: moment.tz(moment(result[0].endDate).format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, this.calendars[index].timezone)
       };
     }
   }
