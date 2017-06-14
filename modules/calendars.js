@@ -134,8 +134,8 @@ class Calendars {
       this.calendars = jsonfile.readFileSync(file);
     }
     catch (err) {
-      console.error('File read error: ' + err);
-      process.exit();
+      console.log(`Unable to read ${file}, proceeding with new calendars array.`);
+      this.calendars = [];
     }
   }
 
