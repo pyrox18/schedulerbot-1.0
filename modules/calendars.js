@@ -58,7 +58,21 @@ class Calendars {
       let actualStartDate = moment.tz(localStartDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, this.calendars[index].timezone);
       let actualEndDate = moment.tz(localEndDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, this.calendars[index].timezone);
 
-      this.calendars[index].events.push(new CalendarEvent(eventName, actualStartDate, actualEndDate));
+      if (this.calendars[index].events.length == 0) {
+        this.calendars[index].events.push(new CalendarEvent(eventName, actualStartDate, actualEndDate));
+      }
+      else {
+        for (let i = 0; i < this.calendars[index].events.length; i++) {
+          if (moment.tz(this.calendars[index].events[i].startDate, this.calendars[index].timezone).diff(actualStartDate) >= 0) {
+            this.calendars[index].events.splice(i, 0, new CalendarEvent(eventName, actualStartDate, actualEndDate));
+            break;
+          }
+          if (i == this.calendars[index].events.length - 1) {
+            this.calendars[index].events.push(new CalendarEvent(eventName, actualStartDate, actualEndDate));
+            break;
+          }
+        }
+      }
       this.writeCalendars();
       return {
         eventName: eventName,
