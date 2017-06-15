@@ -20,9 +20,7 @@ bot.on("ready", () => {
   });
 
   // Set bot's Playing text
-  bot.editStatus({
-    name: "+help | In development"
-  });
+  bot.editStatus(config.game);
 
   console.log("Bot ready!");
 });
