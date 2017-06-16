@@ -1,6 +1,6 @@
 const moment = require('moment-timezone');
 
-const config = require('../config/bot');
+const config = require('../config/bot.config');
 
 let prefix = config.prefix;
 

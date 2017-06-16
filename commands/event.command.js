@@ -4,7 +4,7 @@ require('eris-embed-builder');
 
 const Calendar = require('../models/calendar.model');
 
-const config = require('../config/bot');
+const config = require('../config/bot.config');
 const prefix = config.prefix;
 
 module.exports = (bot) => {

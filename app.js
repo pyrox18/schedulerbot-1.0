@@ -3,7 +3,7 @@ const glob = require('glob');
 const path = require('path');
 const mongoose = require('mongoose');
 
-const config = require('./config/bot');
+const config = require('./config/bot.config');
 
 const prefix = config.prefix;
 
@@ -28,7 +28,7 @@ bot = new Eris.CommandClient(config.botToken, {}, {
 });
 
 bot.on("ready", () => {
-  glob.sync('./commands/**/*.js').forEach(file => {
+  glob.sync('./commands/**/*.command.js').forEach(file => {
     const actualCommand = require(path.resolve(file));
     actualCommand(bot);
   });
