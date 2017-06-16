@@ -6,6 +6,8 @@ This bot uses the [Eris](https://abal.moe/Eris/) library. Reference documentatio
 
 ## Installation
 
+This project requires [NodeJS](https://nodejs.org), [npm](https://npmjs.com) and [MongoDB](https://mongodb.com). Install these first before continuing. (**NOTE**: npm comes with NodeJS.)
+
 Make sure you have set up SSH on GitLab. Then:
 
 ```bash
@@ -24,19 +26,15 @@ Before running the bot, you will have to create a Discord Developer App at https
 4. Uncheck "Public Bot" under the app bot user if you don't want anyone else inviting your bot to the server.
 5. Take note of the app bot user's token, which will be used in the bot's config.
 
-Next, copy `data/bot-example.js` into `data/bot.js`.
+Next, copy `data/bot-example.config.js` into `data/bot.config.js`.
 
 ```bash
-$ cp data/bot-example.js data/bot.js
+$ cp data/bot-example.config.js data/bot.config.js
 ```
 
 Replace the botToken string with your app bot user's token, and change the prefix if necessary.
 
-Finally, create a `data` folder in the root, and a `calendars.json` file inside it. The contents of the file should just be an empty array:
-
-```json
-[]
-```
+Before starting the bot, make sure MongoDB is running. The bot will attempt to connect to the `schedulerbot` database on port 27017 by default; this can be changed in the `bot.config.js` file.
 
 Then, you can start the bot.
 
