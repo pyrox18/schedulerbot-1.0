@@ -2,7 +2,7 @@ const chrono = require('chrono-node');
 const moment = require('moment-timezone');
 require('eris-embed-builder');
 
-let calendars = require('../modules/calendars');
+const Calendar = require('../models/calendar.model');
 
 const config = require('../config/bot');
 const prefix = config.prefix;
@@ -26,22 +26,33 @@ module.exports = (bot) => {
       endDate = startDate.clone().add(1, 'h');
     }
 
-    let addSuccessObject = calendars.addEventToCalendar(msg.channel.guild.id, eventName, startDate, endDate);
+    Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      if (!calendar) {
+        msg.channel.createMessage("Calendar not initialized. Please run `" + prefix + "calendar` to initialize the calendar first.");
+      }
+      else {
+        calendar.addEvent(eventName, startDate, endDate, (err, calendar) => {
+          if (err) {
+            console.error(err);
+          }
+          else {
+            let embed = bot.createEmbed(msg.channel.id);
+            embed.title("New Event");
+            embed.color(0x7caeff);
+            embed.field("Event Name", eventName, false);
+            embed.field("Start Date", moment.tz(startDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, calendar.timezone).toString(), false);
+            embed.field("End Date", moment.tz(endDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, calendar.timezone).toString(), false);
 
-    if (addSuccessObject === null) {
-      return "Calendar not initialized. Please run `" + prefix + "calendar` to initialize the calendar first.";
-    }
-    else {
-      let embed = bot.createEmbed(msg.channel.id);
-      embed.title("New Event");
-      embed.color(0x7caeff);
-      embed.field("Event Name", eventName, false);
-      embed.field("Start Date", addSuccessObject.actualStartDate.format('MMM D YYYY, h:mm:ss a z'), false);
-      embed.field("End Date", addSuccessObject.actualEndDate.format('MMM D YYYY, h:mm:ss a z'), false);
-
-      embed.send(bot, msg.channel.id);
-      return "New event created.";
-    }
+            embed.send(bot, msg.channel.id);
+            msg.channel.createMessage("New event created.");
+          }
+        });
+      }
+    });
   }, {
     description: "Add a new event.",
     fullDescription: "Adds a new event to the guild calendar. Type the event details naturally (e.g. 'CS:GO scrims tomorrow from 6pm to 9pm') and the bot will interpret it for you.",
@@ -53,20 +64,29 @@ module.exports = (bot) => {
       return "Invalid input.";
     }
 
-    events = calendars.getEventsForCalendar(msg.channel.guild.id);
-
-    if (events === null) {
-      return "Calendar not initialized. Please run `" + prefix + "calendar` to initialize the calendar first.";
-    }
-    else {
-      resultString = "```css\n[Events]\n\n";
-      for (let i = 0; i < events.length; i++) {
-        resultString = resultString + `${i+1} : ${events[i].name} /* ${events[i].startDate} to ${events[i].endDate} */\n`;
+    Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
+      if (err) {
+        console.error(err);
+        return;
       }
+      if (!calendar) {
+        msg.channel.createMessage("Calendar not initialized. Please run `" + prefix + "calendar` to initialize the calendar first.");
+      }
+      else {
+        let resultString = "```css\n[Events]\n\n";
 
-      resultString = resultString + "```";
-      return resultString;
-    }
+        if (calendar.events.length == 0) {
+          resultString = resultString + "No events found!\n";
+        }
+        else {
+          for (let i = 0; i < calendar.events.length; i++) {
+            resultString = resultString + `${i+1} : ${calendar.events[i].name} /* ${moment(calendar.events[i].startDate).tz(calendar.timezone).toString()} to ${moment(calendar.events[i].endDate).tz(calendar.timezone).toString()} */\n`;
+          }
+        }
+        resultString = resultString + "```";
+        msg.channel.createMessage(resultString);
+      }
+    });
   }, {
     description: "List existing events.",
     fullDescription: "Displays a list of events that have been created."
@@ -83,20 +103,29 @@ module.exports = (bot) => {
     }
     index = index - 1;
 
-    let resultObject = calendars.deleteEvent(msg.channel.guild.id, index);
-    if (resultObject === null) {
-      return "Event not found.";
-    }
-    
-    let embed = bot.createEmbed(msg.channel.id);
-    embed.title("Delete Event");
-    embed.color(0xff2b2b);
-    embed.field("Event Name", resultObject.eventName, false);
-    embed.field("Start Date", resultObject.actualStartDate.format('MMM D YYYY, h:mm:ss a z'), false);
-    embed.field("End Date", resultObject.actualEndDate.format('MMM D YYYY, h:mm:ss a z'), false);
+    Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
+      if (index < 0 || index >= calendar.events.length) {
+        msg.channel.createMessage("Event not found.");
+      }
+      else {
+        let deletedEvent = calendar.events[index];
+        calendar.deleteEvent(index, (err) => {
+          if (err) {
+            console.error(err);
+            return;
+          }
+          let embed = bot.createEmbed(msg.channel.id);
+          embed.title("Delete Event");
+          embed.color(0xff2b2b);
+          embed.field("Event Name", deletedEvent.name, false);
+          embed.field("Start Date", moment(deletedEvent.startDate).tz(calendar.timezone).toString(), false);
+          embed.field("End Date", moment(deletedEvent.endDate).tz(calendar.timezone).toString(), false);
 
-    embed.send(bot, msg.channel.id);
-    return "Event deleted.";
+          embed.send(bot, msg.channel.id);
+          msg.channel.createMessage("Event deleted.");
+        })
+      }
+    });
   }, {
     description: "Delete an event.",
     fullDescription: "Delete an event from the existing event list.",
@@ -127,22 +156,38 @@ module.exports = (bot) => {
       endDate = startDate.clone().add(1, 'h');
     }
 
-    let updateSuccessObject = calendars.updateEvent(msg.channel.guild.id, index, eventName, startDate, endDate);
+    Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      if (!calendar) {
+        msg.channel.createMessage("Calendar not initialized. Please run `" + prefix + "calendar` to initialize the calendar first.");
+      }
+      else {
+        if (index < 0 || index >= calendar.events.length) {
+          msg.channel.createMessage("Event not found.");
+        }
+        else {
+          calendar.updateEvent(index, eventName, startDate, endDate, (err, calendar) => {
+            if (err) {
+              console.error(err);
+            }
+            else {
+              let embed = bot.createEmbed(msg.channel.id);
+              embed.title("Update Event");
+              embed.color(0xfff835);
+              embed.field("Event Name", eventName, false);
+              embed.field("Start Date", moment.tz(startDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, calendar.timezone).toString(), false);
+              embed.field("End Date", moment.tz(endDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, calendar.timezone).toString(), false);
 
-    if (updateSuccessObject === null) {
-      return "Calendar not initialized or event not found.";
-    }
-    else {
-      let embed = bot.createEmbed(msg.channel.id);
-      embed.title("Update Event");
-      embed.color(0xfff835);
-      embed.field("Event Name", eventName, false);
-      embed.field("Start Date", updateSuccessObject.actualStartDate.format('MMM D YYYY, h:mm:ss a z'), false);
-      embed.field("End Date", updateSuccessObject.actualEndDate.format('MMM D YYYY, h:mm:ss a z'), false);
-
-      embed.send(bot, msg.channel.id);
-      return "Event updated.";
-    }
+              embed.send(bot, msg.channel.id);
+              msg.channel.createMessage("Event updated.");
+            }
+          });
+        }
+      }
+    });
   }, {
     description: "Update an existing event.",
     fullDescription: "Updates an existing event in the guild calendar.",
