@@ -4,6 +4,10 @@ This changelog is formatted based on [Keep a Changelog](http://keepachangelog.co
 
 ## [Unreleased]
 
+### Added
+
+- Guilds can now have custom prefixes for the bot.
+
 ### Changed
 
 - Calendar and event data is now stored in a MongoDB database.
