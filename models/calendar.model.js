@@ -30,7 +30,7 @@ calendarSchema.methods.addEvent = function(eventName, startDate, endDate, callba
   }
   else {
     for (let i = 0; i < this.events.length; i++) {
-      if (moment.tz(this.events[i].startDate, this.timezone).diff(actualStartDate) >= 0) {
+      if (this.events[i].startDate >= event.startDate) {
         this.events.splice(i, 0, event);
         break;
       }
