@@ -6,9 +6,6 @@ const mongoose = require('mongoose');
 const config = require('./config/bot.config');
 const Prefix = require('./models/prefix.model');
 
-const prefix = config.prefix;
-
-
 // Connect to database
 mongoose.connect(config.dbConnectionUrl);
 db = mongoose.connection;
@@ -25,7 +22,7 @@ db.once('open', () => {
 bot = new Eris.CommandClient(config.botToken, {}, {
   description: "A Discord bot for scheduling events",
   owner: "Pyrox",
-  prefix: [prefix, "@mention "]
+  prefix: [config.prefix, "@mention "]
 });
 
 bot.on("ready", () => {

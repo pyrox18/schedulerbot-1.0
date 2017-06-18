@@ -3,8 +3,6 @@ const moment = require('moment-timezone');
 const config = require('../config/bot.config');
 const Prefix = require('../models/prefix.model');
 
-let prefix = config.prefix;
-
 module.exports = (bot) => {
   bot.registerCommand("ping", (msg, args) => {
     let diff = moment().diff(msg.timestamp);

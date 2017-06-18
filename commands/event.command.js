@@ -5,7 +5,6 @@ require('eris-embed-builder');
 const Calendar = require('../models/calendar.model');
 
 const config = require('../config/bot.config');
-const prefix = config.prefix;
 
 module.exports = (bot) => {
   let eventCommand = bot.registerCommand("event", (msg, args) => {
@@ -32,7 +31,7 @@ module.exports = (bot) => {
         return;
       }
       if (!calendar) {
-        msg.channel.createMessage("Calendar not initialized. Please run `" + prefix + "calendar` to initialize the calendar first.");
+        msg.channel.createMessage("Calendar not initialized. Please run `" + config.prefix + "calendar` to initialize the calendar first.");
       }
       else {
         calendar.addEvent(eventName, startDate, endDate, (err, calendar) => {
@@ -70,7 +69,7 @@ module.exports = (bot) => {
         return;
       }
       if (!calendar) {
-        msg.channel.createMessage("Calendar not initialized. Please run `" + prefix + "calendar` to initialize the calendar first.");
+        msg.channel.createMessage("Calendar not initialized. Please run `" + config.prefix + "calendar` to initialize the calendar first.");
       }
       else {
         let resultString = "```css\n[Events]\n\n";
@@ -162,7 +161,7 @@ module.exports = (bot) => {
         return;
       }
       if (!calendar) {
-        msg.channel.createMessage("Calendar not initialized. Please run `" + prefix + "calendar` to initialize the calendar first.");
+        msg.channel.createMessage("Calendar not initialized. Please run `" + config.prefix + "calendar` to initialize the calendar first.");
       }
       else {
         if (index < 0 || index >= calendar.events.length) {
