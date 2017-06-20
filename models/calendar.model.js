@@ -2,17 +2,21 @@ const mongoose = require('mongoose');
 const moment = require('moment-timezone');
 
 let calendarSchema = mongoose.Schema({
-  guildId: String,
+  _id: String,
   timezone: String,
   events: [{
     name: String,
     startDate: String,
     endDate: String
-  }]
+  }],
+  prefix: String
+  // permissions: [{ ??? }]
+}, {
+  _id: false
 });
 
 calendarSchema.statics.findByGuildId = function(guildId, callback) {
-  return this.findOne({ guildId: guildId }, callback);
+  return this.findOne({ _id: guildId }, callback);
 }
 
 calendarSchema.methods.addEvent = function(eventName, startDate, endDate, callback) {
@@ -55,6 +59,21 @@ calendarSchema.methods.updateEvent = function(eventIndex, eventName, startDate, 
   if (eventIndex >= 0 && eventIndex < this.events.length) {
     this.events.splice(eventIndex, 1);
     this.addEvent(eventName, startDate, endDate, callback);
+  }
+}
+
+calendarSchema.methods.updatePrefix = function(prefix, callback) {
+  this.prefix = prefix;
+  this.save(callback);
+}
+
+calendarSchema.methods.setTimezone = function(timezone, callback) {
+  if (moment.tz.zone(timezone) === null) {
+    throw new Error("Timezone not found");
+  }
+  else {
+    this.timezone = timezone;
+    this.save(callback);
   }
 }
 

@@ -30,8 +30,8 @@ module.exports = (bot) => {
         console.error(err);
         return;
       }
-      if (!calendar) {
-        msg.channel.createMessage("Calendar not initialized. Please run `" + config.prefix + "calendar` to initialize the calendar first.");
+      if (!calendar || !calendar.timezone) {
+        msg.channel.createMessage("Timezone not set. Run the `calendar <timezone>` command to set the timezone first.");
       }
       else {
         calendar.addEvent(eventName, startDate, endDate, (err, calendar) => {
@@ -68,8 +68,8 @@ module.exports = (bot) => {
         console.error(err);
         return;
       }
-      if (!calendar) {
-        msg.channel.createMessage("Calendar not initialized. Please run `" + config.prefix + "calendar` to initialize the calendar first.");
+      if (!calendar || !calendar.timezone) {
+        msg.channel.createMessage("Timezone not set. Run the `calendar <timezone>` command to set the timezone first.");
       }
       else {
         let resultString = "```css\n[Events]\n\n";
@@ -103,7 +103,10 @@ module.exports = (bot) => {
     index = index - 1;
 
     Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
-      if (index < 0 || index >= calendar.events.length) {
+      if (!calendar) {
+        msg.channel.createMessage("Calendar not found.");
+      }
+      else if (index < 0 || index >= calendar.events.length) {
         msg.channel.createMessage("Event not found.");
       }
       else {
@@ -161,7 +164,7 @@ module.exports = (bot) => {
         return;
       }
       if (!calendar) {
-        msg.channel.createMessage("Calendar not initialized. Please run `" + config.prefix + "calendar` to initialize the calendar first.");
+        msg.channel.createMessage("Calendar not found.");
       }
       else {
         if (index < 0 || index >= calendar.events.length) {

@@ -4,7 +4,7 @@ const path = require('path');
 const mongoose = require('mongoose');
 
 const config = require('./config/bot.config');
-const Prefix = require('./models/prefix.model');
+const Calendar = require('./models/calendar.model');
 
 // Connect to database
 mongoose.connect(config.dbConnectionUrl);
@@ -33,10 +33,10 @@ bot.on("ready", () => {
   });
 
   // Load all guild prefixes
-  Prefix.find((err, prefixes) => {
-    for (let guild of prefixes) {
-      let prefixes = [guild.prefix, bot.user.mention + " "];
-      bot.registerGuildPrefix(guild.guildId, prefixes);
+  Calendar.find((err, calendars) => {
+    for (let calendar of calendars) {
+      let prefixes = [calendar.prefix, bot.user.mention + " "];
+      bot.registerGuildPrefix(calendar._id, prefixes);
     }
   });
 
@@ -48,8 +48,8 @@ bot.on("ready", () => {
 
 bot.on('guildCreate', guild => {
   // Create new Prefix document when joining a guild
-  let newGuild = new Prefix({
-    guildId: guild.id,
+  let newGuild = new Calendar({
+    _id: guild.id,
     prefix: config.prefix
   });
   newGuild.save(err => {
@@ -61,8 +61,8 @@ bot.on('guildCreate', guild => {
 
 bot.on('guildDelete', guild => {
   // Delete Prefix document of guild when leaving a guild
-  Prefix.findOneAndRemove({ guildId: guild.id }, (error, document) => {
-    console.log(`Deleted guildId ${document.guildId} from Prefix collection`);
+  Calendar.findOneAndRemove({ _id: guild.id }, (error, document) => {
+    console.log(`Deleted guildId ${document._id} from Calendar collection`);
   });
 });
 

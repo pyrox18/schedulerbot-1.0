@@ -1,7 +1,7 @@
 const moment = require('moment-timezone');
 
 const config = require('../config/bot.config');
-const Prefix = require('../models/prefix.model');
+const Calendar = require('../models/calendar.model');
 
 module.exports = (bot) => {
   bot.registerCommand("ping", (msg, args) => {
@@ -14,12 +14,12 @@ module.exports = (bot) => {
 
   bot.registerCommand("prefix", (msg, args) => {
     if (args.length == 0) {
-      Prefix.findByGuildId(msg.channel.guild.id, (err, prefix) => {
+      Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
         if (err) {
           console.error(err);
         }
         else {
-          msg.channel.createMessage("`" + prefix.prefix + "`");
+          msg.channel.createMessage("`" + calendar.prefix + "`");
         }
       });
     }
@@ -27,8 +27,8 @@ module.exports = (bot) => {
       msg.channel.createMessage("Invalid input.");
     }
     else {
-      Prefix.findByGuildId(msg.channel.guild.id, (err, prefix) => {
-        prefix.updatePrefix(args[0], err => {
+      Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
+        calendar.updatePrefix(args[0], err => {
           if (err) {
             console.error(err);
           }
