@@ -22,7 +22,8 @@ module.exports = (bot) => {
         let newCal = new Calendar({
           _id: msg.channel.guild.id,
           timezone: args[0],
-          prefix: config.prefix
+          prefix: config.prefix,
+          defaultChannel: msg.channel.id
         });
         newCal.save((err, calendar) => {
           if (err) {
@@ -38,7 +39,9 @@ module.exports = (bot) => {
           msg.channel.createMessage("The calendar timezone has already been set.");
         }
         else {
-          calendar.updateTimezone(args[0], err => {
+          calendar.timezone = args[0];
+          calendar.defaultChannel = msg.channel.id;
+          calendar.save(err => {
             if (err) {
               console.error(err);
             }

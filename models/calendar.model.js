@@ -9,7 +9,8 @@ let calendarSchema = mongoose.Schema({
     startDate: String,
     endDate: String
   }],
-  prefix: String
+  prefix: String,
+  defaultChannel: String
   // permissions: [{ ??? }]
 }, {
   _id: false
