@@ -8,6 +8,8 @@ const config = require('../config/bot.config');
 
 module.exports = (bot) => {
   let eventCommand = bot.registerCommand("event", (msg, args) => {
+    let now = moment();
+    
     if (args.length < 1) {
       return "Invalid input.";
     }
@@ -23,6 +25,10 @@ module.exports = (bot) => {
     }
     catch (err) {
       endDate = startDate.clone().add(1, 'h');
+    }
+
+    if (now.diff(startDate) > 0) {
+      return "Cannot create an event that starts in the past.";
     }
 
     Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
@@ -135,6 +141,8 @@ module.exports = (bot) => {
   });
 
   eventCommand.registerSubcommand("update", (msg, args) => {
+    let now = moment();
+    
     if (args.length < 2) {
       return "Invalid input.";
     }
@@ -156,6 +164,10 @@ module.exports = (bot) => {
     }
     catch (err) {
       endDate = startDate.clone().add(1, 'h');
+    }
+
+    if (now.diff(startDate) > 0) {
+      return "Cannot update to an event that starts in the past.";
     }
 
     Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
