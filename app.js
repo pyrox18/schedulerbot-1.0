@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 
 const config = require('./config/bot.config');
 const Calendar = require('./models/calendar.model');
+const scheduler = require('./modules/scheduler.module');
 
 // Connect to database
 mongoose.connect(config.dbConnectionUrl);
@@ -37,6 +38,7 @@ bot.on("ready", () => {
     for (let calendar of calendars) {
       let prefixes = [calendar.prefix, bot.user.mention + " "];
       bot.registerGuildPrefix(calendar._id, prefixes);
+      scheduler.scheduleExistingEvents(bot, calendar);
     }
   });
 

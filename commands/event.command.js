@@ -34,7 +34,7 @@ module.exports = (bot) => {
         msg.channel.createMessage("Timezone not set. Run the `calendar <timezone>` command to set the timezone first.");
       }
       else {
-        calendar.addEvent(eventName, startDate, endDate, (err, calendar) => {
+        calendar.addEvent(bot, eventName, startDate, endDate, (err, calendar) => {
           if (err) {
             console.error(err);
           }
