@@ -16,6 +16,9 @@ module.exports = (bot) => {
 
     let inputString = args.join(" ");
     let results = chrono.parse(inputString);
+    if (!results[0]) {
+      return "Failed to parse event data.";
+    }
 
     let eventName = inputString.replace(results[0].text, "").trim();
     let startDate = moment(results[0].start.date());
