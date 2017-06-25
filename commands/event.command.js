@@ -197,22 +197,28 @@ module.exports = (bot) => {
           msg.channel.createMessage("Event not found.");
         }
         else {
-          calendar.updateEvent(index, eventName, startDate, endDate, (err, calendar) => {
-            if (err) {
-              console.error(err);
-            }
-            else {
-              let embed = bot.createEmbed(msg.channel.id);
-              embed.title("Update Event");
-              embed.color(0xfff835);
-              embed.field("Event Name", eventName, false);
-              embed.field("Start Date", moment.tz(startDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, calendar.timezone).toString(), false);
-              embed.field("End Date", moment.tz(endDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, calendar.timezone).toString(), false);
+          let now = moment();
+          if (now.diff(moment(calendar.events[index].startDate)) > 0) {
+            msg.channel.createMessage("Cannot update an event that is currently active.");
+          }
+          else {
+            calendar.updateEvent(index, eventName, startDate, endDate, (err, calendar) => {
+              if (err) {
+                console.error(err);
+              }
+              else {
+                let embed = bot.createEmbed(msg.channel.id);
+                embed.title("Update Event");
+                embed.color(0xfff835);
+                embed.field("Event Name", eventName, false);
+                embed.field("Start Date", moment.tz(startDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, calendar.timezone).toString(), false);
+                embed.field("End Date", moment.tz(endDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, calendar.timezone).toString(), false);
 
-              embed.send(bot, msg.channel.id);
-              msg.channel.createMessage("Event updated.");
-            }
-          });
+                embed.send(bot, msg.channel.id);
+                msg.channel.createMessage("Event updated.");
+              }
+            });
+          }
         }
       }
     });
