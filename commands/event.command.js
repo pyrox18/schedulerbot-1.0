@@ -78,14 +78,28 @@ module.exports = (bot) => {
         msg.channel.createMessage("Timezone not set. Run the `calendar <timezone>` command to set the timezone first.");
       }
       else {
-        let resultString = "```css\n[Events]\n\n";
+        let now = moment();
+        let resultString = "```css\n";
 
         if (calendar.events.length == 0) {
           resultString = resultString + "No events found!\n";
         }
         else {
-          for (let i = 0; i < calendar.events.length; i++) {
+          let i = 0;
+          let activeEventHeaderWritten = false;
+          while (i < calendar.events.length && now.diff(moment(calendar.events[i].startDate)) > 0) {
+            if (!activeEventHeaderWritten) {
+              resultString = resultString + "[Active Events]\n\n";
+            }
             resultString = resultString + `${i+1} : ${calendar.events[i].name} /* ${moment(calendar.events[i].startDate).tz(calendar.timezone).toString()} to ${moment(calendar.events[i].endDate).tz(calendar.timezone).toString()} */\n`;
+            i++;
+          }
+          if (i < calendar.events.length) {
+            resultString = resultString + "\n[Upcoming Events]\n\n";
+          }
+          while (i < calendar.events.length) {
+            resultString = resultString + `${i+1} : ${calendar.events[i].name} /* ${moment(calendar.events[i].startDate).tz(calendar.timezone).toString()} to ${moment(calendar.events[i].endDate).tz(calendar.timezone).toString()} */\n`;
+            i++;
           }
         }
         resultString = resultString + "```";
