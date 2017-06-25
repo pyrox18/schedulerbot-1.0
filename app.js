@@ -7,6 +7,9 @@ const config = require('./config/bot.config');
 const Calendar = require('./models/calendar.model');
 const scheduler = require('./modules/scheduler.module');
 
+// Make mongoose use native Promises
+mongoose.Promise = global.Promise;
+
 // Connect to database
 mongoose.connect(config.dbConnectionUrl);
 db = mongoose.connection;
