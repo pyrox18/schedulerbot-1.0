@@ -2,10 +2,14 @@ const Eris = require('eris');
 const glob = require('glob');
 const path = require('path');
 const mongoose = require('mongoose');
+const winston = require('winston');
 
 const config = require('./config/bot.config');
 const Calendar = require('./models/calendar.model');
 const scheduler = require('./modules/scheduler.module');
+
+// Winston config
+winston.add(winston.transports.File, { filename: 'schedulerbot.log' });
 
 // Make mongoose use native Promises
 mongoose.Promise = global.Promise;
@@ -15,7 +19,8 @@ mongoose.connect(config.dbConnectionUrl);
 db = mongoose.connection;
 
 db.on('error', (err) => {
-  console.error('DB connection error: ' + err);
+  winston.error('DB connection error: ' + err);
+  exit(1);
 });
 
 db.once('open', () => {
@@ -38,6 +43,10 @@ bot.on("ready", () => {
 
   // Load all guild prefixes
   Calendar.find((err, calendars) => {
+    if (err) {
+      winston.error("Guild prefix load error: " + err);
+      exit(1);
+    }
     for (let calendar of calendars) {
       let prefixes = [calendar.prefix, bot.user.mention + " "];
       bot.registerGuildPrefix(calendar._id, prefixes);
@@ -59,15 +68,27 @@ bot.on('guildCreate', guild => {
   });
   newGuild.save(err => {
     if (err) {
-      console.error(err);
+      winston.error('guildCreate error: ' + err);
+    }
+    else {
+      winston.info('guildCreate called', {
+        guildId: newGuild._id
+      });
     }
   })
 });
 
 bot.on('guildDelete', guild => {
   // Delete Prefix document of guild when leaving a guild
-  Calendar.findOneAndRemove({ _id: guild.id }, (error, document) => {
-    console.log(`Deleted guildId ${document._id} from Calendar collection`);
+  Calendar.findOneAndRemove({ _id: guild.id }, (err, document) => {
+    if (err) {
+      winston.error('guildDelete error: ' + err);
+    }
+    else {
+      winston.info('guildDelete called', {
+        guildId: document._id
+      });
+    }
   });
 });
 
