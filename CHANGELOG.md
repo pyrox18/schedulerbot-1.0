@@ -8,6 +8,7 @@ This changelog is formatted based on [Keep a Changelog](http://keepachangelog.co
 
 - Guilds can now have custom prefixes for the bot.
 - The bot will notify guild channels when an event is starting, and automatically remove events that have ended.
+- Error messages are now displayed on Discord when the bot encounters any errors.
 
 ### Changed
 
