@@ -1,5 +1,4 @@
 const winston = require('winston');
-winston.add(winston.transports.File, { filename: 'schedulerbot.log' });
 
 class CommandError {
   constructor(err, bot, msg) {
