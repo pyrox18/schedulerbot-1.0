@@ -2,6 +2,7 @@ const moment = require('moment-timezone');
 
 const config = require('../config/bot.config');
 const Calendar = require('../models/calendar.model');
+const CommandError = require('../models/command-error.model');
 
 module.exports = (bot) => {
   bot.registerCommand("ping", (msg, args) => {
@@ -16,7 +17,7 @@ module.exports = (bot) => {
     if (args.length == 0) {
       Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
         if (err) {
-          console.error(err);
+          new CommandError(err, bot, msg);
         }
         else {
           msg.channel.createMessage("`" + calendar.prefix + "`");
@@ -28,16 +29,21 @@ module.exports = (bot) => {
     }
     else {
       Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
-        calendar.updatePrefix(args[0], err => {
-          if (err) {
-            console.error(err);
-          }
-          else {
-            prefixes = [args[0], bot.user.mention + " "];
-            bot.registerGuildPrefix(msg.channel.guild.id, prefixes);
-            msg.channel.createMessage("Prefix set to `" + args[0] + "`.");
-          }
-        });
+        if (err) {
+          new CommandError(err, bot, msg);
+        }
+        else {
+          calendar.updatePrefix(args[0], err => {
+            if (err) {
+              new CommandError(err, bot, msg);
+            }
+            else {
+              prefixes = [args[0], bot.user.mention + " "];
+              bot.registerGuildPrefix(msg.channel.guild.id, prefixes);
+              msg.channel.createMessage("Prefix set to `" + args[0] + "`.");
+            }
+          });
+        }
       });
     }
   }, {

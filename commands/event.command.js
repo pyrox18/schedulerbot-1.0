@@ -3,6 +3,7 @@ const moment = require('moment-timezone');
 require('eris-embed-builder');
 
 const Calendar = require('../models/calendar.model');
+const CommandError = require('../models/command-error.model');
 
 const config = require('../config/bot.config');
 
@@ -36,16 +37,15 @@ module.exports = (bot) => {
 
     Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
       if (err) {
-        console.error(err);
-        return;
+        new CommandError(err, bot, msg);
       }
-      if (!calendar || !calendar.timezone) {
+      else if (!calendar || !calendar.timezone) {
         msg.channel.createMessage("Timezone not set. Run the `calendar <timezone>` command to set the timezone first.");
       }
       else {
         calendar.addEvent(bot, eventName, startDate, endDate, (err, calendar) => {
           if (err) {
-            console.error(err);
+            new CommandError(err, bot, msg);
           }
           else {
             let embed = bot.createEmbed(msg.channel.id);
@@ -74,10 +74,9 @@ module.exports = (bot) => {
 
     Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
       if (err) {
-        console.error(err);
-        return;
+        new CommandError(err, bot, msg);
       }
-      if (!calendar || !calendar.timezone) {
+      else if (!calendar || !calendar.timezone) {
         msg.channel.createMessage("Timezone not set. Run the `calendar <timezone>` command to set the timezone first.");
       }
       else {
@@ -126,7 +125,10 @@ module.exports = (bot) => {
     index = index - 1;
 
     Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
-      if (!calendar) {
+      if (err) {
+        new CommandError(err, bot, msg);
+      }
+      else if (!calendar) {
         msg.channel.createMessage("Calendar not found.");
       }
       else if (index < 0 || index >= calendar.events.length) {
@@ -136,18 +138,19 @@ module.exports = (bot) => {
         let deletedEvent = calendar.events[index];
         calendar.deleteEvent(index, (err) => {
           if (err) {
-            console.error(err);
-            return;
+            new CommandError(err, bot, msg);
           }
-          let embed = bot.createEmbed(msg.channel.id);
-          embed.title("Delete Event");
-          embed.color(0xff2b2b);
-          embed.field("Event Name", deletedEvent.name, false);
-          embed.field("Start Date", moment(deletedEvent.startDate).tz(calendar.timezone).toString(), false);
-          embed.field("End Date", moment(deletedEvent.endDate).tz(calendar.timezone).toString(), false);
+          else {
+            let embed = bot.createEmbed(msg.channel.id);
+            embed.title("Delete Event");
+            embed.color(0xff2b2b);
+            embed.field("Event Name", deletedEvent.name, false);
+            embed.field("Start Date", moment(deletedEvent.startDate).tz(calendar.timezone).toString(), false);
+            embed.field("End Date", moment(deletedEvent.endDate).tz(calendar.timezone).toString(), false);
 
-          embed.send(bot, msg.channel.id);
-          msg.channel.createMessage("Event deleted.");
+            embed.send(bot, msg.channel.id);
+            msg.channel.createMessage("Event deleted.");
+          }
         })
       }
     });
@@ -189,10 +192,9 @@ module.exports = (bot) => {
 
     Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
       if (err) {
-        console.error(err);
-        return;
+        new CommandError(err, bot, msg);
       }
-      if (!calendar) {
+      else if (!calendar) {
         msg.channel.createMessage("Calendar not found.");
       }
       else {
@@ -207,7 +209,7 @@ module.exports = (bot) => {
           else {
             calendar.updateEvent(index, eventName, startDate, endDate, (err, calendar) => {
               if (err) {
-                console.error(err);
+                new CommandError(err, bot, msg);
               }
               else {
                 let embed = bot.createEmbed(msg.channel.id);

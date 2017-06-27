@@ -1,6 +1,7 @@
 const moment = require('moment-timezone');
 
 const Calendar = require('../models/calendar.model');
+const CommandError = require('../models/command-error.model');
 const config = require('../config/bot.config');
 
 module.exports = (bot) => {
@@ -15,7 +16,7 @@ module.exports = (bot) => {
 
     Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
       if (err) {
-        console.error(err);
+        new CommandError(err, bot, msg);
       }
       
       if (!calendar) {
@@ -27,7 +28,7 @@ module.exports = (bot) => {
         });
         newCal.save((err, calendar) => {
           if (err) {
-            console.error(err);
+            new CommandError(err, bot, msg);
           }
           else {
             msg.channel.createMessage(`Set calendar timezone to ${calendar.timezone}.`);
@@ -43,7 +44,7 @@ module.exports = (bot) => {
           calendar.defaultChannel = msg.channel.id;
           calendar.save(err => {
             if (err) {
-              console.error(err);
+              new CommandError(err, bot, msg);
             }
             else {
               msg.channel.createMessage(`Set calendar timezone to ${calendar.timezone}.`);
