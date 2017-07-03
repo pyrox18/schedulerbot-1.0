@@ -15,7 +15,7 @@ const availableNodes = [
 
 module.exports = (bot) => {
   bot.registerCommand('perms', (msg, args) => {
-    if (args.length < 4 || (args[0] != allow && args[0] != deny) || (args[2] != '--role' && args[2] != '--user')) {
+    if (args.length < 4 || (args[0] != 'allow' && args[0] != 'deny') || (args[2] != '--role' && args[2] != '--user')) {
       return "Invalid input.";
     }
     if (!availableNodes.find(node => { return args[1] == node })) {
@@ -25,12 +25,13 @@ module.exports = (bot) => {
     if (args[2] == '--role') {
       let fuzzyRoleName = args.slice(3).join(' ');
       let roles = [];
-      for (let role of msg.channel.guild.roles) {
-        roles.push(role.name);
-      }
-
+      msg.channel.guild.roles.forEach(value => {
+        roles.push(value.name);
+      });
+      console.log(roles);
+      console.log(typeof roles);
       let fuzzyRoles = FuzzySet(roles);
-      let results = fuzzyRoles.get(fuzzyRoleName);
+      let results = fuzzyRoles.get(fuzzyRoleName, null, 0.5);
       if (results.length == 0) {
         return "No matching role found.";
       }
@@ -44,11 +45,11 @@ module.exports = (bot) => {
         matchedRoleName = results[0][1];
       }
 
-      let roleId = msg.channel.roles.find(role => {
+      let roleId = msg.channel.guild.roles.find(role => {
         if (role.name == matchedRoleName) {
           return role.id;
         }
-      });
+      }).id;
 
       Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
         if (err) {
