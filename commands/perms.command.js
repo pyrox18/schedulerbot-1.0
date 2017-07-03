@@ -38,38 +38,59 @@ module.exports = (bot) => {
 
       let matchedRoleName;
       if (results.length > 1) {
-        // Temporary; replace with selector later
-        return "Too many roles matching the name. Please be more specific.";
+        let resultString = "```css\n";
+        for (let i = 0; i < results.length; i++) {
+          resultString = resultString + `${i+1} : ${results[i][1]}\n`
+        }
+        resultString = resultString + "```";
+
+        msg.channel.createMessage("Select a role.\n" + resultString);
+        setTimeout(() => {
+          bot.once('messageCreate', msg => {
+            let index = parseInt(msg.content);
+            if (isNaN(index)) {
+              return;
+            }
+            index = index - 1;
+            matchedRoleName = results[index][1];
+            setPermission(args[1], matchedRoleName, args[0], msg);
+          }); 
+        }, 1000);
+        
+        return;
       }
       else {
         matchedRoleName = results[0][1];
+        setPermission(args[1], matchedRoleName, args[0], msg);
       }
-
-      let roleId = msg.channel.guild.roles.find(role => {
-        if (role.name == matchedRoleName) {
-          return role.id;
-        }
-      }).id;
-
-      Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
-        if (err) {
-          new CommandError(err, bot, msg);
-        }
-        else {
-          calendar.modifyPerm(args[1], 'role', roleId, args[0], err => {
-            if (err) {
-              new CommandError(err, bot, msg);
-            }
-            else {
-              msg.channel.createMessage('Permission successfully modified.');
-            }
-          });
-        }
-      })
     }
   }, {
     description: "Set role/user-specific command permissions.",
     fullDescription: "Allow or deny specific users/roles from the usage of certain commands.",
     usage: "`<allow|deny> <node> [--role <role>] [--user <user>]`"
   });
+}
+
+setPermission = function(node, entityName, perm, msg) {
+  let roleId = msg.channel.guild.roles.find(role => {
+    if (role.name == entityName) {
+      return role.id;
+    }
+  }).id;
+
+  Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
+    if (err) {
+      new CommandError(err, bot, msg);
+    }
+    else {
+      calendar.modifyPerm(node, 'role', roleId, perm, err => {
+        if (err) {
+          new CommandError(err, bot, msg);
+        }
+        else {
+          msg.channel.createMessage('Permission successfully modified.');
+        }
+      });
+    }
+  })
 }
