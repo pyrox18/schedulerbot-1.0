@@ -53,12 +53,12 @@ module.exports = (bot) => {
 
       Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
         if (err) {
-          new CommandError(err, bot, 'Perm modify error');
+          new CommandError(err, bot, msg);
         }
         else {
           calendar.modifyPerm(args[1], 'role', roleId, args[0], err => {
             if (err) {
-              new CommandError(err, bot, 'perms modify save error');
+              new CommandError(err, bot, msg);
             }
             else {
               msg.channel.createMessage('Permission successfully modified.');
