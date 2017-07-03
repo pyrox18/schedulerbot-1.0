@@ -22,46 +22,47 @@ module.exports = (bot) => {
       return "Invalid input.";
     }
 
+    let targetName = args.slice(3).join(' ');
+    let results;
     if (args[2] == '--role') {
-      let fuzzyRoleName = args.slice(3).join(' ');
-      let roles = [];
-      msg.channel.guild.roles.forEach(value => {
-        roles.push(value.name);
-      });
-      console.log(roles);
-      console.log(typeof roles);
-      let fuzzyRoles = FuzzySet(roles);
-      let results = fuzzyRoles.get(fuzzyRoleName);
-      if (results.length == 0) {
-        return "No matching role found.";
+      results = findEntityNames(msg.channel.guild.roles, targetName);
+    }
+    else {
+      results = findEntityNames(msg.channel.guild.members, targetName);
+    }
+    if (results.length == 0) {
+      return "No match found.";
+    }
+    if (results.length > 1) {
+      let resultString = "```css\n";
+      for (let i = 0; i < results.length; i++) {
+        resultString = resultString + `${i+1} : ${results[i][1]}\n`
       }
+      resultString = resultString + "```";
 
-      let matchedRoleName;
-      if (results.length > 1) {
-        let resultString = "```css\n";
-        for (let i = 0; i < results.length; i++) {
-          resultString = resultString + `${i+1} : ${results[i][1]}\n`
-        }
-        resultString = resultString + "```";
-
-        msg.channel.createMessage("Select a role.\n" + resultString);
-        setTimeout(() => {
-          bot.once('messageCreate', msg => {
-            let index = parseInt(msg.content);
-            if (isNaN(index)) {
-              return;
-            }
-            index = index - 1;
-            matchedRoleName = results[index][1];
-            setPermission(args[1], matchedRoleName, args[0], msg);
-          }); 
-        }, 1000);
-        
-        return;
+      msg.channel.createMessage("Select one.\n" + resultString);
+      setTimeout(() => {
+        bot.once('messageCreate', msg => {
+          let index = parseInt(msg.content);
+          if (isNaN(index)) {
+            return;
+          }
+          index = index - 1;
+          if (args[2] == '--role') {
+            setRolePermission(args[1], results[index][1], args[0], msg);  
+          }
+          else {
+            setUserPermission(args[1], results[index][1], args[0], msg);
+          }
+        }); 
+      }, 1000);
+    }
+    else {
+      if (args[2] == '--role') {
+        setRolePermission(args[1], results[0][1], args[0], msg);  
       }
       else {
-        matchedRoleName = results[0][1];
-        setPermission(args[1], matchedRoleName, args[0], msg);
+        setUserPermission(args[1], results[0][1], args[0], msg);
       }
     }
   }, {
@@ -71,9 +72,9 @@ module.exports = (bot) => {
   });
 }
 
-setPermission = function(node, entityName, perm, msg) {
+setRolePermission = function(node, roleName, perm, msg) {
   let roleId = msg.channel.guild.roles.find(role => {
-    if (role.name == entityName) {
+    if (role.name == roleName) {
       return role.id;
     }
   }).id;
@@ -93,4 +94,50 @@ setPermission = function(node, entityName, perm, msg) {
       });
     }
   })
+}
+
+setUserPermission = function(node, username, perm, msg) {
+  let userId = msg.channel.guild.members.find(member => {
+    let fullName = `${member.username}#${member.discriminator}`;
+    if (member.nick) {
+      fullName = fullName + ` (${member.nick})`;
+    }
+    if (fullName == username) {
+      return member;
+    }
+  }).id;
+
+  Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
+    if (err) {
+      new CommandError(err, bot, msg);
+    }
+    else {
+      calendar.modifyPerm(node, 'user', userId, perm, err => {
+        if (err) {
+          new CommandError(err, bot, msg);
+        }
+        else {
+          msg.channel.createMessage('Permission successfully modified.');
+        }
+      });
+    }
+  })
+}
+
+findEntityNames = function(entityCollection, targetName) {
+  let names = [];
+  entityCollection.forEach(value => {
+    if (value.name) { // only role collections have a name property
+      names.push(value.name);
+    }
+    else {
+      let result = `${value.username}#${value.discriminator}`;
+      if (value.nick) {
+        result = result + ` (${value.nick})`;
+      }
+      names.push(result);
+    }
+  });
+  let fuzzyNames = FuzzySet(names);
+  return fuzzyNames.get(targetName, null, 0.1);
 }
