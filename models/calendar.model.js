@@ -12,8 +12,18 @@ let calendarSchema = mongoose.Schema({
     endDate: String
   }],
   prefix: String,
-  defaultChannel: String
-  // permissions: [{ ??? }]
+  defaultChannel: String,
+  permissions: [{
+    node: String,
+    allow: [{
+      type: String,
+      id: String
+    }],
+    deny: [{
+      type: String,
+      id: String
+    }]
+  }]
 }, {
   _id: false
 });
@@ -119,6 +129,62 @@ calendarSchema.methods.setTimezone = function(timezone, callback) {
     this.timezone = timezone;
     this.save(callback);
   }
+}
+
+calendarSchema.methods.modifyPerm = function(node, type, id, perm, callback) {
+  let index = this.permissions.findIndex(perms => {
+    return perms.node = node;
+  });
+
+  if (index < 0) {
+    this.permissions.push({
+      node: node
+    });
+    index = this.permissions.length - 1;
+  }
+
+  if (perm != 'allow' && perm != 'deny') {
+    throw new Error('Incorrect permission setting');
+  }
+  if (type != 'role' && type != 'user') {
+    throw new Error('Incorrect user type setting');
+  }
+
+  if (perm == 'allow') {
+    let object;
+    let i = this.permissions[index].deny.findIndex(object => {
+      return object.type == type && object.id == id;
+    });
+    if (i < 0) {
+      object = {
+        type: type,
+        id: id
+      }
+    }
+    else {
+      object = this.permissions[index].deny.splice(i, 1);
+    }
+    this.permissions[index].allow.push(object);
+  }
+
+  if (perm == 'deny') {
+    let object;
+    let i = this.permissions[index].allow.findIndex(object => {
+      return object.type == type && object.id == id;
+    });
+    if (i < 0) {
+      object = {
+        type: type,
+        id: id
+      }
+    }
+    else {
+      object = this.permissions[index].allow.splice(i, 1);
+    }
+    this.permissions[index].deny.push(object);
+  }
+
+  this.save(callback);
 }
 
 module.exports = mongoose.model('Calendar', calendarSchema);
