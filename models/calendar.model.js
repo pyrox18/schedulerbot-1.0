@@ -3,27 +3,30 @@ const moment = require('moment-timezone');
 
 const scheduler = require('../modules/scheduler.module');
 
+let eventSchema = mongoose.Schema({
+  name: String,
+  startDate: String,
+  endDate: String
+});
+
+let permsEntitySchema = mongoose.Schema({
+  type: String,
+  id: String
+})
+
+let permsSchema = mongoose.Schema({
+  node: String,
+  allow: [permsEntitySchema],
+  deny: [permsEntitySchema]
+});
+
 let calendarSchema = mongoose.Schema({
   _id: String,
   timezone: String,
-  events: [{
-    name: String,
-    startDate: String,
-    endDate: String
-  }],
+  events: [eventSchema],
   prefix: String,
   defaultChannel: String,
-  permissions: [{
-    node: String,
-    allow: [{
-      type: String,
-      id: String
-    }],
-    deny: [{
-      type: String,
-      id: String
-    }]
-  }]
+  permissions: [permsSchema]
 }, {
   _id: false
 });
@@ -162,7 +165,7 @@ calendarSchema.methods.modifyPerm = function(node, type, id, perm, callback) {
       }
     }
     else {
-      object = this.permissions[index].deny.splice(i, 1);
+      object = this.permissions[index].deny.splice(i, 1)[0];
     }
     this.permissions[index].allow.push(object);
   }
@@ -179,7 +182,7 @@ calendarSchema.methods.modifyPerm = function(node, type, id, perm, callback) {
       }
     }
     else {
-      object = this.permissions[index].allow.splice(i, 1);
+      object = this.permissions[index].allow.splice(i, 1)[0];
     }
     this.permissions[index].deny.push(object);
   }
