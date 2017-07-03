@@ -21,6 +21,7 @@
     "dict": "^1.4.0",
     "eris": "^0.7.0",
     "eris-embed-builder": "^0.1.2",
+    "fuzzyset.js": "0.0.3",
     "glob": "^7.1.2",
     "moment-timezone": "^0.5.13",
     "mongoose": "^4.10.6",
