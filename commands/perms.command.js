@@ -31,7 +31,7 @@ module.exports = (bot) => {
       console.log(roles);
       console.log(typeof roles);
       let fuzzyRoles = FuzzySet(roles);
-      let results = fuzzyRoles.get(fuzzyRoleName, null, 0.5);
+      let results = fuzzyRoles.get(fuzzyRoleName);
       if (results.length == 0) {
         return "No matching role found.";
       }
