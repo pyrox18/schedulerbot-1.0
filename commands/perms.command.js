@@ -14,7 +14,7 @@ const availableNodes = [
 ];
 
 module.exports = (bot) => {
-  bot.registerCommand('perms', (msg, args) => {
+  let permsCommand = bot.registerCommand('perms', (msg, args) => {
     if (args.length < 4 || (args[0] != 'allow' && args[0] != 'deny') || (args[2] != '--role' && args[2] != '--user')) {
       return "Invalid input.";
     }
@@ -69,6 +69,18 @@ module.exports = (bot) => {
     description: "Set role/user-specific command permissions.",
     fullDescription: "Allow or deny specific users/roles from the usage of certain commands.",
     usage: "`<allow|deny> <node> [--role <role>] [--user <user>]`"
+  });
+
+  permsCommand.registerSubcommand('nodes', (msg, args) => {
+    let nodes = "```css\n";
+    for (let node of availableNodes) {
+      nodes = nodes + `${node}\n`;
+    }
+    nodes = nodes + "```";
+    return nodes;
+  }, {
+    description: "Display available nodes.",
+    fullDescription: "Display a list of available permission nodes."
   });
 }
 
