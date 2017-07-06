@@ -9,15 +9,10 @@ let eventSchema = mongoose.Schema({
   endDate: String
 });
 
-let permsEntitySchema = mongoose.Schema({
-  type: String,
-  id: String
-})
-
 let permsSchema = mongoose.Schema({
   node: String,
-  allow: [permsEntitySchema],
-  deny: [permsEntitySchema]
+  deniedRoles: [String],
+  deniedUsers: [String]
 });
 
 let calendarSchema = mongoose.Schema({
@@ -134,57 +129,71 @@ calendarSchema.methods.setTimezone = function(timezone, callback) {
   }
 }
 
-calendarSchema.methods.modifyPerm = function(node, type, id, perm, callback) {
-  let index = this.permissions.findIndex(perms => {
-    return perms.node = node;
+calendarSchema.methods.denyRolePerm = function(roleId, node, callback) {
+  let index = this.permissions.findIndex(perm => {
+    return perm.node == node;
   });
-
   if (index < 0) {
     this.permissions.push({
-      node: node
+      node: node,
+      deniedRoles: [],
+      deniedUsers: []
     });
     index = this.permissions.length - 1;
   }
 
-  if (perm != 'allow' && perm != 'deny') {
-    throw new Error('Incorrect permission setting');
-  }
-  if (type != 'role' && type != 'user') {
-    throw new Error('Incorrect user type setting');
+  if (!this.permissions[index].deniedRoles.find(id => { return roleId == id })) {
+    this.permissions[index].deniedRoles.push(roleId);
   }
 
-  if (perm == 'allow') {
-    let object;
-    let i = this.permissions[index].deny.findIndex(object => {
-      return object.type == type && object.id == id;
+  this.save(callback);
+}
+
+calendarSchema.methods.denyUserPerm = function(userId, node, callback) {
+  let index = this.permissions.findIndex(perm => {
+    return perm.node == node;
+  });
+  if (index < 0) {
+    this.permissions.push({
+      node: node,
+      deniedRoles: [],
+      deniedUsers: []
     });
-    if (i < 0) {
-      object = {
-        type: type,
-        id: id
-      }
-    }
-    else {
-      object = this.permissions[index].deny.splice(i, 1)[0];
-    }
-    this.permissions[index].allow.push(object);
+    index = this.permissions.length - 1;
   }
 
-  if (perm == 'deny') {
-    let object;
-    let i = this.permissions[index].allow.findIndex(object => {
-      return object.type == type && object.id == id;
-    });
-    if (i < 0) {
-      object = {
-        type: type,
-        id: id
-      }
+  if (!this.permissions[index].deniedUsers.find(id => { return userId == id })) {
+    this.permissions[index].deniedUsers.push(userId);
+  }
+
+  this.save(callback);
+}
+
+calendarSchema.methods.allowRolePerm = function(roleId, node, callback) {
+  let index = this.permissions.findIndex(perm => {
+    return perm.node == node;
+  });
+
+  if (index >= 0) {
+    let roleIndex = this.permissions[index].deniedRoles.findIndex(id => { return roleId == id })
+    if (roleIndex >= 0) {
+      this.permissions[index].deniedRoles.splice(roleIndex, 1);
     }
-    else {
-      object = this.permissions[index].allow.splice(i, 1)[0];
+  }
+
+  this.save(callback);
+}
+
+calendarSchema.methods.allowUserPerm = function(userId, node, callback) {
+  let index = this.permissions.findIndex(perm => {
+    return perm.node == node;
+  });
+
+  if (index >= 0) {
+    let userIndex = this.permissions[index].deniedUsers.findIndex(id => { return userId == id });
+    if (userIndex >= 0) {
+      this.permissions[index].deniedUsers.splice(userIndex, 1);
     }
-    this.permissions[index].deny.push(object);
   }
 
   this.save(callback);

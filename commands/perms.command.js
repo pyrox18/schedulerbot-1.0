@@ -96,14 +96,26 @@ setRolePermission = function(node, roleName, perm, msg) {
       new CommandError(err, bot, msg);
     }
     else {
-      calendar.modifyPerm(node, 'role', roleId, perm, err => {
-        if (err) {
-          new CommandError(err, bot, msg);
-        }
-        else {
-          msg.channel.createMessage('Permission successfully modified.');
-        }
-      });
+      if (perm == 'deny') {
+        calendar.denyRolePerm(roleId, node, err => {
+          if (err) {
+            new CommandError(err, bot, msg);
+          }
+          else {
+            msg.channel.createMessage('Permission successfully modified.');
+          }
+        });
+      }
+      else {
+        calendar.allowRolePerm(roleId, node, err => {
+          if (err) {
+            new CommandError(err, bot, msg);
+          }
+          else {
+            msg.channel.createMessage('Permission successfully modified.');
+          }
+        });
+      }
     }
   })
 }
@@ -124,14 +136,26 @@ setUserPermission = function(node, username, perm, msg) {
       new CommandError(err, bot, msg);
     }
     else {
-      calendar.modifyPerm(node, 'user', userId, perm, err => {
-        if (err) {
-          new CommandError(err, bot, msg);
-        }
-        else {
-          msg.channel.createMessage('Permission successfully modified.');
-        }
-      });
+      if (perm == 'deny') {
+        calendar.denyUserPerm(userId, node, err => {
+          if (err) {
+            new CommandError(err, bot, msg);
+          }
+          else {
+            msg.channel.createMessage('Permission successfully modified.');
+          }
+        });
+      }
+      else {
+        calendar.allowUserPerm(userId, node, err => {
+          if (err) {
+            new CommandError(err, bot, msg);
+          }
+          else {
+            msg.channel.createMessage('Permission successfully modified.');
+          }
+        });
+      }
     }
   })
 }
