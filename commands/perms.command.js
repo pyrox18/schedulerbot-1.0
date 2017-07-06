@@ -82,14 +82,135 @@ module.exports = (bot) => {
     description: "Display available nodes.",
     fullDescription: "Display a list of available permission nodes."
   });
+
+  permsCommand.registerSubcommand('show', (msg, args) => {
+    if (args.length < 2 || (args[0] != '--node' && args[0] != '--role' && args[0] != '--user')) {
+      return "Invalid input.";
+    }
+
+    if (args[0] == '--node') {
+      if (availableNodes.find(node => { return node == args[1] })) {
+        Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
+          if (err) {
+            new CommandError(err, bot, msg);
+          }
+          else {
+            let permNode = calendar.permissions.find(perm => {
+              return perm.node == args[1];
+            });
+            
+            let resultString = "```css\nNode: " + args[1] + "\nDenied Roles: ";
+            if (permNode.deniedRoles.length == 0) {
+              resultString = resultString + "None";
+            }
+            else {
+              for (let i = 0; i < permNode.deniedRoles.length; i++) {
+                resultString = resultString + msg.channel.guild.roles.get(permNode.deniedRoles[i]).name;
+                if (i < permNode.deniedRoles.length - 1) {
+                  resultString = resultString + ", ";
+                }
+              }
+            }
+            resultString = resultString + "\nDenied Users: ";
+            if (permNode.deniedUsers.length == 0) {
+              resultString = resultString + "None";
+            }
+            else {
+              for (let i = 0; i < permNode.deniedUsers.length; i++) {
+                let user = msg.channel.guild.members.get(permNode.deniedUsers[i]);
+                resultString = resultString + `${user.username}#${user.discriminator}`
+                if (user.nick) {
+                  resultString = resultString + ` (${user.nick})`;
+                }
+                if (i < permNode.deniedUsers.length - 1) {
+                  resultString = resultString + ", ";
+                }
+              }
+            }
+            resultString = resultString + "\n```";
+
+            msg.channel.createMessage(resultString);
+          }
+        });
+      }
+      else {
+        return "The node does not exist.";
+      }
+    }
+    else {
+      let targetName = args.slice(1).join(' ');
+      let results;
+      if (args[0] == '--role') {
+        results = findEntityNames(msg.channel.guild.roles, targetName);
+      }
+      else {
+        results = findEntityNames(msg.channel.guild.members, targetName);
+      }
+      if (results.length == 0) {
+        return "No match found.";
+      }
+      if (results.length > 1) {
+        let resultString = "```css\n";
+        for (let i = 0; i < results.length; i++) {
+          resultString = resultString + `${i+1} : ${results[i][1]}\n`
+        }
+        resultString = resultString + "```";
+
+        msg.channel.createMessage("Select one.\n" + resultString);
+        setTimeout(() => {
+          bot.once('messageCreate', msg => {
+            let index = parseInt(msg.content);
+            if (isNaN(index)) {
+              return;
+            }
+            index = index - 1;
+            if (args[0] == '--role') {
+              displayRolePermissions(msg, results[index][1]);
+            }
+            else {
+              displayUserPermissions(msg, results[index][1]);
+            }
+          }); 
+        }, 1000);
+      }
+      else {
+        if (args[0] == '--role') {
+          displayRolePermissions(msg, results[0][1]);  
+        }
+        else {
+          displayUserPermissions(msg, results[0][1]);  
+        }
+      }
+    }
+  }, {
+    description: "Show the permissions related to a node, user or role.",
+    fullDescription: "Display the permission settings granted in relation to a node, or to a role or user.",
+    usage: '`--node <node>|--role <role>|--user <user>`'
+  })
+}
+
+getRoleIdByName = function(roleCollection, roleName) {
+  return roleCollection.find(role => {
+    if (role.name == roleName) {
+      return role;
+    }
+  }).id;
+}
+
+getUserIdByName = function(userCollection, username) {
+  return userCollection.find(member => {
+    let fullName = `${member.username}#${member.discriminator}`;
+    if (member.nick) {
+      fullName = fullName + ` (${member.nick})`;
+    }
+    if (fullName == username) {
+      return member;
+    }
+  }).id;
 }
 
 setRolePermission = function(node, roleName, perm, msg) {
-  let roleId = msg.channel.guild.roles.find(role => {
-    if (role.name == roleName) {
-      return role.id;
-    }
-  }).id;
+  let roleId = getRoleIdByName(msg.channel.guild.roles, roleName);
 
   Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
     if (err) {
@@ -121,15 +242,7 @@ setRolePermission = function(node, roleName, perm, msg) {
 }
 
 setUserPermission = function(node, username, perm, msg) {
-  let userId = msg.channel.guild.members.find(member => {
-    let fullName = `${member.username}#${member.discriminator}`;
-    if (member.nick) {
-      fullName = fullName + ` (${member.nick})`;
-    }
-    if (fullName == username) {
-      return member;
-    }
-  }).id;
+  let userId = getUserIdByName(msg.channel.guild.members, username);
 
   Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
     if (err) {
@@ -176,4 +289,72 @@ findEntityNames = function(entityCollection, targetName) {
   });
   let fuzzyNames = FuzzySet(names);
   return fuzzyNames.get(targetName, null, 0.1);
+}
+
+displayRolePermissions = function(msg, roleName) {
+  let roleId = getRoleIdByName(msg.channel.guild.roles, roleName);
+  
+  Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
+    if (err) { 
+      new CommandError(err, bot, msg);
+    }
+    else {
+      let resultString = "```css\nRole: " + roleName + "\nDenied Nodes: ";
+      let deniedNodes = [];
+      for (let perm of calendar.permissions) {
+        if (perm.deniedRoles.find(id => { return id == roleId })) {
+          deniedNodes.push(perm.node);
+        }
+      }
+
+      if (deniedNodes.length == 0) {
+        resultString = resultString + "None";
+      }
+      else {
+        for (let i = 0; i < deniedNodes.length; i++) {
+          resultString = resultString + deniedNodes[i];
+          if (i < deniedNodes.length - 1) {
+            resultString = resultString + ", ";
+          }
+        }
+      }
+      resultString = resultString + "\n```";
+
+      msg.channel.createMessage(resultString);
+    }
+  });
+}
+
+displayUserPermissions = function(msg, username) {
+  let userId = getUserIdByName(msg.channel.guild.members, username);
+
+  Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
+    if (err) { 
+      new CommandError(err, bot, msg);
+    }
+    else {
+      let resultString = "```css\nUser: " + username + "\nDenied Nodes: ";
+      let deniedNodes = [];
+      for (let perm of calendar.permissions) {
+        if (perm.deniedUsers.find(id => { return id == userId })) {
+          deniedNodes.push(perm.node);
+        }
+      }
+
+      if (deniedNodes.length == 0) {
+        resultString = resultString + "None";
+      }
+      else {
+        for (let i = 0; i < deniedNodes.length; i++) {
+          resultString = resultString + deniedNodes[i];
+          if (i < deniedNodes.length - 1) {
+            resultString = resultString + ", ";
+          }
+        }
+      }
+      resultString = resultString + "\n```";
+
+      msg.channel.createMessage(resultString);
+    }
+  });
 }
