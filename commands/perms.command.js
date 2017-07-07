@@ -4,7 +4,7 @@ const Calendar = require('../models/calendar.model');
 const CommandError = require('../models/command-error.model');
 
 const availableNodes = [
-  'calendar',
+  // 'calendar',
   'event.create',
   'event.update',
   'event.delete',
