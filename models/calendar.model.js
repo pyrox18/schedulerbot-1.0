@@ -199,4 +199,20 @@ calendarSchema.methods.allowUserPerm = function(userId, node, callback) {
   this.save(callback);
 }
 
+calendarSchema.methods.checkPerm = function(node, userId, roleIdArray) {
+  let perm = this.permissions.find(perm => { return perm.node == node; });
+  if (perm) {
+    if (perm.deniedUsers.find(id => { return id == userId; })) { // Check if user is denied
+      return false;
+    }
+    for (let roleId of perm.deniedRoles) { // Check if user's roles are denied
+      if (roleIdArray.find(id => { return id == roleId })) {
+        return false;
+      }
+    }
+  }
+
+  return true; // Return true if user and user's roles are all not denied
+}
+
 module.exports = mongoose.model('Calendar', calendarSchema);
