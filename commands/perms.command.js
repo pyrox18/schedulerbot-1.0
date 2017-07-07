@@ -18,7 +18,7 @@ const availableNodes = [
 
 module.exports = (bot) => {
   let permsCommand = bot.registerCommand('perms', (msg, args) => {
-    Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
+    Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
         new CommandError(err, bot, msg);
       }
@@ -90,7 +90,7 @@ module.exports = (bot) => {
   });
 
   permsCommand.registerSubcommand('nodes', (msg, args) => {
-    Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
+    Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
         new CommandError(err, bot, msg);
       }
@@ -114,7 +114,7 @@ module.exports = (bot) => {
   });
 
   permsCommand.registerSubcommand('show', (msg, args) => {
-    Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
+    Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
         new CommandError(err, bot, msg);
       }

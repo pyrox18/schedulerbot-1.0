@@ -6,7 +6,7 @@ const CommandError = require('../models/command-error.model');
 
 module.exports = (bot) => {
   bot.registerCommand("ping", (msg, args) => {
-    Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
+    Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
         new CommandError(err, bot, msg);
       }
@@ -26,7 +26,7 @@ module.exports = (bot) => {
   });
 
   bot.registerCommand("prefix", (msg, args) => {
-    Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
+    Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
         new CommandError(err, bot, msg);
       }

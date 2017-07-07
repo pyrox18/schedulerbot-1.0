@@ -14,7 +14,7 @@ module.exports = (bot) => {
       return "Timezone not found. See https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List under the TZ column for available timezones.";
     }
 
-    Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
+    Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
         new CommandError(err, bot, msg);
       }

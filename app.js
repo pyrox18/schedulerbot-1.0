@@ -93,7 +93,7 @@ bot.on('guildDelete', guild => {
 });
 
 bot.on('guildMemberRemove', (guild, member) => {
-  Calendar.findByGuildId(guild.id, (err, calendar) => {
+  Calendar.findById(guild.id, (err, calendar) => {
     for (let perm of calendar.permissions) {
       let index = perm.deniedUsers.findIndex(id => { return id == member.id });
       if (index >= 0) {
@@ -116,7 +116,7 @@ bot.on('guildMemberRemove', (guild, member) => {
 });
 
 bot.on('guildRoleDelete', (guild, role) => {
-  Calendar.findByGuildId(guild.id, (err, calendar) => {
+  Calendar.findById(guild.id, (err, calendar) => {
     for (let perm of calendar.permissions) {
       let index = perm.deniedRoles.findIndex(id => { return id == role.id });
       if (index >= 0) {

@@ -11,7 +11,7 @@ module.exports = (bot) => {
   let eventCommand = bot.registerCommand("event", (msg, args) => {
     let now = moment();
     
-    Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
+    Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
         new CommandError(err, bot, msg);
       }
@@ -76,7 +76,7 @@ module.exports = (bot) => {
   });
 
   eventCommand.registerSubcommand("list", (msg, args) => {
-    Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
+    Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
         new CommandError(err, bot, msg);
       }
@@ -129,7 +129,7 @@ module.exports = (bot) => {
   });
 
   eventCommand.registerSubcommand("delete", (msg, args) => {
-    Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
+    Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
         new CommandError(err, bot, msg);
       }
@@ -187,7 +187,7 @@ module.exports = (bot) => {
   eventCommand.registerSubcommand("update", (msg, args) => {
     let now = moment();
     
-    Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
+    Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
         new CommandError(err, bot, msg);
       }

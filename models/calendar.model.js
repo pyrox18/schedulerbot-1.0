@@ -26,10 +26,6 @@ let calendarSchema = mongoose.Schema({
   _id: false
 });
 
-calendarSchema.statics.findByGuildId = function(guildId, callback) {
-  return this.findOne({ _id: guildId }, callback);
-}
-
 calendarSchema.methods.addEvent = function(bot, eventName, startDate, endDate, callback) {
   let actualStartDate = moment.tz(startDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, this.timezone);
   let actualEndDate = moment.tz(endDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, this.timezone);
