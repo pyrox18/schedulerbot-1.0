@@ -92,4 +92,50 @@ bot.on('guildDelete', guild => {
   });
 });
 
+bot.on('guildMemberRemove', (guild, member) => {
+  Calendar.findByGuildId(guild.id, (err, calendar) => {
+    for (let perm of calendar.permissions) {
+      let index = perm.deniedUsers.findIndex(id => { return id == member.id });
+      if (index >= 0) {
+        perm.deniedUsers.splice(index, 1);
+      }
+    }
+
+    calendar.save(err => {
+      if (err) {
+        winston.error('guildMemberRemove error: ' + err);
+      }
+      else {
+        winston.info('guildMemberRemove called', {
+          guildId: guild.id,
+          member: member
+        })
+      }
+    });
+  });
+});
+
+bot.on('guildRoleDelete', (guild, role) => {
+  Calendar.findByGuildId(guild.id, (err, calendar) => {
+    for (let perm of calendar.permissions) {
+      let index = perm.deniedRoles.findIndex(id => { return id == role.id });
+      if (index >= 0) {
+        perm.deniedRoles.splice(index, 1);
+      }
+    }
+
+    calendar.save(err => {
+      if (err) {
+        winston.error('guildRoleDelete error: ' + err);
+      }
+      else {
+        winston.info('guildRoleDelete called', {
+          guildId: guild.id,
+          roleId: role.id
+        })
+      }
+    });
+  });
+});
+
 bot.connect();
