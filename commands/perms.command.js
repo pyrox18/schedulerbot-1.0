@@ -131,7 +131,7 @@ module.exports = (bot) => {
               });
               
               let resultString = "```css\nNode: " + args[1] + "\nDenied Roles: ";
-              if (permNode.deniedRoles.length == 0) {
+              if (!permNode || permNode.deniedRoles.length == 0) {
                 resultString = resultString + "None";
               }
               else {
@@ -143,7 +143,7 @@ module.exports = (bot) => {
                 }
               }
               resultString = resultString + "\nDenied Users: ";
-              if (permNode.deniedUsers.length == 0) {
+              if (!permNode || permNode.deniedUsers.length == 0) {
                 resultString = resultString + "None";
               }
               else {
