@@ -49,20 +49,20 @@ module.exports = (bot) => {
           }
           index = index - 1;
           if (args[2] == '--role') {
-            setRolePermission(args[1], results[index][1], args[0], msg);  
+            setRolePermission(bot, args[1], results[index][1], args[0], msg);  
           }
           else {
-            setUserPermission(args[1], results[index][1], args[0], msg);
+            setUserPermission(bot, args[1], results[index][1], args[0], msg);
           }
         }); 
       }, 1000);
     }
     else {
       if (args[2] == '--role') {
-        setRolePermission(args[1], results[0][1], args[0], msg);  
+        setRolePermission(bot, args[1], results[0][1], args[0], msg);  
       }
       else {
-        setUserPermission(args[1], results[0][1], args[0], msg);
+        setUserPermission(bot, args[1], results[0][1], args[0], msg);
       }
     }
   }, {
@@ -165,20 +165,20 @@ module.exports = (bot) => {
             }
             index = index - 1;
             if (args[0] == '--role') {
-              displayRolePermissions(msg, results[index][1]);
+              displayRolePermissions(bot, msg, results[index][1]);
             }
             else {
-              displayUserPermissions(msg, results[index][1]);
+              displayUserPermissions(bot, msg, results[index][1]);
             }
           }); 
         }, 1000);
       }
       else {
         if (args[0] == '--role') {
-          displayRolePermissions(msg, results[0][1]);  
+          displayRolePermissions(bot, msg, results[0][1]);  
         }
         else {
-          displayUserPermissions(msg, results[0][1]);  
+          displayUserPermissions(bot, msg, results[0][1]);  
         }
       }
     }
@@ -209,7 +209,7 @@ getUserIdByName = function(userCollection, username) {
   }).id;
 }
 
-setRolePermission = function(node, roleName, perm, msg) {
+setRolePermission = function(bot, node, roleName, perm, msg) {
   let roleId = getRoleIdByName(msg.channel.guild.roles, roleName);
 
   Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
@@ -241,7 +241,7 @@ setRolePermission = function(node, roleName, perm, msg) {
   })
 }
 
-setUserPermission = function(node, username, perm, msg) {
+setUserPermission = function(bot, node, username, perm, msg) {
   let userId = getUserIdByName(msg.channel.guild.members, username);
 
   Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
@@ -291,7 +291,7 @@ findEntityNames = function(entityCollection, targetName) {
   return fuzzyNames.get(targetName, null, 0.1);
 }
 
-displayRolePermissions = function(msg, roleName) {
+displayRolePermissions = function(bot, msg, roleName) {
   let roleId = getRoleIdByName(msg.channel.guild.roles, roleName);
   
   Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
@@ -325,7 +325,7 @@ displayRolePermissions = function(msg, roleName) {
   });
 }
 
-displayUserPermissions = function(msg, username) {
+displayUserPermissions = function(bot, msg, username) {
   let userId = getUserIdByName(msg.channel.guild.members, username);
 
   Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
