@@ -46,21 +46,14 @@ module.exports = (bot) => {
             msg.channel.createMessage("Invalid input.");
           }
           else {
-            Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
+            calendar.updatePrefix(args[0], err => {
               if (err) {
                 new CommandError(err, bot, msg);
               }
               else {
-                calendar.updatePrefix(args[0], err => {
-                  if (err) {
-                    new CommandError(err, bot, msg);
-                  }
-                  else {
-                    prefixes = [args[0], bot.user.mention + " "];
-                    bot.registerGuildPrefix(msg.channel.guild.id, prefixes);
-                    msg.channel.createMessage("Prefix set to `" + args[0] + "`.");
-                  }
-                });
+                prefixes = [args[0], bot.user.mention + " "];
+                bot.registerGuildPrefix(msg.channel.guild.id, prefixes);
+                msg.channel.createMessage("Prefix set to `" + args[0] + "`.");
               }
             });
           }
