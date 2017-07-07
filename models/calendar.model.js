@@ -199,14 +199,18 @@ calendarSchema.methods.allowUserPerm = function(userId, node, callback) {
   this.save(callback);
 }
 
-calendarSchema.methods.checkPerm = function(node, userId, roleIdArray) {
+calendarSchema.methods.checkPerm = function(node, msg) {
+  if (msg.channel.guild.ownerID == msg.member.id) {
+    return true;
+  }
+
   let perm = this.permissions.find(perm => { return perm.node == node; });
   if (perm) {
-    if (perm.deniedUsers.find(id => { return id == userId; })) { // Check if user is denied
+    if (perm.deniedUsers.find(id => { return id == msg.member.id; })) { // Check if user is denied
       return false;
     }
     for (let roleId of perm.deniedRoles) { // Check if user's roles are denied
-      if (roleIdArray.find(id => { return id == roleId })) {
+      if (msg.member.roles.find(id => { return id == roleId })) {
         return false;
       }
     }

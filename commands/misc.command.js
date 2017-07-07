@@ -11,7 +11,7 @@ module.exports = (bot) => {
         new CommandError(err, bot, msg);
       }
       else {
-        if (calendar.checkPerm('ping', msg.member.id, msg.member.roles)) {
+        if (calendar.checkPerm('ping', msg)) {
           let diff = moment().diff(msg.timestamp);
           msg.channel.createMessage(`Pong! Time: ${diff}ms`);
         }
@@ -31,7 +31,7 @@ module.exports = (bot) => {
         new CommandError(err, bot, msg);
       }
       else {
-        if (calendar.checkPerm('prefix', msg.member.id, msg.member.roles)) {
+        if (calendar.checkPerm('prefix', msg)) {
           if (args.length == 0) {
             Calendar.findByGuildId(msg.channel.guild.id, (err, calendar) => {
               if (err) {

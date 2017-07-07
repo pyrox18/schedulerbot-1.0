@@ -16,7 +16,7 @@ module.exports = (bot) => {
         new CommandError(err, bot, msg);
       }
       else {
-        if (calendar.checkPerm('event.create', msg.member.id, msg.member.roles)) {
+        if (calendar.checkPerm('event.create', msg)) {
           if (args.length < 1) {
             msg.channel.createMessage("Invalid input.");
             return;
@@ -81,7 +81,7 @@ module.exports = (bot) => {
         new CommandError(err, bot, msg);
       }
       else {
-        if (calendar.checkPerm('event.list', msg.member.id, msg.member.roles)) {
+        if (calendar.checkPerm('event.list', msg)) {
           if (args.length > 0) {
             msg.channel.createMessage("Invalid input.");
           }
@@ -134,7 +134,7 @@ module.exports = (bot) => {
         new CommandError(err, bot, msg);
       }
       else {
-        if (calendar.checkPerm('event.delete', msg.member.id, msg.member.roles)) {
+        if (calendar.checkPerm('event.delete', msg)) {
           if (args.length < 1 || args.length > 1) {
             msg.channel.createMessage("Invalid input.");
             return;
@@ -192,7 +192,7 @@ module.exports = (bot) => {
         new CommandError(err, bot, msg);
       }
       else {
-        if (calendar.checkPerm('event.update', msg.member.id, msg.member.roles)) {
+        if (calendar.checkPerm('event.update', msg)) {
           if (args.length < 2) {
             msg.channel.createMessage("Invalid input.");
             return;
