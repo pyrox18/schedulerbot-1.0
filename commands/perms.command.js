@@ -19,69 +19,7 @@ const availableNodes = [
 module.exports = (bot) => {
   let permsCommand = bot.registerCommand('perms', (msg, args) => {
     Calendar.findById(msg.channel.guild.id, (err, calendar) => {
-      if (err) {
-        new CommandError(err, bot, msg);
-      }
-      else {
-        if (calendar.checkPerm('perms.modify', msg)) {
-          if (args.length < 4 || (args[0] != 'allow' && args[0] != 'deny') || (args[2] != '--role' && args[2] != '--user')) {
-            msg.channel.createMessage("Invalid input.");
-            return;
-          }
-          if (!availableNodes.find(node => { return args[1] == node })) {
-            msg.channel.createMessage("Invalid input.");
-            return;
-          }
-
-          let targetName = args.slice(3).join(' ');
-          let results;
-          if (args[2] == '--role') {
-            results = findEntityNames(msg.channel.guild.roles, targetName);
-          }
-          else {
-            results = findEntityNames(msg.channel.guild.members, targetName);
-          }
-          if (results.length == 0) {
-            msg.channel.createMessage("No match found.");
-            return;
-          }
-          if (results.length > 1) {
-            let resultString = "```css\n";
-            for (let i = 0; i < results.length; i++) {
-              resultString = resultString + `${i+1} : ${results[i][1]}\n`
-            }
-            resultString = resultString + "```";
-
-            msg.channel.createMessage("Select one.\n" + resultString);
-            setTimeout(() => {
-              bot.once('messageCreate', msg => {
-                let index = parseInt(msg.content);
-                if (isNaN(index)) {
-                  return;
-                }
-                index = index - 1;
-                if (args[2] == '--role') {
-                  setRolePermission(bot, calendar, args[1], results[index][1], args[0], msg);  
-                }
-                else {
-                  setUserPermission(bot, calendar, args[1], results[index][1], args[0], msg);
-                }
-              }); 
-            }, 1000);
-          }
-          else {
-            if (args[2] == '--role') {
-              setRolePermission(bot, calendar, args[1], results[0][1], args[0], msg);  
-            }
-            else {
-              setUserPermission(bot, calendar, args[1], results[0][1], args[0], msg);
-            }
-          }
-        }
-        else {
-          msg.channel.createMessage("You are not permitted to use this command.");
-        }
-      }
+      modifyPerms(err, calendar, bot, msg, args);
     });
   }, {
     description: "Set role/user-specific command permissions.",
@@ -91,22 +29,7 @@ module.exports = (bot) => {
 
   permsCommand.registerSubcommand('nodes', (msg, args) => {
     Calendar.findById(msg.channel.guild.id, (err, calendar) => {
-      if (err) {
-        new CommandError(err, bot, msg);
-      }
-      else {
-        if (calendar.checkPerm('perms.nodes', msg)) {
-          let nodes = "```css\n";
-          for (let node of availableNodes) {
-            nodes = nodes + `${node}\n`;
-          }
-          nodes = nodes + "```";
-          msg.channel.createMessage(nodes);
-        }
-        else {
-          msg.channel.createMessage("You are not permitted to use this command.");
-        }
-      }
+      displayPermNodes(err, calendar, bot, msg);
     });
   }, {
     description: "Display available nodes.",
@@ -115,107 +38,7 @@ module.exports = (bot) => {
 
   permsCommand.registerSubcommand('show', (msg, args) => {
     Calendar.findById(msg.channel.guild.id, (err, calendar) => {
-      if (err) {
-        new CommandError(err, bot, msg);
-      }
-      else {
-        if (calendar.checkPerm('perms.show', msg)) {
-          if (args.length < 2 || (args[0] != '--node' && args[0] != '--role' && args[0] != '--user')) {
-            return "Invalid input.";
-          }
-
-          if (args[0] == '--node') {
-            if (availableNodes.find(node => { return node == args[1] })) {
-              let permNode = calendar.permissions.find(perm => {
-                return perm.node == args[1];
-              });
-              
-              let resultString = "```css\nNode: " + args[1] + "\nDenied Roles: ";
-              if (!permNode || permNode.deniedRoles.length == 0) {
-                resultString = resultString + "None";
-              }
-              else {
-                for (let i = 0; i < permNode.deniedRoles.length; i++) {
-                  resultString = resultString + msg.channel.guild.roles.get(permNode.deniedRoles[i]).name;
-                  if (i < permNode.deniedRoles.length - 1) {
-                    resultString = resultString + ", ";
-                  }
-                }
-              }
-              resultString = resultString + "\nDenied Users: ";
-              if (!permNode || permNode.deniedUsers.length == 0) {
-                resultString = resultString + "None";
-              }
-              else {
-                for (let i = 0; i < permNode.deniedUsers.length; i++) {
-                  let user = msg.channel.guild.members.get(permNode.deniedUsers[i]);
-                  resultString = resultString + `${user.username}#${user.discriminator}`
-                  if (user.nick) {
-                    resultString = resultString + ` (${user.nick})`;
-                  }
-                  if (i < permNode.deniedUsers.length - 1) {
-                    resultString = resultString + ", ";
-                  }
-                }
-              }
-              resultString = resultString + "\n```";
-
-              msg.channel.createMessage(resultString);
-            }
-            else {
-              return "The node does not exist.";
-            }
-          }
-          else {
-            let targetName = args.slice(1).join(' ');
-            let results;
-            if (args[0] == '--role') {
-              results = findEntityNames(msg.channel.guild.roles, targetName);
-            }
-            else {
-              results = findEntityNames(msg.channel.guild.members, targetName);
-            }
-            if (results.length == 0) {
-              return "No match found.";
-            }
-            if (results.length > 1) {
-              let resultString = "```css\n";
-              for (let i = 0; i < results.length; i++) {
-                resultString = resultString + `${i+1} : ${results[i][1]}\n`
-              }
-              resultString = resultString + "```";
-
-              msg.channel.createMessage("Select one.\n" + resultString);
-              setTimeout(() => {
-                bot.once('messageCreate', msg => {
-                  let index = parseInt(msg.content);
-                  if (isNaN(index)) {
-                    return;
-                  }
-                  index = index - 1;
-                  if (args[0] == '--role') {
-                    displayRolePermissions(bot, calendar, msg, results[index][1]);
-                  }
-                  else {
-                    displayUserPermissions(bot, calendar, msg, results[index][1]);
-                  }
-                }); 
-              }, 1000);
-            }
-            else {
-              if (args[0] == '--role') {
-                displayRolePermissions(bot, calendar, msg, results[0][1]);  
-              }
-              else {
-                displayUserPermissions(bot, calendar, msg, results[0][1]);  
-              }
-            }
-          }
-        }
-        else {
-          msg.channel.createMessage("You are not permitted to use this command.");
-        }
-      }
+      showPerm(err, calendar, bot, msg, args);
     });
   }, {
     description: "Show the permissions related to a node, user or role.",
@@ -360,4 +183,193 @@ displayUserPermissions = function(bot, calendar, msg, username) {
   resultString = resultString + "\n```";
 
   msg.channel.createMessage(resultString);
+}
+
+function modifyPerms(err, calendar, bot, msg, args) {
+  if (err) {
+    new CommandError(err, bot, msg);
+  }
+  else {
+    if (calendar.checkPerm('perms.modify', msg)) {
+      if (args.length < 4 || (args[0] != 'allow' && args[0] != 'deny') || (args[2] != '--role' && args[2] != '--user')) {
+        msg.channel.createMessage("Invalid input.");
+        return;
+      }
+      if (!availableNodes.find(node => { return args[1] == node })) {
+        msg.channel.createMessage("Invalid input.");
+        return;
+      }
+
+      let targetName = args.slice(3).join(' ');
+      let results;
+      if (args[2] == '--role') {
+        results = findEntityNames(msg.channel.guild.roles, targetName);
+      }
+      else {
+        results = findEntityNames(msg.channel.guild.members, targetName);
+      }
+      if (results.length == 0) {
+        msg.channel.createMessage("No match found.");
+        return;
+      }
+      if (results.length > 1) {
+        let resultString = "```css\n";
+        for (let i = 0; i < results.length; i++) {
+          resultString = resultString + `${i+1} : ${results[i][1]}\n`
+        }
+        resultString = resultString + "```";
+
+        msg.channel.createMessage("Select one.\n" + resultString);
+        setTimeout(() => {
+          bot.once('messageCreate', msg => {
+            let index = parseInt(msg.content);
+            if (isNaN(index)) {
+              return;
+            }
+            index = index - 1;
+            if (args[2] == '--role') {
+              setRolePermission(bot, calendar, args[1], results[index][1], args[0], msg);  
+            }
+            else {
+              setUserPermission(bot, calendar, args[1], results[index][1], args[0], msg);
+            }
+          }); 
+        }, 1000);
+      }
+      else {
+        if (args[2] == '--role') {
+          setRolePermission(bot, calendar, args[1], results[0][1], args[0], msg);  
+        }
+        else {
+          setUserPermission(bot, calendar, args[1], results[0][1], args[0], msg);
+        }
+      }
+    }
+    else {
+      msg.channel.createMessage("You are not permitted to use this command.");
+    }
+  }
+}
+
+function displayPermNodes(err, calendar, bot, msg) {
+  if (err) {
+    new CommandError(err, bot, msg);
+  }
+  else {
+    if (calendar.checkPerm('perms.nodes', msg)) {
+      let nodes = "```css\n";
+      for (let node of availableNodes) {
+        nodes = nodes + `${node}\n`;
+      }
+      nodes = nodes + "```";
+      msg.channel.createMessage(nodes);
+    }
+    else {
+      msg.channel.createMessage("You are not permitted to use this command.");
+    }
+  }
+}
+
+function showPerm(err, calendar, bot, msg, args) {
+  if (err) {
+    new CommandError(err, bot, msg);
+  }
+  else {
+    if (calendar.checkPerm('perms.show', msg)) {
+      if (args.length < 2 || (args[0] != '--node' && args[0] != '--role' && args[0] != '--user')) {
+        return "Invalid input.";
+      }
+
+      if (args[0] == '--node') {
+        if (availableNodes.find(node => { return node == args[1] })) {
+          let permNode = calendar.permissions.find(perm => {
+            return perm.node == args[1];
+          });
+          
+          let resultString = "```css\nNode: " + args[1] + "\nDenied Roles: ";
+          if (!permNode || permNode.deniedRoles.length == 0) {
+            resultString = resultString + "None";
+          }
+          else {
+            for (let i = 0; i < permNode.deniedRoles.length; i++) {
+              resultString = resultString + msg.channel.guild.roles.get(permNode.deniedRoles[i]).name;
+              if (i < permNode.deniedRoles.length - 1) {
+                resultString = resultString + ", ";
+              }
+            }
+          }
+          resultString = resultString + "\nDenied Users: ";
+          if (!permNode || permNode.deniedUsers.length == 0) {
+            resultString = resultString + "None";
+          }
+          else {
+            for (let i = 0; i < permNode.deniedUsers.length; i++) {
+              let user = msg.channel.guild.members.get(permNode.deniedUsers[i]);
+              resultString = resultString + `${user.username}#${user.discriminator}`
+              if (user.nick) {
+                resultString = resultString + ` (${user.nick})`;
+              }
+              if (i < permNode.deniedUsers.length - 1) {
+                resultString = resultString + ", ";
+              }
+            }
+          }
+          resultString = resultString + "\n```";
+
+          msg.channel.createMessage(resultString);
+        }
+        else {
+          return "The node does not exist.";
+        }
+      }
+      else {
+        let targetName = args.slice(1).join(' ');
+        let results;
+        if (args[0] == '--role') {
+          results = findEntityNames(msg.channel.guild.roles, targetName);
+        }
+        else {
+          results = findEntityNames(msg.channel.guild.members, targetName);
+        }
+        if (results.length == 0) {
+          return "No match found.";
+        }
+        if (results.length > 1) {
+          let resultString = "```css\n";
+          for (let i = 0; i < results.length; i++) {
+            resultString = resultString + `${i+1} : ${results[i][1]}\n`
+          }
+          resultString = resultString + "```";
+
+          msg.channel.createMessage("Select one.\n" + resultString);
+          setTimeout(() => {
+            bot.once('messageCreate', msg => {
+              let index = parseInt(msg.content);
+              if (isNaN(index)) {
+                return;
+              }
+              index = index - 1;
+              if (args[0] == '--role') {
+                displayRolePermissions(bot, calendar, msg, results[index][1]);
+              }
+              else {
+                displayUserPermissions(bot, calendar, msg, results[index][1]);
+              }
+            }); 
+          }, 1000);
+        }
+        else {
+          if (args[0] == '--role') {
+            displayRolePermissions(bot, calendar, msg, results[0][1]);  
+          }
+          else {
+            displayUserPermissions(bot, calendar, msg, results[0][1]);  
+          }
+        }
+      }
+    }
+    else {
+      msg.channel.createMessage("You are not permitted to use this command.");
+    }
+  }
 }
