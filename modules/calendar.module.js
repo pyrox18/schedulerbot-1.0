@@ -1,5 +1,7 @@
 const chrono = require('chrono-node');
 const moment = require('moment-timezone');
+require('eris-embed-builder');
+
 const Calendar = require('../models/calendar.model');
 const CommandError = require('../models/command-error.model');
 
@@ -58,12 +60,6 @@ class CalendarModule {
       }
       else {
         if (calendar.checkPerm('event.create', msg)) {
-          // if (args.length < 1) {
-          //   msg.channel.createMessage("Invalid input.");
-          //   return;
-          // }
-    
-          // let inputString = args.join(" ");
           let results = chrono.parse(inputString);
           if (!results[0]) {
             msg.channel.createMessage("Failed to parse event data.");
@@ -119,9 +115,6 @@ class CalendarModule {
       }
       else {
         if (calendar.checkPerm('event.list', msg)) {
-          // if (args.length > 0) {
-          //   msg.channel.createMessage("Invalid input.");
-          // }
           if (!calendar || !calendar.timezone) {
             msg.channel.createMessage("Timezone not set. Run the `calendar <timezone>` command to set the timezone first.");
           }
@@ -169,16 +162,6 @@ class CalendarModule {
       }
       else {
         if (calendar.checkPerm('event.delete', msg)) {
-          // if (args.length < 1 || args.length > 1) {
-          //   msg.channel.createMessage("Invalid input.");
-          //   return;
-          // }
-    
-          // let index = parseInt(args[0]);
-          // if (isNaN(index)) {
-          //   msg.channel.createMessage("Invalid input.");
-          //   return;
-          // }
           index = index - 1;
     
           if (!calendar) {
@@ -222,19 +205,8 @@ class CalendarModule {
       }
       else {
         if (calendar.checkPerm('event.update', msg)) {
-          // if (args.length < 2) {
-          //   msg.channel.createMessage("Invalid input.");
-          //   return;
-          // }
-    
-          // let index = parseInt(args[0]);
-          // if (isNaN(index)) {
-          //   msg.channel.createMessage("Invalid input.");
-          //   return;
-          // }
           index = index - 1;
     
-          // let inputString = args.slice(1).join(" ");
           let results = chrono.parse(inputString);
           if (!results[0]) {
             msg.channel.createMessage("Failed to parse event data.");
