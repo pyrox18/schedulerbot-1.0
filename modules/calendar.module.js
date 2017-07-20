@@ -6,11 +6,7 @@ const Calendar = require('../models/calendar.model');
 const CommandError = require('../models/command-error.model');
 
 class CalendarModule {
-  constructor() {
-
-  }
-
-  initCalendar(bot, msg, args) {
+  static initCalendar(bot, msg, args) {
     Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
         new CommandError(err, bot, msg);
@@ -52,7 +48,7 @@ class CalendarModule {
     });
   }
 
-  addEvent(bot, msg, inputString) {
+  static addEvent(bot, msg, inputString) {
     let now = moment();
     Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
@@ -108,7 +104,7 @@ class CalendarModule {
     });
   }
 
-  listEvents(bot, msg) {
+  static listEvents(bot, msg) {
     Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
         new CommandError(err, bot, msg);
@@ -155,7 +151,7 @@ class CalendarModule {
     });
   }
 
-  deleteEvent(bot, msg, index) {
+  static deleteEvent(bot, msg, index) {
     Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
         new CommandError(err, bot, msg);
@@ -197,7 +193,7 @@ class CalendarModule {
     });
   }
 
-  updateEvent(bot, msg, index, inputString) {
+  static updateEvent(bot, msg, index, inputString) {
     let now = moment();
     Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
@@ -270,4 +266,4 @@ class CalendarModule {
   }
 }
 
-module.exports = new CalendarModule();
+module.exports = CalendarModule;

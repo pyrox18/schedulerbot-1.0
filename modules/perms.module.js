@@ -17,11 +17,7 @@ const availableNodes = [
 ];
 
 class PermsModule {
-  constructor() {
-    
-  }
-  
-  modifyPerms(bot, msg, args) {
+  static modifyPerms(bot, msg, args) {
     Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
         new CommandError(err, bot, msg);
@@ -85,7 +81,7 @@ class PermsModule {
     });
   }
   
-  displayPermNodes(bot, msg) {
+  static displayPermNodes(bot, msg) {
     Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
         new CommandError(err, bot, msg);
@@ -106,7 +102,7 @@ class PermsModule {
     });
   }
   
-  showPerm(bot, msg, args) {
+  static showPerm(bot, msg, args) {
     Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
         new CommandError(err, bot, msg);
@@ -350,4 +346,4 @@ displayUserPermissions = function(bot, calendar, msg, username) {
 }
 
 
-module.exports = new PermsModule()
+module.exports = PermsModule;
