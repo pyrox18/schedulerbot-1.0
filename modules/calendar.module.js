@@ -50,7 +50,7 @@ class CalendarModule {
     });
   }
 
-  addEvent(bot, msg, args) {
+  addEvent(bot, msg, inputString) {
     let now = moment();
     Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
@@ -58,12 +58,12 @@ class CalendarModule {
       }
       else {
         if (calendar.checkPerm('event.create', msg)) {
-          if (args.length < 1) {
-            msg.channel.createMessage("Invalid input.");
-            return;
-          }
+          // if (args.length < 1) {
+          //   msg.channel.createMessage("Invalid input.");
+          //   return;
+          // }
     
-          let inputString = args.join(" ");
+          // let inputString = args.join(" ");
           let results = chrono.parse(inputString);
           if (!results[0]) {
             msg.channel.createMessage("Failed to parse event data.");
@@ -112,17 +112,17 @@ class CalendarModule {
     });
   }
 
-  listEvents(bot, msg, args) {
+  listEvents(bot, msg) {
     Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
         new CommandError(err, bot, msg);
       }
       else {
         if (calendar.checkPerm('event.list', msg)) {
-          if (args.length > 0) {
-            msg.channel.createMessage("Invalid input.");
-          }
-          else if (!calendar || !calendar.timezone) {
+          // if (args.length > 0) {
+          //   msg.channel.createMessage("Invalid input.");
+          // }
+          if (!calendar || !calendar.timezone) {
             msg.channel.createMessage("Timezone not set. Run the `calendar <timezone>` command to set the timezone first.");
           }
           else {
@@ -162,23 +162,23 @@ class CalendarModule {
     });
   }
 
-  deleteEvent(bot, msg, args) {
+  deleteEvent(bot, msg, index) {
     Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
         new CommandError(err, bot, msg);
       }
       else {
         if (calendar.checkPerm('event.delete', msg)) {
-          if (args.length < 1 || args.length > 1) {
-            msg.channel.createMessage("Invalid input.");
-            return;
-          }
+          // if (args.length < 1 || args.length > 1) {
+          //   msg.channel.createMessage("Invalid input.");
+          //   return;
+          // }
     
-          let index = parseInt(args[0]);
-          if (isNaN(index)) {
-            msg.channel.createMessage("Invalid input.");
-            return;
-          }
+          // let index = parseInt(args[0]);
+          // if (isNaN(index)) {
+          //   msg.channel.createMessage("Invalid input.");
+          //   return;
+          // }
           index = index - 1;
     
           if (!calendar) {
@@ -214,7 +214,7 @@ class CalendarModule {
     });
   }
 
-  updateEvent(bot, msg, args) {
+  updateEvent(bot, msg, index, inputString) {
     let now = moment();
     Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
@@ -222,19 +222,19 @@ class CalendarModule {
       }
       else {
         if (calendar.checkPerm('event.update', msg)) {
-          if (args.length < 2) {
-            msg.channel.createMessage("Invalid input.");
-            return;
-          }
+          // if (args.length < 2) {
+          //   msg.channel.createMessage("Invalid input.");
+          //   return;
+          // }
     
-          let index = parseInt(args[0]);
-          if (isNaN(index)) {
-            msg.channel.createMessage("Invalid input.");
-            return;
-          }
+          // let index = parseInt(args[0]);
+          // if (isNaN(index)) {
+          //   msg.channel.createMessage("Invalid input.");
+          //   return;
+          // }
           index = index - 1;
     
-          let inputString = args.slice(1).join(" ");
+          // let inputString = args.slice(1).join(" ");
           let results = chrono.parse(inputString);
           if (!results[0]) {
             msg.channel.createMessage("Failed to parse event data.");

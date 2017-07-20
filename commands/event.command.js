@@ -15,7 +15,11 @@ module.exports = (bot) => {
     // Calendar.findById(msg.channel.guild.id, (err, calendar) => {
     //   addEvent(err, calendar, bot, msg, args, now);
     // });
-    calendar.addEvent(bot, msg, args);
+    if (args.length < 1) {
+      return "Invalid input.";
+    }
+
+    calendar.addEvent(bot, msg, args.join(" "));
   }, {
     description: "Add a new event.",
     fullDescription: "Adds a new event to the guild calendar. Type the event details naturally (e.g. 'CS:GO scrims tomorrow from 6pm to 9pm') and the bot will interpret it for you.",
@@ -26,7 +30,11 @@ module.exports = (bot) => {
     // Calendar.findById(msg.channel.guild.id, (err, calendar) => {
     //   listEvents(err, calendar, bot, msg, args);
     // });
-    calendar.listEvents(bot, msg, args);
+    if (args.length > 0) {
+      return "Invalid input.";
+    }
+
+    calendar.listEvents(bot, msg);
   }, {
     description: "List existing events.",
     fullDescription: "Displays a list of events that have been created."
@@ -36,7 +44,15 @@ module.exports = (bot) => {
     // Calendar.findById(msg.channel.guild.id, (err, calendar) => {
     //   deleteEvent(err, calendar, bot, msg, args);
     // });
-    calendar.deleteEvent(bot, msg, args);
+    if (args.length < 1 || args.length > 1) {
+      return "Invalid input.";
+    }
+    let index = parseInt(args[0]);
+    if (isNaN(index)) {
+      return "Invalid input.";
+    }
+
+    calendar.deleteEvent(bot, msg, index);
   }, {
     description: "Delete an event.",
     fullDescription: "Delete an event from the existing event list.",
@@ -49,7 +65,17 @@ module.exports = (bot) => {
     // Calendar.findById(msg.channel.guild.id, (err, calendar) => {
     //   updateEvent(err, calendar, bot, msg, args, now);
     // });
-    calendar.updateEvent(bot, msg, args);
+    if (args.length < 2) {
+      return "Invalid input.";
+    }
+    let index = parseInt(args[0]);
+    if (isNaN(index)) {
+      return "Invalid input.";
+    }
+
+    let inputString = args.slice(1).join(" ");
+
+    calendar.updateEvent(bot, msg, index, inputString);
   }, {
     description: "Update an existing event.",
     fullDescription: "Updates an existing event in the guild calendar.",
