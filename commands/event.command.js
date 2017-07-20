@@ -2,18 +2,20 @@ const chrono = require('chrono-node');
 const moment = require('moment-timezone');
 require('eris-embed-builder');
 
-const Calendar = require('../models/calendar.model');
-const CommandError = require('../models/command-error.model');
+// const Calendar = require('../models/calendar.model');
+// const CommandError = require('../models/command-error.model');
+const calendar = require('../modules/calendar.module');
 
 const config = require('../config/bot.config');
 
 module.exports = (bot) => {
   let eventCommand = bot.registerCommand("event", (msg, args) => {
-    let now = moment();
+    // let now = moment();
     
-    Calendar.findById(msg.channel.guild.id, (err, calendar) => {
-      addEvent(err, calendar, bot, msg, args, now);
-    });
+    // Calendar.findById(msg.channel.guild.id, (err, calendar) => {
+    //   addEvent(err, calendar, bot, msg, args, now);
+    // });
+    calendar.addEvent(bot, msg, args);
   }, {
     description: "Add a new event.",
     fullDescription: "Adds a new event to the guild calendar. Type the event details naturally (e.g. 'CS:GO scrims tomorrow from 6pm to 9pm') and the bot will interpret it for you.",
@@ -21,18 +23,20 @@ module.exports = (bot) => {
   });
 
   eventCommand.registerSubcommand("list", (msg, args) => {
-    Calendar.findById(msg.channel.guild.id, (err, calendar) => {
-      listEvents(err, calendar, bot, msg, args);
-    });
+    // Calendar.findById(msg.channel.guild.id, (err, calendar) => {
+    //   listEvents(err, calendar, bot, msg, args);
+    // });
+    calendar.listEvents(bot, msg, args);
   }, {
     description: "List existing events.",
     fullDescription: "Displays a list of events that have been created."
   });
 
   eventCommand.registerSubcommand("delete", (msg, args) => {
-    Calendar.findById(msg.channel.guild.id, (err, calendar) => {
-      deleteEvent(err, calendar, bot, msg, args);
-    });
+    // Calendar.findById(msg.channel.guild.id, (err, calendar) => {
+    //   deleteEvent(err, calendar, bot, msg, args);
+    // });
+    calendar.deleteEvent(bot, msg, args);
   }, {
     description: "Delete an event.",
     fullDescription: "Delete an event from the existing event list.",
@@ -40,11 +44,12 @@ module.exports = (bot) => {
   });
 
   eventCommand.registerSubcommand("update", (msg, args) => {
-    let now = moment();
+    // let now = moment();
     
-    Calendar.findById(msg.channel.guild.id, (err, calendar) => {
-      updateEvent(err, calendar, bot, msg, args, now);
-    });
+    // Calendar.findById(msg.channel.guild.id, (err, calendar) => {
+    //   updateEvent(err, calendar, bot, msg, args, now);
+    // });
+    calendar.updateEvent(bot, msg, args);
   }, {
     description: "Update an existing event.",
     fullDescription: "Updates an existing event in the guild calendar.",
