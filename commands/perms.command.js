@@ -1,3 +1,4 @@
+const CommandError = require('../models/command-error.model');
 const perms = require('../modules/perms.module');
 const cmdDesc = require('../assets/command-desc');
 
@@ -7,11 +8,21 @@ module.exports = (bot) => {
       return "Invalid input.";
     }
 
-    perms.modifyPerms(bot, msg, args);
+    try {
+      perms.modifyPerms(bot, msg, args);
+    }
+    catch (err) {
+      new CommandError(err, bot, msg);
+    }
   }, cmdDesc.perms.modify);
 
   permsCommand.registerSubcommand('nodes', (msg, args) => {
-    perms.displayPermNodes(bot, msg);
+    try {
+      perms.displayPermNodes(bot, msg);
+    }
+    catch (err) {
+      new CommandError(err, bot, msg);
+    }
   }, cmdDesc.perms.nodes);
 
   permsCommand.registerSubcommand('show', (msg, args) => {
@@ -19,6 +30,11 @@ module.exports = (bot) => {
       return "Invalid input.";
     }
     
-    perms.showPerm(bot, msg, args);
+    try {
+      perms.showPerm(bot, msg, args);
+    }
+    catch (err) {
+      new CommandError(err, bot, msg);
+    }
   }, cmdDesc.perms.show);
 }

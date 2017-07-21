@@ -1,5 +1,6 @@
 const moment = require('moment-timezone');
 
+const CommandError = require('../models/command-error.model');
 const calendar = require('../modules/calendar.module');
 const config = require('../config/bot.config');
 const cmdDesc = require('../assets/command-desc');
@@ -14,6 +15,11 @@ module.exports = (bot) => {
       return "Timezone not found. See https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List under the TZ column for available timezones.";
     }
 
-    calendar.initCalendar(bot, msg, args);
+    try {
+      calendar.initCalendar(bot, msg, args);
+    }
+    catch (err) {
+      new CommandError(err, bot, msg);
+    }
   }, cmdDesc.calendar);
 }
