@@ -2,6 +2,7 @@ const moment = require('moment-timezone');
 
 const calendar = require('../modules/calendar.module');
 const config = require('../config/bot.config');
+const cmdDesc = require('../assets/command-desc');
 
 module.exports = (bot) => {
   bot.registerCommand("calendar", (msg, args) =>  {
@@ -14,9 +15,5 @@ module.exports = (bot) => {
     }
 
     calendar.initCalendar(bot, msg, args);
-  }, {
-    description: "Initialise calendar.",
-    fullDescription: "Initialises a calendar for the guild in the specified timezone.",
-    usage: "`<timezone>`"
-  });
+  }, cmdDesc.calendar);
 }

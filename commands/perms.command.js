@@ -1,4 +1,5 @@
 const perms = require('../modules/perms.module');
+const cmdDesc = require('../assets/command-desc');
 
 module.exports = (bot) => {
   let permsCommand = bot.registerCommand('perms', (msg, args) => {
@@ -7,18 +8,11 @@ module.exports = (bot) => {
     }
 
     perms.modifyPerms(bot, msg, args);
-  }, {
-    description: "Set role/user-specific command permissions.",
-    fullDescription: "Allow or deny specific users/roles from the usage of certain commands.",
-    usage: "`<allow|deny> <node> [--role <role>] [--user <user>]`"
-  });
+  }, cmdDesc.perms.modify);
 
   permsCommand.registerSubcommand('nodes', (msg, args) => {
     perms.displayPermNodes(bot, msg);
-  }, {
-    description: "Display available nodes.",
-    fullDescription: "Display a list of available permission nodes."
-  });
+  }, cmdDesc.perms.nodes);
 
   permsCommand.registerSubcommand('show', (msg, args) => {
     if (args.length < 2 || (args[0] != '--node' && args[0] != '--role' && args[0] != '--user')) {
@@ -26,9 +20,5 @@ module.exports = (bot) => {
     }
     
     perms.showPerm(bot, msg, args);
-  }, {
-    description: "Show the permissions related to a node, user or role.",
-    fullDescription: "Display the permission settings granted in relation to a node, or to a role or user.",
-    usage: '`--node <node>|--role <role>|--user <user>`'
-  })
+  }, cmdDesc.perms.show);
 }
