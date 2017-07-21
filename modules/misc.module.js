@@ -26,26 +26,29 @@ class MiscModule {
       if (err) {
         new CommandError(err, bot, msg);
       }
+      else if (args.length > 1) {
+        msg.channel.createMessage("Invalid input.");
+      }
+      else if (args.length == 0) {
+        if (calendar.checkPerm('prefix.show', msg)) {
+          msg.channel.createMessage("`" + calendar.prefix + "`");
+        }
+        else {
+          msg.channel.createMessage("You are not permitted to use this command.");
+        }
+      }
       else {
-        if (calendar.checkPerm('prefix', msg)) {
-          if (args.length == 0) {
-            msg.channel.createMessage("`" + calendar.prefix + "`");
-          }
-          else if (args.length > 1) {
-            msg.channel.createMessage("Invalid input.");
-          }
-          else {
-            calendar.updatePrefix(args[0], err => {
-              if (err) {
-                new CommandError(err, bot, msg);
-              }
-              else {
-                let prefixes = [args[0], bot.user.mention + " "];
-                bot.registerGuildPrefix(msg.channel.guild.id, prefixes);
-                msg.channel.createMessage("Prefix set to `" + args[0] + "`.");
-              }
-            });
-          }
+        if (calendar.checkPerm('prefix.modify', msg)) {
+          calendar.updatePrefix(args[0], err => {
+            if (err) {
+              new CommandError(err, bot, msg);
+            }
+            else {
+              let prefixes = [args[0], bot.user.mention + " "];
+              bot.registerGuildPrefix(msg.channel.guild.id, prefixes);
+              msg.channel.createMessage("Prefix set to `" + args[0] + "`.");
+            }
+          });
         }
         else {
           msg.channel.createMessage("You are not permitted to use this command.");

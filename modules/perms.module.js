@@ -10,7 +10,8 @@ const availableNodes = [
   'event.delete',
   'event.list',
   'ping',
-  'prefix',
+  'prefix.show',
+  'prefix.modify',
   'perms.modify',
   'perms.nodes',
   'perms.show'
