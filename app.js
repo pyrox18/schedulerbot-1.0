@@ -3,13 +3,11 @@ const glob = require('glob');
 const path = require('path');
 const mongoose = require('mongoose');
 const winston = require('winston');
+require('winston-mongodb').MongoDB;
 
 const config = require('./config/bot.config');
 const Calendar = require('./models/calendar.model');
 const scheduler = require('./modules/scheduler.module');
-
-// Winston config
-winston.add(winston.transports.File, { filename: 'schedulerbot.log' });
 
 // Make mongoose use native Promises
 mongoose.Promise = global.Promise;
@@ -25,6 +23,7 @@ db.on('error', (err) => {
 
 db.once('open', () => {
   console.log('Connected to database');
+  winston.add(winston.transports.MongoDB, { db: config.dbConnectionUrl })
 });
 
 // Bot setup
