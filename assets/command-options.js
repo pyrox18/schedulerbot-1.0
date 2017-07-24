@@ -1,4 +1,4 @@
-// Descriptions for Eris commands
+// Options for Eris commands
 
 module.exports = {
   calendar: {

@@ -1,6 +1,6 @@
 const CommandError = require('../models/command-error.model');
 const perms = require('../modules/perms.module');
-const cmdDesc = require('../assets/command-desc');
+const cmdOptions = require('../assets/command-options');
 
 module.exports = (bot) => {
   let permsCommand = bot.registerCommand('perms', (msg, args) => {
@@ -14,7 +14,7 @@ module.exports = (bot) => {
     catch (err) {
       new CommandError(err, bot, msg);
     }
-  }, cmdDesc.perms.modify);
+  }, cmdOptions.perms.modify);
 
   permsCommand.registerSubcommand('nodes', (msg, args) => {
     try {
@@ -23,7 +23,7 @@ module.exports = (bot) => {
     catch (err) {
       new CommandError(err, bot, msg);
     }
-  }, cmdDesc.perms.nodes);
+  }, cmdOptions.perms.nodes);
 
   permsCommand.registerSubcommand('show', (msg, args) => {
     if (args.length < 2 || (args[0] != '--node' && args[0] != '--role' && args[0] != '--user')) {
@@ -36,5 +36,5 @@ module.exports = (bot) => {
     catch (err) {
       new CommandError(err, bot, msg);
     }
-  }, cmdDesc.perms.show);
+  }, cmdOptions.perms.show);
 }

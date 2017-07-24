@@ -1,6 +1,6 @@
 const CommandError = require('../models/command-error.model');
 const misc = require('../modules/misc.module');
-const cmdDesc = require('../assets/command-desc');
+const cmdOptions = require('../assets/command-options');
 
 module.exports = (bot) => {
   bot.registerCommand("ping", (msg, args) => {
@@ -10,7 +10,7 @@ module.exports = (bot) => {
     catch (err) {
       new CommandError(err, bot, msg);
     }
-  }, cmdDesc.ping);
+  }, cmdOptions.ping);
 
   bot.registerCommand("prefix", (msg, args) => {
     try {
@@ -19,5 +19,5 @@ module.exports = (bot) => {
     catch (err) {
       new CommandError(err, bot, msg);
     }
-  }, cmdDesc.prefix);
+  }, cmdOptions.prefix);
 }

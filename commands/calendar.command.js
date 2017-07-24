@@ -3,7 +3,7 @@ const moment = require('moment-timezone');
 const CommandError = require('../models/command-error.model');
 const calendar = require('../modules/calendar.module');
 const config = require('../config/bot.config');
-const cmdDesc = require('../assets/command-desc');
+const cmdOptions = require('../assets/command-options');
 
 module.exports = (bot) => {
   bot.registerCommand("init", (msg, args) =>  {
@@ -21,5 +21,5 @@ module.exports = (bot) => {
     catch (err) {
       new CommandError(err, bot, msg);
     }
-  }, cmdDesc.calendar);
+  }, cmdOptions.calendar);
 }

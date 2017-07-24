@@ -1,7 +1,7 @@
 const CommandError = require('../models/command-error.model');
 const calendar = require('../modules/calendar.module');
 const config = require('../config/bot.config');
-const cmdDesc = require('../assets/command-desc.js');
+const commandOptions = require('../assets/command-options');
 
 module.exports = (bot) => {
   let eventCommand = bot.registerCommand("event", (msg, args) => {
@@ -15,7 +15,7 @@ module.exports = (bot) => {
     catch (err) {
       new CommandError(err, bot, msg);
     }
-  }, cmdDesc.event.add);
+  }, commandOptions.event.add);
 
   eventCommand.registerSubcommand("list", (msg, args) => {
     if (args.length > 0) {
@@ -28,7 +28,7 @@ module.exports = (bot) => {
     catch (err) {
       new CommandError(err, bot, msg);
     }
-  }, cmdDesc.event.list);
+  }, commandOptions.event.list);
 
   eventCommand.registerSubcommand("delete", (msg, args) => {
     if (args.length < 1 || args.length > 1) {
@@ -45,7 +45,7 @@ module.exports = (bot) => {
     catch (err) {
       new CommandError(err, bot, msg);
     }
-  }, cmdDesc.event.delete);
+  }, commandOptions.event.delete);
 
   eventCommand.registerSubcommand("update", (msg, args) => {
     if (args.length < 2) {
@@ -64,5 +64,5 @@ module.exports = (bot) => {
       new CommandError(err, bot, msg);
     }
 
-  }, cmdDesc.event.update);
+  }, commandOptions.event.update);
 }
