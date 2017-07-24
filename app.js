@@ -18,12 +18,13 @@ db = mongoose.connection;
 
 db.on('error', (err) => {
   winston.error('DB connection error: ' + err);
-  exit(1);
+  process.exit(1);
 });
 
 db.once('open', () => {
   console.log('Connected to database');
-  winston.add(winston.transports.MongoDB, { db: config.dbConnectionUrl })
+  winston.add(winston.transports.MongoDB, { db: config.dbConnectionUrl });
+  bot.connect();
 });
 
 // Bot setup
@@ -136,5 +137,3 @@ bot.on('guildRoleDelete', (guild, role) => {
     });
   });
 });
-
-bot.connect();
