@@ -6,7 +6,7 @@ const config = require('../config/bot.config');
 const cmdDesc = require('../assets/command-desc');
 
 module.exports = (bot) => {
-  bot.registerCommand("calendar", (msg, args) =>  {
+  bot.registerCommand("init", (msg, args) =>  {
     if (args.length > 1 || args.length < 1) {
       return "Invalid input.";
     }

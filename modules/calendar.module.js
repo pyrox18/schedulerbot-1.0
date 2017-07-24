@@ -24,13 +24,13 @@ class CalendarModule {
             new CommandError(err, bot, msg);
           }
           else {
-            msg.channel.createMessage(`Set calendar timezone to ${calendar.timezone}.`);
+            msg.channel.createMessage(`Initialised calendar to timezone ${calendar.timezone}.`);
           }
         });
       }
       else {
         if (calendar.timezone) {
-          msg.channel.createMessage("The calendar timezone has already been set.");
+          msg.channel.createMessage("The calendar has already been initialised.");
         }
         else {
           calendar.timezone = args[0];
@@ -40,7 +40,7 @@ class CalendarModule {
               new CommandError(err, bot, msg);
             }
             else {
-              msg.channel.createMessage(`Set calendar timezone to ${calendar.timezone}.`);
+              msg.channel.createMessage(`Initialised calendar to timezone ${calendar.timezone}.`);
             }
           });
         }
