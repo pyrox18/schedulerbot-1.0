@@ -2,6 +2,12 @@
 
 This changelog is formatted based on [Keep a Changelog](http://keepachangelog.com/) and this project attempts to adhere to [Semantic Versioning](http://semver.org) as much as possible.
 
+## v0.3.0 - 2017-07-27
+
+### Added
+
+- New `support` and `invite` commands displays links to the support server and to invite the bot to someone's server, respectively.
+
 ## v0.2.0 - 2017-07-26
 
 ### Added
