@@ -20,4 +20,8 @@ module.exports = (bot) => {
       new CommandError(err, bot, msg);
     }
   }, cmdOptions.prefix);
+
+  bot.registerCommand("support", `Click the following link to join the bot's support server. https://discord.gg/yPNqh3A`, cmdOptions.support);
+
+  bot.registerCommand("invite", `Click the following link to invite the bot to your server. https://discordapp.com/oauth2/authorize?client_id=339019867325726722&scope=bot&permissions=150536`, cmdOptions.invite);
 }
