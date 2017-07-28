@@ -2,6 +2,17 @@
 
 This changelog is formatted based on [Keep a Changelog](http://keepachangelog.com/) and this project attempts to adhere to [Semantic Versioning](http://semver.org) as much as possible.
 
+## v0.3.1 - 2017-07-29
+
+### Fixed:
+
+- Replaced prompts that incorrectly informed users to run `calendar <timezone>` with `init <timezone>`.
+
+### Changed:
+
+- Replaced "Invalid input" messages with command usage guides.
+- Changed the support server link provided in the `support` command to lead to the #welcome channel.
+
 ## v0.3.0 - 2017-07-27
 
 ### Added
