@@ -76,7 +76,7 @@ class CalendarModule {
             msg.channel.createMessage("Cannot create an event that starts in the past.");
           }
           else if (!calendar || !calendar.timezone) {
-            msg.channel.createMessage("Timezone not set. Run the `calendar <timezone>` command to set the timezone first.");
+            msg.channel.createMessage("Timezone not set. Run the `init <timezone>` command to set the timezone first.");
           }
           else {
             calendar.addEvent(bot, eventName, startDate, endDate, (err, calendar) => {
@@ -112,7 +112,7 @@ class CalendarModule {
       else {
         if (calendar.checkPerm('event.list', msg)) {
           if (!calendar || !calendar.timezone) {
-            msg.channel.createMessage("Timezone not set. Run the `calendar <timezone>` command to set the timezone first.");
+            msg.channel.createMessage("Timezone not set. Run the `init <timezone>` command to set the timezone first.");
           }
           else {
             let now = moment();
