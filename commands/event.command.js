@@ -6,7 +6,7 @@ const commandOptions = require('../assets/command-options');
 module.exports = (bot) => {
   let eventCommand = bot.registerCommand("event", (msg, args) => {
     if (args.length < 1) {
-      return "Invalid input.";
+      return "Usage: `event <event details>` Example: `event CSGO Scrims 7pm-9pm tomorrow`";
     }
     
     try {
@@ -19,7 +19,7 @@ module.exports = (bot) => {
 
   eventCommand.registerSubcommand("list", (msg, args) => {
     if (args.length > 0) {
-      return "Invalid input.";
+      return "Usage: `event list`";
     }
 
     try {
@@ -32,11 +32,11 @@ module.exports = (bot) => {
 
   eventCommand.registerSubcommand("delete", (msg, args) => {
     if (args.length < 1 || args.length > 1) {
-      return "Invalid input.";
+      return "Usage: `event delete <eventIndex>` (eventIndex can be checked by running `event list`)";
     }
     let index = parseInt(args[0]);
     if (isNaN(index)) {
-      return "Invalid input.";
+      return "Usage: `event delete <eventIndex>` (eventIndex can be checked by running `event list`)";
     }
 
     try {
@@ -49,11 +49,11 @@ module.exports = (bot) => {
 
   eventCommand.registerSubcommand("update", (msg, args) => {
     if (args.length < 2) {
-      return "Invalid input.";
+      return "Usage: `event update <eventIndex> <event details>` (eventIndex can be checked by running `event list`)";
     }
     let index = parseInt(args[0]);
     if (isNaN(index)) {
-      return "Invalid input.";
+      return "Usage: `event update <eventIndex> <event details>` (eventIndex can be checked by running `event list`)";
     }
 
     try {

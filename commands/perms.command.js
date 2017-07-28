@@ -5,7 +5,7 @@ const cmdOptions = require('../assets/command-options');
 module.exports = (bot) => {
   let permsCommand = bot.registerCommand('perms', (msg, args) => {
     if (args.length < 4 || (args[0] != 'allow' && args[0] != 'deny') || (args[2] != '--role' && args[2] != '--user')) {
-      return "Invalid input.";
+      return "Usage: `perms <allow|deny> <permNode> < --role <role> | --user <user> >`\nRun `perms nodes` for a list of available nodes.";
     }
 
     try {
@@ -27,7 +27,7 @@ module.exports = (bot) => {
 
   permsCommand.registerSubcommand('show', (msg, args) => {
     if (args.length < 2 || (args[0] != '--node' && args[0] != '--role' && args[0] != '--user')) {
-      return "Invalid input.";
+      return "Usage: `perms show < --node <permNode> | --role <role> | --user <user> >`";
     }
     
     try {

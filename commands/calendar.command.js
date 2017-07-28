@@ -8,7 +8,7 @@ const cmdOptions = require('../assets/command-options');
 module.exports = (bot) => {
   bot.registerCommand("init", (msg, args) =>  {
     if (args.length > 1 || args.length < 1) {
-      return "Invalid input.";
+      return "Usage: `init <timezone>`";
     }
 
     if(moment.tz.zone(args[0]) === null) {
