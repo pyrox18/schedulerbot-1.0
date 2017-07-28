@@ -161,7 +161,7 @@ class CalendarModule {
           index = index - 1;
     
           if (!calendar) {
-            msg.channel.createMessage("Calendar not found.");
+            msg.channel.createMessage("Calendar not found. Run `init <timezone>` to initialise the guild calendar.");
           }
           else if (index < 0 || index >= calendar.events.length) {
             msg.channel.createMessage("Event not found.");
@@ -226,7 +226,7 @@ class CalendarModule {
           }
     
           if (!calendar) {
-            msg.channel.createMessage("Calendar not found.");
+            msg.channel.createMessage("Calendar not found. Run `init <timezone>` to initialise the guild calendar.");
           }
           else {
             if (index < 0 || index >= calendar.events.length) {
