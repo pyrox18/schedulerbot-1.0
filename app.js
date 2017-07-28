@@ -70,11 +70,6 @@ bot.on('guildCreate', guild => {
     if (err) {
       winston.error('guildCreate error: ' + err);
     }
-    else {
-      winston.info('guildCreate called', {
-        guildId: newGuild._id
-      });
-    }
   })
 });
 
@@ -83,11 +78,6 @@ bot.on('guildDelete', guild => {
   Calendar.findOneAndRemove({ _id: guild.id }, (err, document) => {
     if (err) {
       winston.error('guildDelete error: ' + err);
-    }
-    else {
-      winston.info('guildDelete called', {
-        guildId: document._id
-      });
     }
   });
 });
@@ -105,12 +95,6 @@ bot.on('guildMemberRemove', (guild, member) => {
       if (err) {
         winston.error('guildMemberRemove error: ' + err);
       }
-      else {
-        winston.info('guildMemberRemove called', {
-          guildId: guild.id,
-          member: member
-        })
-      }
     });
   });
 });
@@ -127,12 +111,6 @@ bot.on('guildRoleDelete', (guild, role) => {
     calendar.save(err => {
       if (err) {
         winston.error('guildRoleDelete error: ' + err);
-      }
-      else {
-        winston.info('guildRoleDelete called', {
-          guildId: guild.id,
-          roleId: role.id
-        })
       }
     });
   });
