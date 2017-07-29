@@ -71,5 +71,10 @@ module.exports = {
     description: "Display a link to invite the bot to your server.",
     fullDescription: "Displays the invite link to invite SchedulerBot to one of your own servers.",
     guildOnly: true
+  },
+  info: {
+    description: "Display statistics about the bot.",
+    fullDescription: "Displays the bot's version, number of guilds and users being served, and the bot's uptime.",
+    guildOnly: true
   }
 }
