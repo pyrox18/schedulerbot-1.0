@@ -1,3 +1,4 @@
+const winston = require('winston');
 const moment = require('moment-timezone');
 const schedule = require('node-schedule');
 const dict = require('dict');
@@ -30,7 +31,8 @@ class Scheduler {
         this.deleteJobs.set(event._id.toString(), schedule.scheduleJob(moment(event.endDate).toDate(), () => {
           calendar.deleteEventById(event._id.toString(), err => {
             if (err) {
-              throw new Error('Failed to delete event by ID in Scheduler.scheduleExistingEvents: ' + err);
+              // throw new Error('Failed to delete event by ID in Scheduler.scheduleExistingEvents: ' + err);
+              winston.log('error', err);
             }
           });
         }));
@@ -38,7 +40,8 @@ class Scheduler {
       else { // Remove event from calendar
         calendar.deleteEventById(event._id.toString(), err => {
           if (err) {
-            throw new Error('Failed to delete event by ID in Scheduler.scheduleExistingEvents: ' + err);
+            // throw new Error('Failed to delete event by ID in Scheduler.scheduleExistingEvents: ' + err);
+            winston.log('error', err);
           }
         });
       }
@@ -60,7 +63,8 @@ class Scheduler {
     this.deleteJobs.set(event._id.toString(), schedule.scheduleJob(moment(event.endDate).toDate(), function() {
       calendar.deleteEventById(event._id.toString(), err => {
         if (err) {
-          throw new Error('Failed to delete event by ID in Scheduler.scheduleEvent: ' + err);
+          // throw new Error('Failed to delete event by ID in Scheduler.scheduleEvent: ' + err);
+          winston.log('error', err);
         }
       });
     }));
