@@ -2,6 +2,12 @@
 
 This changelog is formatted based on [Keep a Changelog](http://keepachangelog.com/) and this project attempts to adhere to [Semantic Versioning](http://semver.org) as much as possible.
 
+## v0.3.2 - 2017-07-31
+
+### Changed:
+
+- Changed error handling in the bot's event scheduling module to prevent the bot from crashing under certain situations.
+
 ## v0.3.1 - 2017-07-29
 
 ### Fixed:
