@@ -75,9 +75,12 @@ bot.on('guildCreate', guild => {
 
 bot.on('guildDelete', guild => {
   // Delete Prefix document of guild when leaving a guild
-  Calendar.findOneAndRemove({ _id: guild.id }, (err, document) => {
+  Calendar.findOneAndRemove({ _id: guild.id }, (err, calendar) => {
     if (err) {
       winston.error('guildDelete error: ' + err);
+    }
+    for (let event of calendar.events) {
+      scheduler.unscheduleEvent(event._id.toString());
     }
   });
 });
