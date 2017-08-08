@@ -1,6 +1,7 @@
 const moment = require('moment-timezone');
 const Calendar = require('../models/calendar.model');
 const CommandError = require('../models/command-error.model');
+const version = require('../package.json').version;
 
 class MiscModule {
   static ping(bot, msg) {
@@ -56,6 +57,30 @@ class MiscModule {
       }
     });
   }
+
+  static info(bot, msg) {
+    let uptimeParsed = convertMS(bot.uptime);
+    let output = "```\n";
+    output += "SchedulerBot\n\n";
+    output += "Version: " + version + "\n";
+    output += `Guilds serving: ${bot.guilds.size}\n`;
+    output += `Users serving: ${bot.users.size}\n`;
+    output += `Uptime: ${uptimeParsed.d} days, ${uptimeParsed.h} hours, ${uptimeParsed.m} minutes, ${uptimeParsed.s} seconds\n`;
+    output += "```"
+    msg.channel.createMessage(output);
+  }
 }
+
+function convertMS(ms) { // https://gist.github.com/remino/1563878
+  var d, h, m, s;
+  s = Math.floor(ms / 1000);
+  m = Math.floor(s / 60);
+  s = s % 60;
+  h = Math.floor(m / 60);
+  m = m % 60;
+  d = Math.floor(h / 24);
+  h = h % 24;
+  return { d: d, h: h, m: m, s: s };
+};
 
 module.exports = MiscModule;
