@@ -1,5 +1,7 @@
 // Options for Eris commands
 
+const adminId = require('../config/bot.config').adminId;
+
 module.exports = {
   calendar: {
     description: "Initialise calendar.",
@@ -76,5 +78,11 @@ module.exports = {
     description: "Display statistics about the bot.",
     fullDescription: "Displays the bot's version, number of guilds and users being served, and the bot's uptime.",
     guildOnly: true
+  },
+  // Special admin command options; applies to all commands in admin.command
+  admin: {
+    requirements: {
+      userIDs: [adminId]
+    }
   }
 }
