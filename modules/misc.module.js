@@ -1,6 +1,7 @@
 const moment = require('moment-timezone');
 const Calendar = require('../models/calendar.model');
 const CommandError = require('../models/command-error.model');
+const version = require('../package.json').version;
 
 class MiscModule {
   static ping(bot, msg) {
@@ -61,7 +62,7 @@ class MiscModule {
     let uptimeParsed = convertMS(bot.uptime);
     let output = "```\n";
     output += "SchedulerBot\n\n";
-    output += "Version: 0.4.0\n";
+    output += "Version: " + version + "\n";
     output += `Guilds serving: ${bot.guilds.size}\n`;
     output += `Users serving: ${bot.users.size}\n`;
     output += `Uptime: ${uptimeParsed.d} days, ${uptimeParsed.h} hours, ${uptimeParsed.m} minutes, ${uptimeParsed.s} seconds\n`;
