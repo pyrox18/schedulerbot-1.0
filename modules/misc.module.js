@@ -3,19 +3,24 @@ const Calendar = require('../models/calendar.model');
 const CommandError = require('../models/command-error.model');
 
 class MiscModule {
-  static ping(bot, msg) {
+  static ping(msg, callback) {
     Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
-        new CommandError(err, bot, msg);
+        callback(err);
       }
       else {
-        let now = moment();
-        if (calendar.checkPerm('ping', msg)) {
-          let diff = now.diff(msg.timestamp);
-          msg.channel.createMessage(`Pong! Time: ${diff}ms`);
+        try {
+          let now = moment();
+          if (calendar.checkPerm('ping', msg)) {
+            let diff = now.diff(moment(msg.timestamp));
+            callback(null, diff);
+          }
+          else {
+            callback(null, null);
+          }
         }
-        else {
-          msg.channel.createMessage("You are not permitted to use this command.");
+        catch (e) {
+          callback(e);
         }
       }    
     });
