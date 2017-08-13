@@ -27,6 +27,18 @@ class Response {
   static unauthorized() {
     return new this(this.responseCodes.UNAUTHORIZED, null, null);
   }
+
+  success() {
+    return this.code == this.responseCodes.SUCCESS;
+  }
+
+  error() {
+    return (this.code == this.responseCodes.ERROR || this.code == this.responseCodes.DB_ERROR);
+  }
+
+  unauthorized() {
+    return this.code == this.responseCodes.UNAUTHORIZED;
+  }
 }
 
 module.exports = Response;
