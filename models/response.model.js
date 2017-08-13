@@ -1,15 +1,19 @@
-class Response {
-  static responseCodes = Object.freeze({
-    SUCCESS: 0,
-    ERROR: 1,
-    DB_ERROR: 2,
-    UNAUTHORIZED: -1
-  });
+const responseCodes = Object.freeze({
+  SUCCESS: 0,
+  ERROR: 1,
+  DB_ERROR: 2,
+  UNAUTHORIZED: -1
+});
 
+class Response {
   constructor(code, message, meta) {
     this.code = code;
     this.message = message;
     this.meta = meta;
+  }
+
+  static get responseCodes() {
+    return responseCodes;
   }
 
   static success(meta) {
@@ -29,15 +33,15 @@ class Response {
   }
 
   success() {
-    return this.code == this.responseCodes.SUCCESS;
+    return this.code == responseCodes.SUCCESS;
   }
 
   error() {
-    return (this.code == this.responseCodes.ERROR || this.code == this.responseCodes.DB_ERROR);
+    return (this.code == responseCodes.ERROR || this.code == responseCodes.DB_ERROR);
   }
 
   unauthorized() {
-    return this.code == this.responseCodes.UNAUTHORIZED;
+    return this.code == responseCodes.UNAUTHORIZED;
   }
 }
 
