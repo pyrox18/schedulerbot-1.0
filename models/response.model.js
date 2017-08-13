@@ -28,3 +28,5 @@ class Response {
     return new this(this.code.UNAUTHORIZED, null, null);
   }
 }
+
+module.exports = Response;
