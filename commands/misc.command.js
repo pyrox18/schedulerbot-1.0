@@ -12,7 +12,7 @@ module.exports = (bot) => {
         return msg.channel.createMessage("You are not permitted to use this command.");
       }
       if (res.success()) {
-        msg.channel.createMessage(`Pong! Time: ${res.meta.ping}ms`);
+        return msg.channel.createMessage(`Pong! Time: ${res.meta.ping}ms`);
       }
     });
   }, cmdOptions.ping);
