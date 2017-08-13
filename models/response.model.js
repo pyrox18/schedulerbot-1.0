@@ -1,5 +1,5 @@
 class Response {
-  static code = Object.freeze({
+  static responseCodes = Object.freeze({
     SUCCESS: 0,
     ERROR: 1,
     DB_ERROR: 2,
@@ -13,19 +13,19 @@ class Response {
   }
 
   static success(meta) {
-    return new this(this.code.SUCCESS, null, meta);
+    return new this(this.responseCodes.SUCCESS, null, meta);
   }
 
   static error(message, meta) {
-    return new this(this.code.ERROR, message, meta);
+    return new this(this.responseCodes.ERROR, message, meta);
   }
 
   static dbError(message, meta) {
-    return new this(this.code.DB_ERROR, message, meta);
+    return new this(this.responseCodes.DB_ERROR, message, meta);
   }
 
   static unauthorized() {
-    return new this(this.code.UNAUTHORIZED, null, null);
+    return new this(this.responseCodes.UNAUTHORIZED, null, null);
   }
 }
 
