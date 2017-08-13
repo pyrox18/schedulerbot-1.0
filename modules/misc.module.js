@@ -1,27 +1,33 @@
 const moment = require('moment-timezone');
 const Calendar = require('../models/calendar.model');
 const CommandError = require('../models/command-error.model');
+<<<<<<< HEAD
 const version = require('../package.json').version;
+=======
+const Response = require('../models/response.model');
+>>>>>>> Implement Response class in ping command
 
 class MiscModule {
   static ping(msg, callback) {
     Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
-        callback(err);
+        callback(Response.error("Guild calendar find error", { error: err }));
       }
       else {
         try {
           let now = moment();
           if (calendar.checkPerm('ping', msg)) {
             let diff = now.diff(moment(msg.timestamp));
-            callback(null, diff);
+            callback(Response.success({
+              ping: diff
+            }));
           }
           else {
-            callback(null, null);
+            callback(Response.unauthorized());
           }
         }
         catch (e) {
-          callback(e);
+          callback(Response.error("Method execution error", { error: e }));
         }
       }    
     });

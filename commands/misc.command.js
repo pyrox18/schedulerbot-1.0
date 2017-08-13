@@ -4,15 +4,15 @@ const cmdOptions = require('../assets/command-options');
 
 module.exports = (bot) => {
   bot.registerCommand("ping", (msg, args) => {
-    misc.ping(msg, (err, res) => {
-      if (err) {
-        new CommandError(err, bot, msg);
+    misc.ping(msg, res => {
+      if (res.error()) {
+        return new CommandError(res.message, bot, msg);
       }
-      else if (!res) {
-        msg.channel.createMessage("You are not permitted to use this command.");
+      if (res.unauthorized()) {
+        return msg.channel.createMessage("You are not permitted to use this command.");
       }
-      else {
-        msg.channel.createMessage(`Pong! Time: ${res}ms`);
+      if (res.success()) {
+        msg.channel.createMessage(`Pong! Time: ${res.meta.ping}ms`);
       }
     });
   }, cmdOptions.ping);
