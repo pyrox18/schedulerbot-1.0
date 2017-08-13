@@ -18,12 +18,23 @@ module.exports = (bot) => {
   }, cmdOptions.ping);
 
   bot.registerCommand("prefix", (msg, args) => {
-    try {
-      misc.prefix(bot, msg, args);
-    }
-    catch (err) {
-      new CommandError(err, bot, msg);
-    }
+    misc.prefix(msg, args, res => {
+      if (res.error()) {
+        return new CommandError(res.message, bot, msg);
+      }
+      if (res.unauthorized()) {
+        return msg.channel.createMessage("You are not permitted to use this command.");
+      }
+      if (res.invalid()) {
+        return msg.channel.createMessage("Invalid input.");
+      }
+      if (res.success()) {
+        if (res.meta.isModified && res.meta.newPrefix) {
+          return msg.channel.createMessage("Prefix set to `" + res.meta.newPrefix + "`.");
+        }
+        return msg.channel.createMessage("`" + res.meta.prefix + "`");
+      }
+    });
   }, cmdOptions.prefix);
 
   bot.registerCommand("support", `Click the following link to join the bot's support server. https://discord.gg/CRxRn5X`, cmdOptions.support);
