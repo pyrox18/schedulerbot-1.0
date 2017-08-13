@@ -2,7 +2,8 @@ const responseCodes = Object.freeze({
   SUCCESS: 0,
   ERROR: 1,
   DB_ERROR: 2,
-  UNAUTHORIZED: -1
+  UNAUTHORIZED: -1,
+  INVALID: -2
 });
 
 class Response {
@@ -32,6 +33,10 @@ class Response {
     return new this(this.responseCodes.UNAUTHORIZED, null, null);
   }
 
+  static invalid() {
+    return new this(this.responseCodes.INVALID, null, null);
+  }
+
   success() {
     return this.code == responseCodes.SUCCESS;
   }
@@ -42,6 +47,10 @@ class Response {
 
   unauthorized() {
     return this.code == responseCodes.UNAUTHORIZED;
+  }
+
+  invalid() {
+    return this.code == responseCodes.INVALID;
   }
 }
 
