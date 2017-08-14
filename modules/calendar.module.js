@@ -155,43 +155,55 @@ class CalendarModule {
     });
   }
 
-  static deleteEvent(bot, msg, index) {
+  static deleteEvent(msg, args, callback) {
+    if (args.length < 1 || args.length > 1) {
+      return callback(Response.invalid({ argCount: true }));
+    }
+
+    let index = parseInt(args[0]);
+    if (isNaN(index)) {
+      return callback(Response.invalid({ indexNaN: true }));
+    }
+
     Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
-        new CommandError(err, bot, msg);
+        callback(Response.dbError("Guild calendar lookup error", { error: err }));
+      }
+      else if (!calendar) {
+        callback(Response.invalid({ noCalendar: true }));
       }
       else {
-        if (calendar.checkPerm('event.delete', msg)) {
-          index = index - 1;
-    
-          if (!calendar) {
-            msg.channel.createMessage("Calendar not found. Run `init <timezone>` to initialise the guild calendar.");
-          }
-          else if (index < 0 || index >= calendar.events.length) {
-            msg.channel.createMessage("Event not found.");
+        try {
+          if (calendar.checkPerm('event.delete', msg)) {
+            index = index - 1;
+            if (index < 0 || index >= calendar.events.length) {
+              callback(Response.invalid({ noEvent: true }));
+            }
+            else {
+              let deletedEvent = calendar.events[index];
+              calendar.deleteEvent(index, (err) => {
+                if (err) {
+                  callback(Response.dbError("Calendar delete event save failure", { error: err }));
+                }
+                else {
+                  let embed = bot.createEmbed(msg.channel.id);
+                  embed.title("Delete Event");
+                  embed.color(0xff2b2b);
+                  embed.field("Event Name", deletedEvent.name, false);
+                  embed.field("Start Date", moment(deletedEvent.startDate).tz(calendar.timezone).toString(), false);
+                  embed.field("End Date", moment(deletedEvent.endDate).tz(calendar.timezone).toString(), false);
+      
+                  callback(Response.success({ eventEmbed: embed }));
+                }
+              });
+            }
           }
           else {
-            let deletedEvent = calendar.events[index];
-            calendar.deleteEvent(index, (err) => {
-              if (err) {
-                new CommandError(err, bot, msg);
-              }
-              else {
-                let embed = bot.createEmbed(msg.channel.id);
-                embed.title("Delete Event");
-                embed.color(0xff2b2b);
-                embed.field("Event Name", deletedEvent.name, false);
-                embed.field("Start Date", moment(deletedEvent.startDate).tz(calendar.timezone).toString(), false);
-                embed.field("End Date", moment(deletedEvent.endDate).tz(calendar.timezone).toString(), false);
-    
-                embed.send(bot, msg.channel.id);
-                msg.channel.createMessage("Event deleted.");
-              }
-            });
+            callback(Response.unauthorized());
           }
         }
-        else {
-          msg.channel.createMessage("You are not permitted to use this command.");
+        catch (e) {
+          callback(Response.error("Method execution error", { error: e }));
         }
       }
     });

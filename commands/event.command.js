@@ -52,20 +52,29 @@ module.exports = (bot) => {
   }, commandOptions.event.list);
 
   eventCommand.registerSubcommand("delete", (msg, args) => {
-    if (args.length < 1 || args.length > 1) {
-      return "Usage: `event delete <eventIndex>` (eventIndex can be checked by running `event list`)";
-    }
-    let index = parseInt(args[0]);
-    if (isNaN(index)) {
-      return "Usage: `event delete <eventIndex>` (eventIndex can be checked by running `event list`)";
-    }
-
-    try {
-      calendar.deleteEvent(bot, msg, index);
-    }
-    catch (err) {
-      new CommandError(err, bot, msg);
-    }
+    calendar.deleteEvent(msg, args, res => {
+      if (res.error()) {
+        return new CommandError(res.message, bot, msg);
+      }
+      if (res.invalid()) {
+        if (res.meta.argCount || res.meta.indexNaN) {
+          return msg.channel.createMessage("Usage: `event delete <eventIndex>` (eventIndex can be checked by running `event list`)");
+        }
+        if (res.meta.noCalendar) {
+          return msg.channel.createMessage("Calendar not found. Run `init <timezone>` to initialise the guild calendar.");
+        }
+        if (res.meta.noEvent) {
+          return msg.channel.createMessage("Event not found.");
+        }
+      }
+      if (res.unauthorized()) {
+        return msg.channel.createMessage("You are not permitted to use this command.");
+      }
+      if (res.success()) {
+        res.meta.eventEmbed.send(bot, msg.channel.id);
+        return msg.channel.createMessage("Event deleted.");
+      }
+    });
   }, commandOptions.event.delete);
 
   eventCommand.registerSubcommand("update", (msg, args) => {
