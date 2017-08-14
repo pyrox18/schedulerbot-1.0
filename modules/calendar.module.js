@@ -52,18 +52,25 @@ class CalendarModule {
     });
   }
 
-  static addEvent(bot, msg, inputString) {
+  static addEvent(bot, msg, args, callback) {
     let now = moment();
+    if (args.length < 1) {
+      return callback(Response.invalid({ argCount: true }));
+    }
+
     Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
-        new CommandError(err, bot, msg);
+        callback(Response.dbError("Guild calendar lookup error", { error: err }));
+      }
+      else if (!calendar || !calendar.timezone) {
+        callback(Response.invalid({ noTimezone: true }));
       }
       else {
         if (calendar.checkPerm('event.create', msg)) {
+          let inputString = args.join(" ");
           let results = chrono.parse(inputString);
           if (!results[0]) {
-            msg.channel.createMessage("Failed to parse event data.");
-            return;
+            return callback(Response.invalid({ parseFail: true }));
           }
     
           let eventName = inputString.replace(results[0].text, "").trim();
@@ -77,15 +84,12 @@ class CalendarModule {
           }
     
           if (now.diff(startDate) > 0) {
-            msg.channel.createMessage("Cannot create an event that starts in the past.");
-          }
-          else if (!calendar || !calendar.timezone) {
-            msg.channel.createMessage("Timezone not set. Run the `init <timezone>` command to set the timezone first.");
+            callback(Response.invalid({ eventInPast: true }));
           }
           else {
             calendar.addEvent(bot, eventName, startDate, endDate, (err, calendar) => {
               if (err) {
-                new CommandError(err, bot, msg);
+                callback(Response.error("Calendar add event save failure", { error: err }));
               }
               else {
                 let embed = bot.createEmbed(msg.channel.id);
@@ -94,15 +98,14 @@ class CalendarModule {
                 embed.field("Event Name", eventName, false);
                 embed.field("Start Date", moment.tz(startDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, calendar.timezone).toString(), false);
                 embed.field("End Date", moment.tz(endDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, calendar.timezone).toString(), false);
-    
-                embed.send(bot, msg.channel.id);
-                msg.channel.createMessage("New event created.");
+
+                callback(Response.success({ eventEmbed: embed }));
               }
             });
           }
         }
         else {
-          msg.channel.createMessage("You are not permitted to use this command.");
+          callback(Response.unauthorized());
         }
       }
     });
