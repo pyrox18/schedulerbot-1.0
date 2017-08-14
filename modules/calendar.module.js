@@ -4,15 +4,19 @@ require('eris-embed-builder');
 
 const Calendar = require('../models/calendar.model');
 const CommandError = require('../models/command-error.model');
+const Response = require('../models/response.model');
+const config = require('../config/bot.config');
 
 class CalendarModule {
-  static initCalendar(bot, msg, args) {
+  static initCalendar(msg, args, callback) {
     Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
-        new CommandError(err, bot, msg);
+        callback(Response.dbError("Guild calendar lookup error", { error: err }));
       }
-      
-      if (!calendar) {
+      if (args.length > 1 || args.length < 1 || moment.tz.zone(args[0]) === null) {
+        callback(Response.invalid());
+      } 
+      else if (!calendar) {
         let newCal = new Calendar({
           _id: msg.channel.guild.id,
           timezone: args[0],
@@ -21,26 +25,26 @@ class CalendarModule {
         });
         newCal.save((err, calendar) => {
           if (err) {
-            new CommandError(err, bot, msg);
+            callback(Response.dbError("New guild calendar save error", { error: err }));
           }
           else {
-            msg.channel.createMessage(`Initialised calendar to timezone ${calendar.timezone}.`);
+            callback(Response.success({ timezone: calendar.timezone }));
           }
         });
       }
       else {
         if (calendar.timezone) {
-          msg.channel.createMessage("The calendar has already been initialised.");
+          callback(Response.success({ alreadyInit: true }));
         }
         else {
           calendar.timezone = args[0];
           calendar.defaultChannel = msg.channel.id;
           calendar.save(err => {
             if (err) {
-              new CommandError(err, bot, msg);
+              callback(Response.dbError("Guild calendar timezone save error", { error: err }));
             }
             else {
-              msg.channel.createMessage(`Initialised calendar to timezone ${calendar.timezone}.`);
+              callback(Response.success({ timezone: calendar.timezone }));
             }
           });
         }

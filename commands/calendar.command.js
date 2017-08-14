@@ -7,19 +7,21 @@ const cmdOptions = require('../assets/command-options');
 
 module.exports = (bot) => {
   bot.registerCommand("init", (msg, args) =>  {
-    if (args.length > 1 || args.length < 1) {
-      return "Usage: `init <timezone>`";
-    }
-
-    if(moment.tz.zone(args[0]) === null) {
-      return "Timezone not found. See https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List under the TZ column for available timezones.";
-    }
-
-    try {
-      calendar.initCalendar(bot, msg, args);
-    }
-    catch (err) {
-      new CommandError(err, bot, msg);
-    }
+    calendar.initCalendar(msg, args, res => {
+      if (res.error()) {
+        return new CommandError(res.message, bot, msg);
+      }
+      if (res.invalid()) {
+        return msg.channel.createMessage("Usage: `init <timezone>`\nSee https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List under the TZ column for available timezones.");
+      }
+      if (res.success()) {
+        if (res.meta.alreadyInit) {
+          return msg.channel.createMessage("The calendar has already been initialised.");
+        }
+        else {
+          return msg.channel.createMessage(`Initialised calendar to timezone ${res.meta.timezone}.`);
+        }
+      }
+    });
   }, cmdOptions.calendar);
 }
