@@ -33,8 +33,8 @@ class Response {
     return new this(this.responseCodes.UNAUTHORIZED, null, null);
   }
 
-  static invalid() {
-    return new this(this.responseCodes.INVALID, null, null);
+  static invalid(meta = null) {
+    return new this(this.responseCodes.INVALID, null, meta);
   }
 
   success() {
