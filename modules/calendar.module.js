@@ -111,48 +111,45 @@ class CalendarModule {
     });
   }
 
-  static listEvents(bot, msg) {
+  static listEvents(msg, callback) {
     Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
-        new CommandError(err, bot, msg);
+        callback(Response.dbError("Guild calendar lookup error"));
+      }
+      else if (!calendar || !calendar.timezone) {
+        callback(Response.invalid({ noTimezone: true }));
       }
       else {
         if (calendar.checkPerm('event.list', msg)) {
-          if (!calendar || !calendar.timezone) {
-            msg.channel.createMessage("Timezone not set. Run the `init <timezone>` command to set the timezone first.");
+          let now = moment();
+          let resultString = "```css\n";
+  
+          if (calendar.events.length == 0) {
+            resultString = resultString + "No events found!\n";
           }
           else {
-            let now = moment();
-            let resultString = "```css\n";
-    
-            if (calendar.events.length == 0) {
-              resultString = resultString + "No events found!\n";
+            let i = 0;
+            let activeEventHeaderWritten = false;
+            while (i < calendar.events.length && now.diff(moment(calendar.events[i].startDate)) > 0) {
+              if (!activeEventHeaderWritten) {
+                resultString = resultString + "[Active Events]\n\n";
+              }
+              resultString = resultString + `${i+1} : ${calendar.events[i].name} /* ${moment(calendar.events[i].startDate).tz(calendar.timezone).toString()} to ${moment(calendar.events[i].endDate).tz(calendar.timezone).toString()} */\n`;
+              i++;
             }
-            else {
-              let i = 0;
-              let activeEventHeaderWritten = false;
-              while (i < calendar.events.length && now.diff(moment(calendar.events[i].startDate)) > 0) {
-                if (!activeEventHeaderWritten) {
-                  resultString = resultString + "[Active Events]\n\n";
-                }
-                resultString = resultString + `${i+1} : ${calendar.events[i].name} /* ${moment(calendar.events[i].startDate).tz(calendar.timezone).toString()} to ${moment(calendar.events[i].endDate).tz(calendar.timezone).toString()} */\n`;
-                i++;
-              }
-              if (i < calendar.events.length) {
-                resultString = resultString + "\n[Upcoming Events]\n\n";
-              }
-              while (i < calendar.events.length) {
-                resultString = resultString + `${i+1} : ${calendar.events[i].name} /* ${moment(calendar.events[i].startDate).tz(calendar.timezone).toString()} to ${moment(calendar.events[i].endDate).tz(calendar.timezone).toString()} */\n`;
-                i++;
-              }
+            if (i < calendar.events.length) {
+              resultString = resultString + "\n[Upcoming Events]\n\n";
             }
-            resultString = resultString + "```";
-            msg.channel.createMessage(resultString);
+            while (i < calendar.events.length) {
+              resultString = resultString + `${i+1} : ${calendar.events[i].name} /* ${moment(calendar.events[i].startDate).tz(calendar.timezone).toString()} to ${moment(calendar.events[i].endDate).tz(calendar.timezone).toString()} */\n`;
+              i++;
+            }
           }
-    
+          resultString = resultString + "```";
+          callback(Response.success({ events: resultString }));
         }
         else {
-          msg.channel.createMessage("You are not permitted to use this command.");
+          callback(Response.unauthorized);
         }
       }
     });

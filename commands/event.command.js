@@ -35,16 +35,20 @@ module.exports = (bot) => {
   }, commandOptions.event.add);
 
   eventCommand.registerSubcommand("list", (msg, args) => {
-    if (args.length > 0) {
-      return "Usage: `event list`";
-    }
-
-    try {
-      calendar.listEvents(bot, msg);
-    }
-    catch (err) {
-      new CommandError(err, bot, msg);
-    }
+    calendar.listEvents(msg, res => {
+      if (res.error()) {
+        return new CommandError(res.message, bot, msg);
+      }
+      if (res.invalid()) {
+        return msg.channel.createMessage("Timezone not set. Run the `init <timezone>` command to set the timezone first.");
+      }
+      if (res.unauthorized()) {
+        msg.channel.createMessage("You are not permitted to use this command.");
+      }
+      if (res.success()) {
+        msg.channel.createMessage(res.meta.events);
+      }
+    })
   }, commandOptions.event.list);
 
   eventCommand.registerSubcommand("delete", (msg, args) => {
