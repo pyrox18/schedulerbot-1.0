@@ -9,171 +9,186 @@ const config = require('../config/bot.config');
 
 class CalendarModule {
   static initCalendar(msg, args, callback) {
-    Calendar.findById(msg.channel.guild.id, (err, calendar) => {
-      if (err) {
-        callback(Response.dbError("Guild calendar lookup error", { error: err }));
-      }
-      if (args.length > 1 || args.length < 1 || moment.tz.zone(args[0]) === null) {
-        callback(Response.invalid());
-      } 
-      else if (!calendar) {
-        let newCal = new Calendar({
-          _id: msg.channel.guild.id,
-          timezone: args[0],
-          prefix: config.prefix,
-          defaultChannel: msg.channel.id
-        });
-        newCal.save((err, calendar) => {
-          if (err) {
-            callback(Response.dbError("New guild calendar save error", { error: err }));
-          }
-          else {
-            callback(Response.success({ timezone: calendar.timezone }));
-          }
-        });
-      }
-      else {
-        if (calendar.timezone) {
-          callback(Response.success({ alreadyInit: true }));
+    try {
+      Calendar.findById(msg.channel.guild.id, (err, calendar) => {
+        if (err) {
+          callback(Response.dbError("Guild calendar lookup error", { error: err }));
         }
-        else {
-          calendar.timezone = args[0];
-          calendar.defaultChannel = msg.channel.id;
-          calendar.save(err => {
+        else if (args.length > 1 || args.length < 1 || moment.tz.zone(args[0]) === null) {
+          callback(Response.invalid());
+        } 
+        else if (!calendar) {
+          let newCal = new Calendar({
+            _id: msg.channel.guild.id,
+            timezone: args[0],
+            prefix: config.prefix,
+            defaultChannel: msg.channel.id
+          });
+          newCal.save((err, calendar) => {
             if (err) {
-              callback(Response.dbError("Guild calendar timezone save error", { error: err }));
+              callback(Response.dbError("New guild calendar save error", { error: err }));
             }
             else {
               callback(Response.success({ timezone: calendar.timezone }));
             }
           });
         }
-      }
-    });
-  }
-
-  static addEvent(bot, msg, args, callback) {
-    let now = moment();
-    if (args.length < 1) {
-      return callback(Response.invalid({ argCount: true }));
-    }
-
-    Calendar.findById(msg.channel.guild.id, (err, calendar) => {
-      if (err) {
-        callback(Response.dbError("Guild calendar lookup error", { error: err }));
-      }
-      else if (!calendar || !calendar.timezone) {
-        callback(Response.invalid({ noTimezone: true }));
-      }
-      else {
-        if (calendar.checkPerm('event.create', msg)) {
-          let inputString = args.join(" ");
-          let results = chrono.parse(inputString);
-          if (!results[0]) {
-            return callback(Response.invalid({ parseFail: true }));
-          }
-    
-          let eventName = inputString.replace(results[0].text, "").trim();
-          let startDate = moment(results[0].start.date());
-          let endDate;
-          try {
-            endDate = moment(results[0].end.date());
-          }
-          catch (err) {
-            endDate = startDate.clone().add(1, 'h');
-          }
-    
-          if (now.diff(startDate) > 0) {
-            callback(Response.invalid({ eventInPast: true }));
+        else {
+          if (calendar.timezone) {
+            callback(Response.success({ alreadyInit: true }));
           }
           else {
-            calendar.addEvent(bot, eventName, startDate, endDate, (err, calendar) => {
+            calendar.timezone = args[0];
+            calendar.defaultChannel = msg.channel.id;
+            calendar.save(err => {
               if (err) {
-                callback(Response.error("Calendar add event save failure", { error: err }));
+                callback(Response.dbError("Guild calendar timezone save error", { error: err }));
               }
               else {
-                let embed = bot.createEmbed(msg.channel.id);
-                embed.title("New Event");
-                embed.color(0x7caeff);
-                embed.field("Event Name", eventName, false);
-                embed.field("Start Date", moment.tz(startDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, calendar.timezone).toString(), false);
-                embed.field("End Date", moment.tz(endDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, calendar.timezone).toString(), false);
-
-                callback(Response.success({ eventEmbed: embed }));
+                callback(Response.success({ timezone: calendar.timezone }));
               }
             });
           }
         }
-        else {
-          callback(Response.unauthorized());
-        }
+      });
+    }
+    catch (e) {
+      callback(Response.error("Method execution error", { error: e }));
+    }
+  }
+
+  static addEvent(bot, msg, args, callback) {
+    try {
+      let now = moment();
+      if (args.length < 1) {
+        return callback(Response.invalid({ argCount: true }));
       }
-    });
+  
+      Calendar.findById(msg.channel.guild.id, (err, calendar) => {
+        if (err) {
+          callback(Response.dbError("Guild calendar lookup error", { error: err }));
+        }
+        else if (!calendar || !calendar.timezone) {
+          callback(Response.invalid({ noTimezone: true }));
+        }
+        else {
+          if (calendar.checkPerm('event.create', msg)) {
+            let inputString = args.join(" ");
+            let results = chrono.parse(inputString);
+            if (!results[0]) {
+              return callback(Response.invalid({ parseFail: true }));
+            }
+      
+            let eventName = inputString.replace(results[0].text, "").trim();
+            let startDate = moment(results[0].start.date());
+            let endDate;
+            try {
+              endDate = moment(results[0].end.date());
+            }
+            catch (err) {
+              endDate = startDate.clone().add(1, 'h');
+            }
+      
+            if (now.diff(startDate) > 0) {
+              callback(Response.invalid({ eventInPast: true }));
+            }
+            else {
+              calendar.addEvent(bot, eventName, startDate, endDate, (err, calendar) => {
+                if (err) {
+                  callback(Response.error("Calendar add event save failure", { error: err }));
+                }
+                else {
+                  let embed = bot.createEmbed(msg.channel.id);
+                  embed.title("New Event");
+                  embed.color(0x7caeff);
+                  embed.field("Event Name", eventName, false);
+                  embed.field("Start Date", moment.tz(startDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, calendar.timezone).toString(), false);
+                  embed.field("End Date", moment.tz(endDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, calendar.timezone).toString(), false);
+  
+                  callback(Response.success({ eventEmbed: embed }));
+                }
+              });
+            }
+          }
+          else {
+            callback(Response.unauthorized());
+          }
+        }
+      });
+    }
+    catch (e) {
+      callback(Response.error("Method execution error", { error: e }));
+    }
   }
 
   static listEvents(msg, callback) {
-    Calendar.findById(msg.channel.guild.id, (err, calendar) => {
-      if (err) {
-        callback(Response.dbError("Guild calendar lookup error"));
-      }
-      else if (!calendar || !calendar.timezone) {
-        callback(Response.invalid({ noTimezone: true }));
-      }
-      else {
-        if (calendar.checkPerm('event.list', msg)) {
-          let now = moment();
-          let resultString = "```css\n";
-  
-          if (calendar.events.length == 0) {
-            resultString = resultString + "No events found!\n";
-          }
-          else {
-            let i = 0;
-            let activeEventHeaderWritten = false;
-            while (i < calendar.events.length && now.diff(moment(calendar.events[i].startDate)) > 0) {
-              if (!activeEventHeaderWritten) {
-                resultString = resultString + "[Active Events]\n\n";
-              }
-              resultString = resultString + `${i+1} : ${calendar.events[i].name} /* ${moment(calendar.events[i].startDate).tz(calendar.timezone).toString()} to ${moment(calendar.events[i].endDate).tz(calendar.timezone).toString()} */\n`;
-              i++;
-            }
-            if (i < calendar.events.length) {
-              resultString = resultString + "\n[Upcoming Events]\n\n";
-            }
-            while (i < calendar.events.length) {
-              resultString = resultString + `${i+1} : ${calendar.events[i].name} /* ${moment(calendar.events[i].startDate).tz(calendar.timezone).toString()} to ${moment(calendar.events[i].endDate).tz(calendar.timezone).toString()} */\n`;
-              i++;
-            }
-          }
-          resultString = resultString + "```";
-          callback(Response.success({ events: resultString }));
+    try {
+      Calendar.findById(msg.channel.guild.id, (err, calendar) => {
+        if (err) {
+          callback(Response.dbError("Guild calendar lookup error"));
+        }
+        else if (!calendar || !calendar.timezone) {
+          callback(Response.invalid({ noTimezone: true }));
         }
         else {
-          callback(Response.unauthorized);
+          if (calendar.checkPerm('event.list', msg)) {
+            let now = moment();
+            let resultString = "```css\n";
+    
+            if (calendar.events.length == 0) {
+              resultString = resultString + "No events found!\n";
+            }
+            else {
+              let i = 0;
+              let activeEventHeaderWritten = false;
+              while (i < calendar.events.length && now.diff(moment(calendar.events[i].startDate)) > 0) {
+                if (!activeEventHeaderWritten) {
+                  resultString = resultString + "[Active Events]\n\n";
+                }
+                resultString = resultString + `${i+1} : ${calendar.events[i].name} /* ${moment(calendar.events[i].startDate).tz(calendar.timezone).toString()} to ${moment(calendar.events[i].endDate).tz(calendar.timezone).toString()} */\n`;
+                i++;
+              }
+              if (i < calendar.events.length) {
+                resultString = resultString + "\n[Upcoming Events]\n\n";
+              }
+              while (i < calendar.events.length) {
+                resultString = resultString + `${i+1} : ${calendar.events[i].name} /* ${moment(calendar.events[i].startDate).tz(calendar.timezone).toString()} to ${moment(calendar.events[i].endDate).tz(calendar.timezone).toString()} */\n`;
+                i++;
+              }
+            }
+            resultString = resultString + "```";
+            callback(Response.success({ events: resultString }));
+          }
+          else {
+            callback(Response.unauthorized);
+          }
         }
-      }
-    });
+      });
+    }
+    catch (e) {
+      callback(Response.error("Method execution error", { error: e }));
+    }
   }
 
   static deleteEvent(msg, args, callback) {
-    if (args.length < 1 || args.length > 1) {
-      return callback(Response.invalid({ argCount: true }));
-    }
-
-    let index = parseInt(args[0]);
-    if (isNaN(index)) {
-      return callback(Response.invalid({ indexNaN: true }));
-    }
-
-    Calendar.findById(msg.channel.guild.id, (err, calendar) => {
-      if (err) {
-        callback(Response.dbError("Guild calendar lookup error", { error: err }));
+    try {
+      if (args.length < 1 || args.length > 1) {
+        return callback(Response.invalid({ argCount: true }));
       }
-      else if (!calendar) {
-        callback(Response.invalid({ noCalendar: true }));
+
+      let index = parseInt(args[0]);
+      if (isNaN(index)) {
+        return callback(Response.invalid({ indexNaN: true }));
       }
-      else {
-        try {
+
+      Calendar.findById(msg.channel.guild.id, (err, calendar) => {
+        if (err) {
+          callback(Response.dbError("Guild calendar lookup error", { error: err }));
+        }
+        else if (!calendar) {
+          callback(Response.invalid({ noCalendar: true }));
+        }
+        else {
           if (calendar.checkPerm('event.delete', msg)) {
             index = index - 1;
             if (index < 0 || index >= calendar.events.length) {
@@ -202,11 +217,11 @@ class CalendarModule {
             callback(Response.unauthorized());
           }
         }
-        catch (e) {
-          callback(Response.error("Method execution error", { error: e }));
-        }
-      }
-    });
+      });
+    }
+    catch (e) {
+      callback(Response.error("Method execution error", { error: e }));
+    }
   }
 
   static updateEvent(bot, msg, index, inputString) {
