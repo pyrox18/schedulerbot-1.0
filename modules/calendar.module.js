@@ -224,76 +224,86 @@ class CalendarModule {
     }
   }
 
-  static updateEvent(bot, msg, index, inputString) {
-    let now = moment();
-    Calendar.findById(msg.channel.guild.id, (err, calendar) => {
-      if (err) {
-        new CommandError(err, bot, msg);
+  static updateEvent(bot, msg, args, callback) {
+    try {
+      let now = moment();
+      if (args.length < 2) {
+        return callback(Response.invalid({ argCount: true }));
       }
-      else {
-        if (calendar.checkPerm('event.update', msg)) {
-          index = index - 1;
-    
-          let results = chrono.parse(inputString);
-          if (!results[0]) {
-            msg.channel.createMessage("Failed to parse event data.");
-            return;
-          }
-    
-    
-          let eventName = inputString.replace(results[0].text, "").trim();
-          let startDate = moment(results[0].start.date());
-          let endDate;
-          try {
-            endDate = moment(results[0].end.date());
-          }
-          catch (err) {
-            endDate = startDate.clone().add(1, 'h');
-          }
-    
-          if (now.diff(startDate) > 0) {
-            msg.channel.createMessage("Cannot update to an event that starts in the past.");
-            return;
-          }
-    
-          if (!calendar) {
-            msg.channel.createMessage("Calendar not found. Run `init <timezone>` to initialise the guild calendar.");
-          }
-          else {
-            if (index < 0 || index >= calendar.events.length) {
-              msg.channel.createMessage("Event not found.");
-            }
-            else {
-              let now = moment();
-              if (now.diff(moment(calendar.events[index].startDate)) > 0) {
-                msg.channel.createMessage("Cannot update an event that is currently active.");
-              }
-              else {
-                calendar.updateEvent(index, eventName, startDate, endDate, (err, calendar) => {
-                  if (err) {
-                    new CommandError(err, bot, msg);
-                  }
-                  else {
-                    let embed = bot.createEmbed(msg.channel.id);
-                    embed.title("Update Event");
-                    embed.color(0xfff835);
-                    embed.field("Event Name", eventName, false);
-                    embed.field("Start Date", moment.tz(startDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, calendar.timezone).toString(), false);
-                    embed.field("End Date", moment.tz(endDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, calendar.timezone).toString(), false);
-    
-                    embed.send(bot, msg.channel.id);
-                    msg.channel.createMessage("Event updated.");
-                  }
-                });
-              }
-            }
-          }
+      let index = parseInt(args[0]);
+      if (isNaN(index)) {
+        return callback(Response.invalid({ indexNaN: true }));
+      }
+
+      Calendar.findById(msg.channel.guild.id, (err, calendar) => {
+        if (err) {
+          callback(Response.dbError("Guild calendar lookup error", { error: err }));
+        }
+        else if (!calendar) {
+          return callback(Response.invalid({ noCalendar: true }));
         }
         else {
-          msg.channel.createMessage("You are not permitted to use this command.");
+          if (calendar.checkPerm('event.update', msg)) {
+            index = index - 1;
+            let inputString = args.slice(1).join(" ");
+      
+            let results = chrono.parse(inputString);
+            if (!results[0]) {
+              return callback(Response.invalid({ parseFail: true }));
+            }
+      
+      
+            let eventName = inputString.replace(results[0].text, "").trim();
+            let startDate = moment(results[0].start.date());
+            let endDate;
+            try {
+              endDate = moment(results[0].end.date());
+            }
+            catch (err) {
+              endDate = startDate.clone().add(1, 'h');
+            }
+      
+            if (now.diff(startDate) > 0) {
+              return callback(Response.invalid({ eventInPast: true }));
+            }
+            else {
+              if (index < 0 || index >= calendar.events.length) {
+                callback(Response.invalid({ noEvent: true }));
+              }
+              else {
+                let now = moment();
+                if (now.diff(moment(calendar.events[index].startDate)) > 0) {
+                  msg.channel.createMessage("Cannot update an event that is currently active.");
+                }
+                else {
+                  calendar.updateEvent(index, eventName, startDate, endDate, (err, calendar) => {
+                    if (err) {
+                      callback(Response.dbError("Calendar update event save failure", { error: err }));
+                    }
+                    else {
+                      let embed = bot.createEmbed(msg.channel.id);
+                      embed.title("Update Event");
+                      embed.color(0xfff835);
+                      embed.field("Event Name", eventName, false);
+                      embed.field("Start Date", moment.tz(startDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, calendar.timezone).toString(), false);
+                      embed.field("End Date", moment.tz(endDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, calendar.timezone).toString(), false);
+      
+                      callback(Response.success({ eventEmbed: embed }));
+                    }
+                  });
+                }
+              }
+            }
+          }
+          else {
+            callback(Response.unauthorized());
+          }
         }
-      }
-    });
+      });
+    }
+    catch (e) {
+      callback(Response.error("Method execution error", { error: e }));
+    }
   }
 }
 
