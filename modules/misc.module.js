@@ -30,7 +30,7 @@ class MiscModule {
     });
   }
 
-  static prefix(msg, args, callback) {
+  static prefix(bot, msg, args, callback) {
     Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
         callback(Response.dbError("Guild calendar find error", err));

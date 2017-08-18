@@ -18,7 +18,7 @@ module.exports = (bot) => {
   }, cmdOptions.ping);
 
   bot.registerCommand("prefix", (msg, args) => {
-    misc.prefix(msg, args, res => {
+    misc.prefix(bot, msg, args, res => {
       if (res.error()) {
         return new CommandError(res.message, bot, msg);
       }
