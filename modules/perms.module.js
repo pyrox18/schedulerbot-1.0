@@ -92,7 +92,7 @@ class PermsModule {
     }
   }
   
-  static displayPermNodes(bot, msg, callback) {
+  static displayPermNodes(msg, callback) {
     try {
       Calendar.findById(msg.channel.guild.id, (err, calendar) => {
         if (err) {

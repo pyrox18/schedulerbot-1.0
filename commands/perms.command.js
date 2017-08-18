@@ -32,7 +32,7 @@ module.exports = (bot) => {
   }, cmdOptions.perms.modify);
 
   permsCommand.registerSubcommand('nodes', (msg, args) => {
-    perms.displayPermNodes(bot, msg, res => {
+    perms.displayPermNodes(msg, res => {
       if (res.error()) {
         return new CommandError(res.message, bot, msg);
       }
