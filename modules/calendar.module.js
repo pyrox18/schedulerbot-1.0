@@ -160,7 +160,7 @@ class CalendarModule {
             callback(Response.success({ events: resultString }));
           }
           else {
-            callback(Response.unauthorized);
+            callback(Response.unauthorized());
           }
         }
       });
