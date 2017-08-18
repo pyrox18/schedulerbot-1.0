@@ -42,12 +42,6 @@ module.exports = (bot) => {
   bot.registerCommand("invite", `Click the following link to invite the bot to your server. https://discordapp.com/oauth2/authorize?client_id=339019867325726722&scope=bot&permissions=150536`, cmdOptions.invite);
 
   bot.registerCommand("info", (msg, args) => {
-    // try {
-    //   misc.info(bot, msg);
-    // }
-    // catch (err) {
-    //   new CommandError(bot, msg, args);
-    // }
     misc.info(bot, msg, res => {
       if (res.error()) {
         return new CommandError(res.message, bot, msg);

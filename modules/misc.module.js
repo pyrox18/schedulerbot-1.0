@@ -89,7 +89,6 @@ class MiscModule {
       output += `Users serving: ${bot.users.size}\n`;
       output += `Uptime: ${uptimeParsed.d} day(s), ${uptimeParsed.h} hour(s), ${uptimeParsed.m} minute(s), ${uptimeParsed.s} second(s)\n`;
       output += "```"
-      // msg.channel.createMessage(output);
       callback(Response.success({ output: output }));
     }
     catch (e) {
