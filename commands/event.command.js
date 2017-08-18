@@ -13,7 +13,7 @@ module.exports = (bot) => {
       if (res.unauthorized()) {
         return msg.channel.createMessage("You are not permitted to use this command.");
       }
-      if (res.invalid()) {
+      if (res.reject()) {
         if (res.meta.parseFail) {
           return msg.channel.createMessage("Failed to parse event data.");
         }
@@ -39,7 +39,7 @@ module.exports = (bot) => {
       if (res.error()) {
         return new CommandError(res.message, bot, msg);
       }
-      if (res.invalid()) {
+      if (res.reject()) {
         return msg.channel.createMessage("Timezone not set. Run the `init <timezone>` command to set the timezone first.");
       }
       if (res.unauthorized()) {
@@ -56,7 +56,7 @@ module.exports = (bot) => {
       if (res.error()) {
         return new CommandError(res.message, bot, msg);
       }
-      if (res.invalid()) {
+      if (res.reject()) {
         if (res.meta.argCount || res.meta.indexNaN) {
           return msg.channel.createMessage("Usage: `event delete <eventIndex>` (eventIndex can be checked by running `event list`)");
         }
@@ -82,7 +82,7 @@ module.exports = (bot) => {
       if (res.error()) {
         return new CommandError(res.message, bot, msg);
       }
-      if (res.invalid()) {
+      if (res.reject()) {
         if (res.meta.argCount || res.meta.indexNaN) {
           return msg.channel.createMessage("Usage: `event delete <eventIndex>` (eventIndex can be checked by running `event list`)");
         }

@@ -36,7 +36,7 @@ class MiscModule {
         callback(Response.dbError("Guild calendar find error", { error: err }));
       }
       else if (args.length > 1) {
-        callback(Response.invalid());
+        callback(Response.reject());
       }
       else if (args.length == 0) {
         try {

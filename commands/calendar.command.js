@@ -11,7 +11,7 @@ module.exports = (bot) => {
       if (res.error()) {
         return new CommandError(res.message, bot, msg);
       }
-      if (res.invalid()) {
+      if (res.reject()) {
         return msg.channel.createMessage("Usage: `init <timezone>`\nSee https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List under the TZ column for available timezones.");
       }
       if (res.success()) {

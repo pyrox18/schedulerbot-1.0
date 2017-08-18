@@ -8,7 +8,7 @@ module.exports = (bot) => {
       if (res.error()) {
         return new CommandError(res.message, bot, msg);
       }
-      if (res.invalid()) {
+      if (res.reject()) {
         if (res.meta.invalidArgs) {
           return msg.channel.createMessage("Usage: `perms <allow|deny> <permNode> < --role <role> | --user <user> >`\nRun `perms nodes` for a list of available nodes.");
         }
@@ -36,7 +36,7 @@ module.exports = (bot) => {
       if (res.error()) {
         return new CommandError(res.message, bot, msg);
       }
-      if (res.invalid()) {
+      if (res.reject()) {
         return msg.channel.createMessage("Calendar not found. Run `init <timezone>` to initialise the guild calendar.");
       }
       if (res.unauthorized()) {
@@ -53,7 +53,7 @@ module.exports = (bot) => {
       if (res.error()) {
         return new CommandError(res.message, bot, msg);
       }
-      if (res.invalid()) {
+      if (res.reject()) {
         if (res.meta.invalidArgs) {
           return msg.channel.createMessage("Usage: `perms show < --node <permNode> | --role <role> | --user <user> >`");
         }

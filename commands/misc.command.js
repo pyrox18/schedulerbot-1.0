@@ -25,7 +25,7 @@ module.exports = (bot) => {
       if (res.unauthorized()) {
         return msg.channel.createMessage("You are not permitted to use this command.");
       }
-      if (res.invalid()) {
+      if (res.reject()) {
         return msg.channel.createMessage("Invalid input.");
       }
       if (res.success()) {

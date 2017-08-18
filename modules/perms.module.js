@@ -21,7 +21,7 @@ const availableNodes = [
 class PermsModule {
   static modifyPerms(bot, msg, args, callback) {
     if (args.length < 4 || (args[0] != 'allow' && args[0] != 'deny') || (args[2] != '--role' && args[2] != '--user')) {
-      return callback(Response.invalid({ invalidArgs: true }));
+      return callback(Response.reject({ invalidArgs: true }));
     }
     try {
       Calendar.findById(msg.channel.guild.id, (err, calendar) => {
@@ -29,12 +29,12 @@ class PermsModule {
           callback(Response.dbError("Guild calendar lookup error", { error: err }));
         }
         else if (!calendar) {
-          callback(Response.invalid({ noCalendar: true }));
+          callback(Response.reject({ noCalendar: true }));
         }
         else {
           if (calendar.checkPerm('perms.modify', msg)) {
             if (!availableNodes.find(node => { return args[1] == node })) {
-              return callback(Response.invalid({ noNode: true }));
+              return callback(Response.reject({ noNode: true }));
             }
       
             let targetName = args.slice(3).join(' ');
@@ -46,7 +46,7 @@ class PermsModule {
               results = findEntityNames(msg.channel.guild.members, targetName);
             }
             if (results.length == 0) {
-              return callback(Response.invalid({ noRoleOrUser: true }));
+              return callback(Response.reject({ noRoleOrUser: true }));
             }
             if (results.length > 1) {
               let resultString = "```css\n";
@@ -99,7 +99,7 @@ class PermsModule {
           callback(Response.dbError("Guild calendar lookup error", { error: err }));
         }
         else if (!calendar) {
-          callback(Response.invalid({ noCalendar: true }));
+          callback(Response.reject({ noCalendar: true }));
         }
         else {
           if (calendar.checkPerm('perms.nodes', msg)) {
@@ -123,7 +123,7 @@ class PermsModule {
   
   static showPerm(bot, msg, args, callback) {
     if (args.length < 2 || (args[0] != '--node' && args[0] != '--role' && args[0] != '--user')) {
-      return callback(Response.invalid({ invalidArgs: true }));
+      return callback(Response.reject({ invalidArgs: true }));
     }
 
     try {
@@ -132,7 +132,7 @@ class PermsModule {
           callback(Response.dbError("Guild calendar lookup error", { error: err }));
         }
         else if (!calendar) {
-          callback(Response.invalid({ noCalendar: true }));
+          callback(Response.reject({ noCalendar: true }));
         }
         else {
           if (calendar.checkPerm('perms.show', msg)) {
@@ -175,7 +175,7 @@ class PermsModule {
                 callback(Response.success({ result: resultString }));
               }
               else {
-                callback(Response.invalid({ noNode: true }));
+                callback(Response.reject({ noNode: true }));
               }
             }
             else {
@@ -188,7 +188,7 @@ class PermsModule {
                 results = findEntityNames(msg.channel.guild.members, targetName);
               }
               if (results.length == 0) {
-                return callback(Response.invalid({ noRoleOrUser: true }));
+                return callback(Response.reject({ noRoleOrUser: true }));
               }
               if (results.length > 1) {
                 let resultString = "```css\n";

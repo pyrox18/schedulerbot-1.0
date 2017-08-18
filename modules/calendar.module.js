@@ -15,7 +15,7 @@ class CalendarModule {
           callback(Response.dbError("Guild calendar lookup error", { error: err }));
         }
         else if (args.length > 1 || args.length < 1 || moment.tz.zone(args[0]) === null) {
-          callback(Response.invalid());
+          callback(Response.reject());
         } 
         else if (!calendar) {
           let newCal = new Calendar({
@@ -61,7 +61,7 @@ class CalendarModule {
     try {
       let now = moment();
       if (args.length < 1) {
-        return callback(Response.invalid({ argCount: true }));
+        return callback(Response.reject({ argCount: true }));
       }
   
       Calendar.findById(msg.channel.guild.id, (err, calendar) => {
@@ -69,14 +69,14 @@ class CalendarModule {
           callback(Response.dbError("Guild calendar lookup error", { error: err }));
         }
         else if (!calendar || !calendar.timezone) {
-          callback(Response.invalid({ noTimezone: true }));
+          callback(Response.reject({ noTimezone: true }));
         }
         else {
           if (calendar.checkPerm('event.create', msg)) {
             let inputString = args.join(" ");
             let results = chrono.parse(inputString);
             if (!results[0]) {
-              return callback(Response.invalid({ parseFail: true }));
+              return callback(Response.reject({ parseFail: true }));
             }
       
             let eventName = inputString.replace(results[0].text, "").trim();
@@ -90,7 +90,7 @@ class CalendarModule {
             }
       
             if (now.diff(startDate) > 0) {
-              callback(Response.invalid({ eventInPast: true }));
+              callback(Response.reject({ eventInPast: true }));
             }
             else {
               calendar.addEvent(bot, eventName, startDate, endDate, (err, calendar) => {
@@ -128,7 +128,7 @@ class CalendarModule {
           callback(Response.dbError("Guild calendar lookup error"));
         }
         else if (!calendar || !calendar.timezone) {
-          callback(Response.invalid({ noTimezone: true }));
+          callback(Response.reject({ noTimezone: true }));
         }
         else {
           if (calendar.checkPerm('event.list', msg)) {
@@ -173,12 +173,12 @@ class CalendarModule {
   static deleteEvent(msg, args, callback) {
     try {
       if (args.length < 1 || args.length > 1) {
-        return callback(Response.invalid({ argCount: true }));
+        return callback(Response.reject({ argCount: true }));
       }
 
       let index = parseInt(args[0]);
       if (isNaN(index)) {
-        return callback(Response.invalid({ indexNaN: true }));
+        return callback(Response.reject({ indexNaN: true }));
       }
 
       Calendar.findById(msg.channel.guild.id, (err, calendar) => {
@@ -186,13 +186,13 @@ class CalendarModule {
           callback(Response.dbError("Guild calendar lookup error", { error: err }));
         }
         else if (!calendar) {
-          callback(Response.invalid({ noCalendar: true }));
+          callback(Response.reject({ noCalendar: true }));
         }
         else {
           if (calendar.checkPerm('event.delete', msg)) {
             index = index - 1;
             if (index < 0 || index >= calendar.events.length) {
-              callback(Response.invalid({ noEvent: true }));
+              callback(Response.reject({ noEvent: true }));
             }
             else {
               let deletedEvent = calendar.events[index];
@@ -228,11 +228,11 @@ class CalendarModule {
     try {
       let now = moment();
       if (args.length < 2) {
-        return callback(Response.invalid({ argCount: true }));
+        return callback(Response.reject({ argCount: true }));
       }
       let index = parseInt(args[0]);
       if (isNaN(index)) {
-        return callback(Response.invalid({ indexNaN: true }));
+        return callback(Response.reject({ indexNaN: true }));
       }
 
       Calendar.findById(msg.channel.guild.id, (err, calendar) => {
@@ -240,7 +240,7 @@ class CalendarModule {
           callback(Response.dbError("Guild calendar lookup error", { error: err }));
         }
         else if (!calendar) {
-          return callback(Response.invalid({ noCalendar: true }));
+          return callback(Response.reject({ noCalendar: true }));
         }
         else {
           if (calendar.checkPerm('event.update', msg)) {
@@ -249,7 +249,7 @@ class CalendarModule {
       
             let results = chrono.parse(inputString);
             if (!results[0]) {
-              return callback(Response.invalid({ parseFail: true }));
+              return callback(Response.reject({ parseFail: true }));
             }
       
       
@@ -264,11 +264,11 @@ class CalendarModule {
             }
       
             if (now.diff(startDate) > 0) {
-              return callback(Response.invalid({ eventInPast: true }));
+              return callback(Response.reject({ eventInPast: true }));
             }
             else {
               if (index < 0 || index >= calendar.events.length) {
-                callback(Response.invalid({ noEvent: true }));
+                callback(Response.reject({ noEvent: true }));
               }
               else {
                 let now = moment();
