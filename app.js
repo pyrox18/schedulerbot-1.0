@@ -13,7 +13,9 @@ const scheduler = require('./modules/scheduler.module');
 mongoose.Promise = global.Promise;
 
 // Connect to database
-mongoose.connect(config.dbConnectionUrl);
+mongoose.connect(config.dbConnectionUrl, {
+  useMongoClient: true
+});
 db = mongoose.connection;
 
 db.on('error', (err) => {
