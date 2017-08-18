@@ -17,15 +17,15 @@ class Response {
     return responseCodes;
   }
 
-  static success(meta) {
+  static success(meta = {}) {
     return new this(this.responseCodes.SUCCESS, null, meta);
   }
 
-  static error(message, meta) {
+  static error(message, meta = {}) {
     return new this(this.responseCodes.ERROR, message, meta);
   }
 
-  static dbError(message, meta) {
+  static dbError(message, meta = {}) {
     return new this(this.responseCodes.DB_ERROR, message, meta);
   }
 
@@ -33,7 +33,7 @@ class Response {
     return new this(this.responseCodes.UNAUTHORIZED, null, null);
   }
 
-  static invalid(meta = null) {
+  static invalid(meta = {}) {
     return new this(this.responseCodes.INVALID, null, meta);
   }
 
