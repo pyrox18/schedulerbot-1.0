@@ -8,7 +8,7 @@ class MiscModule {
   static ping(msg, callback) {
     Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
-        callback(Response.error("Guild calendar find error", { error: err }));
+        callback(Response.error("Guild calendar find error", err));
       }
       else {
         try {
@@ -24,7 +24,7 @@ class MiscModule {
           }
         }
         catch (e) {
-          callback(Response.error("Method execution error", { error: e }));
+          callback(Response.error("Method execution error", e));
         }
       }    
     });
@@ -33,7 +33,7 @@ class MiscModule {
   static prefix(msg, args, callback) {
     Calendar.findById(msg.channel.guild.id, (err, calendar) => {
       if (err) {
-        callback(Response.dbError("Guild calendar find error", { error: err }));
+        callback(Response.dbError("Guild calendar find error", err));
       }
       else if (args.length > 1) {
         callback(Response.reject());
@@ -48,14 +48,14 @@ class MiscModule {
           }
         }
         catch (e) {
-          callback(Response.error("Method execution error", { error: e }));
+          callback(Response.error("Method execution error", e));
         }
       }
       else {
         if (calendar.checkPerm('prefix.modify', msg)) {
           calendar.updatePrefix(args[0], err => {
             if (err) {
-              callback(Response.dbError("Prefix update error", { error: err }));
+              callback(Response.dbError("Prefix update error", err));
             }
             else {
               try {
@@ -67,7 +67,7 @@ class MiscModule {
                 }));
               }
               catch (e) {
-                callback(Response.error("Method execution error", { error: e }));
+                callback(Response.error("Method execution error", e));
               }
             }
           });
@@ -92,7 +92,7 @@ class MiscModule {
       callback(Response.success({ output: output }));
     }
     catch (e) {
-      callback(Response.error("Method execution error", { error: e }));
+      callback(Response.error("Method execution error", e));
     }
   }
 }

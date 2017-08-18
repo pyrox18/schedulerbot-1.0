@@ -12,7 +12,7 @@ class CalendarModule {
     try {
       Calendar.findById(msg.channel.guild.id, (err, calendar) => {
         if (err) {
-          callback(Response.dbError("Guild calendar lookup error", { error: err }));
+          callback(Response.dbError("Guild calendar lookup error", err));
         }
         else if (args.length > 1 || args.length < 1 || moment.tz.zone(args[0]) === null) {
           callback(Response.reject());
@@ -26,7 +26,7 @@ class CalendarModule {
           });
           newCal.save((err, calendar) => {
             if (err) {
-              callback(Response.dbError("New guild calendar save error", { error: err }));
+              callback(Response.dbError("New guild calendar save error", err));
             }
             else {
               callback(Response.success({ timezone: calendar.timezone }));
@@ -42,7 +42,7 @@ class CalendarModule {
             calendar.defaultChannel = msg.channel.id;
             calendar.save(err => {
               if (err) {
-                callback(Response.dbError("Guild calendar timezone save error", { error: err }));
+                callback(Response.dbError("Guild calendar timezone save error", err));
               }
               else {
                 callback(Response.success({ timezone: calendar.timezone }));
@@ -53,7 +53,7 @@ class CalendarModule {
       });
     }
     catch (e) {
-      callback(Response.error("Method execution error", { error: e }));
+      callback(Response.error("Method execution error", e));
     }
   }
 
@@ -66,7 +66,7 @@ class CalendarModule {
   
       Calendar.findById(msg.channel.guild.id, (err, calendar) => {
         if (err) {
-          callback(Response.dbError("Guild calendar lookup error", { error: err }));
+          callback(Response.dbError("Guild calendar lookup error", err));
         }
         else if (!calendar || !calendar.timezone) {
           callback(Response.reject({ noTimezone: true }));
@@ -95,7 +95,7 @@ class CalendarModule {
             else {
               calendar.addEvent(bot, eventName, startDate, endDate, (err, calendar) => {
                 if (err) {
-                  callback(Response.error("Calendar add event save failure", { error: err }));
+                  callback(Response.error("Calendar add event save failure", err));
                 }
                 else {
                   let embed = bot.createEmbed(msg.channel.id);
@@ -117,7 +117,7 @@ class CalendarModule {
       });
     }
     catch (e) {
-      callback(Response.error("Method execution error", { error: e }));
+      callback(Response.error("Method execution error", e));
     }
   }
 
@@ -166,7 +166,7 @@ class CalendarModule {
       });
     }
     catch (e) {
-      callback(Response.error("Method execution error", { error: e }));
+      callback(Response.error("Method execution error", e));
     }
   }
 
@@ -183,7 +183,7 @@ class CalendarModule {
 
       Calendar.findById(msg.channel.guild.id, (err, calendar) => {
         if (err) {
-          callback(Response.dbError("Guild calendar lookup error", { error: err }));
+          callback(Response.dbError("Guild calendar lookup error", err));
         }
         else if (!calendar) {
           callback(Response.reject({ noCalendar: true }));
@@ -198,7 +198,7 @@ class CalendarModule {
               let deletedEvent = calendar.events[index];
               calendar.deleteEvent(index, (err) => {
                 if (err) {
-                  callback(Response.dbError("Calendar delete event save failure", { error: err }));
+                  callback(Response.dbError("Calendar delete event save failure", err));
                 }
                 else {
                   let embed = bot.createEmbed(msg.channel.id);
@@ -220,7 +220,7 @@ class CalendarModule {
       });
     }
     catch (e) {
-      callback(Response.error("Method execution error", { error: e }));
+      callback(Response.error("Method execution error", e));
     }
   }
 
@@ -237,7 +237,7 @@ class CalendarModule {
 
       Calendar.findById(msg.channel.guild.id, (err, calendar) => {
         if (err) {
-          callback(Response.dbError("Guild calendar lookup error", { error: err }));
+          callback(Response.dbError("Guild calendar lookup error", err));
         }
         else if (!calendar) {
           return callback(Response.reject({ noCalendar: true }));
@@ -278,7 +278,7 @@ class CalendarModule {
                 else {
                   calendar.updateEvent(index, eventName, startDate, endDate, (err, calendar) => {
                     if (err) {
-                      callback(Response.dbError("Calendar update event save failure", { error: err }));
+                      callback(Response.dbError("Calendar update event save failure", err));
                     }
                     else {
                       let embed = bot.createEmbed(msg.channel.id);
@@ -302,7 +302,7 @@ class CalendarModule {
       });
     }
     catch (e) {
-      callback(Response.error("Method execution error", { error: e }));
+      callback(Response.error("Method execution error", e));
     }
   }
 }

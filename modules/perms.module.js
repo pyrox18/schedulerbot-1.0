@@ -26,7 +26,7 @@ class PermsModule {
     try {
       Calendar.findById(msg.channel.guild.id, (err, calendar) => {
         if (err) {
-          callback(Response.dbError("Guild calendar lookup error", { error: err }));
+          callback(Response.dbError("Guild calendar lookup error", err));
         }
         else if (!calendar) {
           callback(Response.reject({ noCalendar: true }));
@@ -88,7 +88,7 @@ class PermsModule {
       });
     }
     catch (e) {
-      callback(Response.error("Method execution error"));
+      callback(Response.error("Method execution error", e));
     }
   }
   
@@ -96,7 +96,7 @@ class PermsModule {
     try {
       Calendar.findById(msg.channel.guild.id, (err, calendar) => {
         if (err) {
-          callback(Response.dbError("Guild calendar lookup error", { error: err }));
+          callback(Response.dbError("Guild calendar lookup error", err));
         }
         else if (!calendar) {
           callback(Response.reject({ noCalendar: true }));
@@ -117,7 +117,7 @@ class PermsModule {
       });
     }
     catch (e) {
-      callback(Response.error("Method execution error", { error: e }));
+      callback(Response.error("Method execution error", e));
     }
   }
   
@@ -129,7 +129,7 @@ class PermsModule {
     try {
       Calendar.findById(msg.channel.guild.id, (err, calendar) => {
         if (err) {
-          callback(Response.dbError("Guild calendar lookup error", { error: err }));
+          callback(Response.dbError("Guild calendar lookup error", err));
         }
         else if (!calendar) {
           callback(Response.reject({ noCalendar: true }));
@@ -231,7 +231,7 @@ class PermsModule {
       });
     }
     catch (e) {
-      callback(Response.error("Method execution error", { error: err }));
+      callback(Response.error("Method execution error", e));
     }
   }
 }
@@ -262,7 +262,7 @@ setRolePermission = function(bot, calendar, node, roleName, perm, msg, callback)
   if (perm == 'deny') {
     calendar.denyRolePerm(roleId, node, err => {
       if (err) {
-        callback(Response.dbError("Role permission deny save error", { error: err }));
+        callback(Response.dbError("Role permission deny save error", err));
       }
       else {
         callback(Response.success());
@@ -272,7 +272,7 @@ setRolePermission = function(bot, calendar, node, roleName, perm, msg, callback)
   else {
     calendar.allowRolePerm(roleId, node, err => {
       if (err) {
-        callback(Response.dbError("Role permission allow save error", { error: err }));
+        callback(Response.dbError("Role permission allow save error", err));
       }
       else {
         callback(Response.success());
@@ -287,7 +287,7 @@ setUserPermission = function(bot, calendar, node, username, perm, msg, callback)
   if (perm == 'deny') {
     calendar.denyUserPerm(userId, node, err => {
       if (err) {
-        callback(Response.dbError("User permission deny save error", { error: err }));
+        callback(Response.dbError("User permission deny save error", err));
       }
       else {
         callback(Response.success());
@@ -297,7 +297,7 @@ setUserPermission = function(bot, calendar, node, username, perm, msg, callback)
   else {
     calendar.allowUserPerm(userId, node, err => {
       if (err) {
-        callback(Response.dbError("User permission deny save error", { error: err }));
+        callback(Response.dbError("User permission deny save error", err));
       }
       else {
         callback(Response.success());

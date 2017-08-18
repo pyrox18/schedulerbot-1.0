@@ -21,12 +21,16 @@ class Response {
     return new this(this.responseCodes.SUCCESS, null, meta);
   }
 
-  static error(message, meta = {}) {
-    return new this(this.responseCodes.ERROR, message, meta);
+  static error(message, error, meta = {}) {
+    let res = new this(this.responseCodes.ERROR, message, meta);
+    meta.error = error;
+    return res;
   }
 
-  static dbError(message, meta = {}) {
-    return new this(this.responseCodes.DB_ERROR, message, meta);
+  static dbError(message, error, meta = {}) {
+    let res = new this(this.responseCodes.DB_ERROR, message, meta);
+    meta.error = error;
+    return res;
   }
 
   static unauthorized() {
