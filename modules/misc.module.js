@@ -79,16 +79,22 @@ class MiscModule {
     });
   }
 
-  static info(bot, msg) {
-    let uptimeParsed = convertMS(bot.uptime);
-    let output = "```\n";
-    output += "SchedulerBot\n\n";
-    output += "Version: " + version + "\n";
-    output += `Guilds serving: ${bot.guilds.size}\n`;
-    output += `Users serving: ${bot.users.size}\n`;
-    output += `Uptime: ${uptimeParsed.d} days, ${uptimeParsed.h} hours, ${uptimeParsed.m} minutes, ${uptimeParsed.s} seconds\n`;
-    output += "```"
-    msg.channel.createMessage(output);
+  static info(bot, msg, callback) {
+    try {
+      let uptimeParsed = convertMS(bot.uptime);
+      let output = "```\n";
+      output += "SchedulerBot\n\n";
+      output += "Version: " + version + "\n";
+      output += `Guilds serving: ${bot.guilds.size}\n`;
+      output += `Users serving: ${bot.users.size}\n`;
+      output += `Uptime: ${uptimeParsed.d} day(s), ${uptimeParsed.h} hour(s), ${uptimeParsed.m} minute(s), ${uptimeParsed.s} second(s)\n`;
+      output += "```"
+      // msg.channel.createMessage(output);
+      callback(Response.success({ output: output }));
+    }
+    catch (e) {
+      callback(Response.error("Method execution error", { error: e }));
+    }
   }
 }
 
