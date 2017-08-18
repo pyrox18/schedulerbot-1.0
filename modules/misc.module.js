@@ -1,11 +1,8 @@
 const moment = require('moment-timezone');
 const Calendar = require('../models/calendar.model');
 const CommandError = require('../models/command-error.model');
-<<<<<<< HEAD
 const version = require('../package.json').version;
-=======
 const Response = require('../models/response.model');
->>>>>>> Implement Response class in ping command
 
 class MiscModule {
   static ping(msg, callback) {
