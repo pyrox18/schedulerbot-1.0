@@ -50,7 +50,7 @@ bot.on("ready", () => {
       exit(1);
     }
     for (let calendar of calendars) {
-      let prefixes = [calendar.prefix, bot.user.mention + " "];
+      let prefixes = [calendar.prefix, "@mention "];
       bot.registerGuildPrefix(calendar._id, prefixes);
       scheduler.scheduleExistingEvents(bot, calendar);
     }

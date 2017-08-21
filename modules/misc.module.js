@@ -59,7 +59,7 @@ class MiscModule {
             }
             else {
               try {
-                let prefixes = [args[0], bot.user.mention + " "];
+                let prefixes = [args[0], "@mention "];
                 bot.registerGuildPrefix(msg.channel.guild.id, prefixes);
                 callback(Response.success({ 
                   isModified: true,
