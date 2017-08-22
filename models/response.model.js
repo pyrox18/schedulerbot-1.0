@@ -38,7 +38,7 @@ class Response {
   }
 
   static reject(meta = {}) {
-    return new this(this.responseCodes.INVALID, null, meta);
+    return new this(this.responseCodes.REJECT, null, meta);
   }
 
   success() {
