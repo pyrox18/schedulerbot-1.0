@@ -5,8 +5,8 @@ const scheduler = require('../modules/scheduler.module');
 
 let eventSchema = mongoose.Schema({
   name: String,
-  startDate: String,
-  endDate: String
+  startDate: Date,
+  endDate: Date
 });
 
 let permsSchema = mongoose.Schema({
@@ -27,13 +27,10 @@ let calendarSchema = mongoose.Schema({
 });
 
 calendarSchema.methods.addEvent = function(bot, eventName, startDate, endDate, callback) {
-  let actualStartDate = moment.tz(startDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, this.timezone);
-  let actualEndDate = moment.tz(endDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, this.timezone);
-
   let event = {
     name: eventName,
-    startDate: actualStartDate.toISOString(),
-    endDate: actualEndDate.toISOString()
+    startDate: startDate.toDate(),
+    endDate: endDate.toDate()
   }
   let eventIndex;
 
@@ -43,7 +40,7 @@ calendarSchema.methods.addEvent = function(bot, eventName, startDate, endDate, c
   }
   else {
     for (let i = 0; i < this.events.length; i++) {
-      if (this.events[i].startDate >= event.startDate) {
+      if (moment(this.events[i].startDate).isSameOrAfter(startDate)) {
         this.events.splice(i, 0, event);
         eventIndex = i;
         break;
@@ -81,19 +78,17 @@ calendarSchema.methods.updateEvent = function(eventIndex, eventName, startDate, 
   if (eventIndex >= 0 && eventIndex < this.events.length) {
     let eventArray = this.events.splice(eventIndex, 1);
     let event = eventArray[0];
-    let actualStartDate = moment.tz(startDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, this.timezone);
-    let actualEndDate = moment.tz(endDate.format('YYYY-MM-DDTHH:mm:ss.SSS'), moment.ISO_8601, this.timezone);
 
     event.name = eventName;
-    event.startDate = actualStartDate.toISOString();
-    event.endDate = actualEndDate.toISOString();
+    event.startDate = startDate.toDate();
+    event.endDate = endDate.toDate();
 
     if (this.events.length == 0) {
       this.events.push(event);
     }
     else {
       for (let i = 0; i < this.events.length; i++) {
-        if (this.events[i].startDate >= event.startDate) {
+        if (moment(this.events[i].startDate).isSameOrAfter(startDate)) {
           this.events.splice(i, 0, event);
           break;
         }

@@ -14,7 +14,7 @@ class Scheduler {
     let now = moment();
     for (let event of calendar.events) {
       if (now.diff(moment(event.startDate)) <= 0) { // Schedule notifier job only if event hasn't started
-        this.notifierJobs.set(event._id.toString(), schedule.scheduleJob(moment(event.startDate).toDate(), () => {
+        this.notifierJobs.set(event._id.toString(), schedule.scheduleJob(event.startDate, () => {
           let embed = bot.createEmbed(calendar.defaultChannel);
           embed.title("Event starting now!");
           embed.color(0x14ff47);
@@ -28,7 +28,7 @@ class Scheduler {
       }
 
       if (now.diff(moment(event.endDate)) <= 0) { // Schedule delete job if event hasn't ended
-        this.deleteJobs.set(event._id.toString(), schedule.scheduleJob(moment(event.endDate).toDate(), () => {
+        this.deleteJobs.set(event._id.toString(), schedule.scheduleJob(event.endDate, () => {
           calendar.deleteEventById(event._id.toString(), err => {
             if (err) {
               // throw new Error('Failed to delete event by ID in Scheduler.scheduleExistingEvents: ' + err);
@@ -49,7 +49,7 @@ class Scheduler {
   }
 
   scheduleEvent(bot, calendar, event) {
-    this.notifierJobs.set(event._id.toString(), schedule.scheduleJob(moment(event.startDate).toDate(), () => {
+    this.notifierJobs.set(event._id.toString(), schedule.scheduleJob(event.startDate, () => {
       let embed = bot.createEmbed(calendar.defaultChannel);
       embed.title("Event starting now!");
       embed.color(0x14ff47);
@@ -60,7 +60,7 @@ class Scheduler {
       embed.send(bot, calendar.defaultChannel);
       bot.createMessage(calendar.defaultChannel, `${event.name} starting now!`);
     }));
-    this.deleteJobs.set(event._id.toString(), schedule.scheduleJob(moment(event.endDate).toDate(), function() {
+    this.deleteJobs.set(event._id.toString(), schedule.scheduleJob(event.endDate, () => {
       calendar.deleteEventById(event._id.toString(), err => {
         if (err) {
           // throw new Error('Failed to delete event by ID in Scheduler.scheduleEvent: ' + err);
