@@ -2,34 +2,46 @@
 
 This changelog is formatted based on [Keep a Changelog](http://keepachangelog.com/) and this project attempts to adhere to [Semantic Versioning](http://semver.org) as much as possible.
 
+## v0.4.1 - 2017-08-22
+
+### Changed
+
+- Updated the bot's dependencies to solve certain issues.
+- Changed the handling of how the bot loads the alternative prefix (bot mention).
+
+### Fixed
+
+- Invalid command entries should now make the bot provide an appropriate response.
+- The bot's status message should now display properly, as a Discord API update broke the previous implementation of the status setter in the Eris library.
+
 ## v0.4.0 - 2017-08-18
 
-### Added:
+### Added
 
 - New `info` command allows users to see the bot's version, number of guilds and users serving, and uptime.
 - New admin command set for the bot owner to perform restricted actions (like forcing errors for testing purposes) easily. Not accessible to any other users except for the bot owner.
 
-### Changed:
+### Changed
 
 - The interaction between command declarations and its corresponding modules has been revised so that modules now return standardised responses, which the commands then interpret to send a response to the user on Discord.
 
-### Fixed:
+### Fixed
 
 - When a guild is deleted (i.e. the bot is kicked from a server), the scheduler module now unschedules events that are in the guild's calendar before deleting the calendar from the database. Previously, the bot would not unschedule those events, and would crash when attempting to send a scheduled notification message to the deleted guild.
 
 ## v0.3.2 - 2017-07-31
 
-### Changed:
+### Changed
 
 - Changed error handling in the bot's event scheduling module to prevent the bot from crashing under certain situations.
 
 ## v0.3.1 - 2017-07-29
 
-### Fixed:
+### Fixed
 
 - Replaced prompts that incorrectly informed users to run `calendar <timezone>` with `init <timezone>`.
 
-### Changed:
+### Changed
 
 - Replaced "Invalid input" messages with command usage guides.
 - Changed the support server link provided in the `support` command to lead to the #welcome channel.
