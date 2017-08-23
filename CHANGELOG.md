@@ -2,6 +2,18 @@
 
 This changelog is formatted based on [Keep a Changelog](http://keepachangelog.com/) and this project attempts to adhere to [Semantic Versioning](http://semver.org) as much as possible.
 
+## v0.4.2 - 2017-08-23
+
+### Changed
+
+- Changed the way the bot handles command flags (like `--role` and `--user`) as a preparation for future features.
+- Modified the event creation and updating behaviour so that end dates cannot be set before start dates.
+- Event dates are now stored as ISODate objects in the database instead of Strings that contain ISO 8601 date representations.
+
+### Fixed
+
+- Fixed a bug where start dates were implied incorrectly in certain locations when the user did not supply a date in the `event` and `event update` commands, resulting in the bot thinking that the event starts in the past.
+
 ## v0.4.1 - 2017-08-22
 
 ### Changed
