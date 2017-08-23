@@ -80,6 +80,13 @@ class CalendarModule {
             }
       
             let eventName = inputString.replace(results[0].text, "").trim();
+            // If no date supplied by user, assign the current date based on the timezone
+            if (results[0].start.impliedValues.day && results[0].start.impliedValues.month && results[0].start.impliedValues.year) {
+              let nowWithTimezone = now.tz(calendar.timezone);
+              results[0].start.impliedValues.day = nowWithTimezone.date();
+              results[0].start.impliedValues.month = nowWithTimezone.month() + 1;
+              results[0].start.impliedValues.year = nowWithTimezone.year();
+            }
             let startDate = moment(results[0].start.date());
             let endDate;
             try {
@@ -254,6 +261,13 @@ class CalendarModule {
       
       
             let eventName = inputString.replace(results[0].text, "").trim();
+            // If no date supplied by user, assign the current date based on the timezone
+            if (results[0].start.impliedValues.day && results[0].start.impliedValues.month && results[0].start.impliedValues.year) {
+              let nowWithTimezone = now.tz(calendar.timezone);
+              results[0].start.impliedValues.day = nowWithTimezone.date();
+              results[0].start.impliedValues.month = nowWithTimezone.month() + 1;
+              results[0].start.impliedValues.year = nowWithTimezone.year();
+            }
             let startDate = moment(results[0].start.date());
             let endDate;
             try {
