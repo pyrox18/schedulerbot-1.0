@@ -1,6 +1,6 @@
 {
   "name": "scheduler-discord",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "A Discord bot for scheduling events",
   "main": "app.js",
   "scripts": {
