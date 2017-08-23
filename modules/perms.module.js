@@ -3,6 +3,7 @@ const FuzzySet = require('fuzzyset.js');
 const Calendar = require('../models/calendar.model');
 const CommandError = require('../models/command-error.model');
 const Response = require('../models/response.model');
+const flagParser = require('../modules/flag-parser.module');
 
 const availableNodes = [
   // 'calendar',
@@ -20,7 +21,7 @@ const availableNodes = [
 
 class PermsModule {
   static modifyPerms(bot, msg, args, callback) {
-    if (args.length < 4 || (args[0] != 'allow' && args[0] != 'deny') || (args[2] != '--role' && args[2] != '--user')) {
+    if (args.length < 4 || (args[0] != 'allow' && args[0] != 'deny')) {
       return callback(Response.reject({ invalidArgs: true }));
     }
     try {
@@ -37,13 +38,20 @@ class PermsModule {
               return callback(Response.reject({ noNode: true }));
             }
       
-            let targetName = args.slice(3).join(' ');
+            let flags = flagParser.parse(args);
+            if (!flags.role && !flags.user) {
+              return callback(Response.reject({ invalidArgs: true }));
+            }
+            if (Object.keys(flags).length > 1) {
+              return callback(Response.reject({ tooManyFlags: true }));
+            }
+
             let results;
-            if (args[2] == '--role') {
-              results = findEntityNames(msg.channel.guild.roles, targetName);
+            if (flags.role) {
+              results = findEntityNames(msg.channel.guild.roles, flags.role);
             }
             else {
-              results = findEntityNames(msg.channel.guild.members, targetName);
+              results = findEntityNames(msg.channel.guild.members, flags.user);
             }
             if (results.length == 0) {
               return callback(Response.reject({ noRoleOrUser: true }));
@@ -63,7 +71,7 @@ class PermsModule {
                     return;
                   }
                   index = index - 1;
-                  if (args[2] == '--role') {
+                  if (flags.role) {
                     setRolePermission(bot, calendar, args[1], results[index][1], args[0], msg, callback);  
                   }
                   else {
@@ -73,7 +81,7 @@ class PermsModule {
               }, 1000);
             }
             else {
-              if (args[2] == '--role') {
+              if (flags.role) {
                 setRolePermission(bot, calendar, args[1], results[0][1], args[0], msg, callback);  
               }
               else {
@@ -122,7 +130,7 @@ class PermsModule {
   }
   
   static showPerm(bot, msg, args, callback) {
-    if (args.length < 2 || (args[0] != '--node' && args[0] != '--role' && args[0] != '--user')) {
+    if (args.length < 2) {
       return callback(Response.reject({ invalidArgs: true }));
     }
 
@@ -136,13 +144,20 @@ class PermsModule {
         }
         else {
           if (calendar.checkPerm('perms.show', msg)) {
-            if (args[0] == '--node') {
-              if (availableNodes.find(node => { return node == args[1] })) {
+            let flags = flagParser.parse(args);
+            if (!flags.node && !flags.role && !flags.user) {
+              return callback(Response.reject({ invalidArgs: true }));
+            }
+            if (Object.keys(flags).length > 1) {
+              return callback(Response.reject({ tooManyFlags: true }));
+            }
+            else if (flags.node) {
+              if (availableNodes.find(node => { return node == flags.node })) {
                 let permNode = calendar.permissions.find(perm => {
-                  return perm.node == args[1];
+                  return perm.node == flags.node;
                 });
                 
-                let resultString = "```css\nNode: " + args[1] + "\nDenied Roles: ";
+                let resultString = "```css\nNode: " + flags.node + "\nDenied Roles: ";
                 if (!permNode || permNode.deniedRoles.length == 0) {
                   resultString = resultString + "None";
                 }
@@ -179,13 +194,12 @@ class PermsModule {
               }
             }
             else {
-              let targetName = args.slice(1).join(' ');
               let results;
-              if (args[0] == '--role') {
-                results = findEntityNames(msg.channel.guild.roles, targetName);
+              if (flags.role) {
+                results = findEntityNames(msg.channel.guild.roles, flags.role);
               }
               else {
-                results = findEntityNames(msg.channel.guild.members, targetName);
+                results = findEntityNames(msg.channel.guild.members, flags.user);
               }
               if (results.length == 0) {
                 return callback(Response.reject({ noRoleOrUser: true }));

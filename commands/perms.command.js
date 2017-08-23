@@ -21,6 +21,9 @@ module.exports = (bot) => {
         if (res.meta.noRoleOrUser) {
           return msg.channel.createMessage("No matching role/user found.");
         }
+        if (res.meta.tooManyFlags) {
+          return msg.channel.createMessage("Too many flags. Please select to modify the permission of a role or user.");
+        }
       }
       if (res.unauthorized()) {
         return msg.channel.createMessage("You are not permitted to use this command.");
@@ -65,6 +68,9 @@ module.exports = (bot) => {
         }
         if (res.meta.noRoleOrUser) {
           return msg.channel.createMessage("No match found.");
+        }
+        if (res.meta.tooManyFlags) {
+          return msg.channel.createMessage("Too many flags. Please select to show permissions for a node, role or user.");
         }
       }
       if (res.unauthorized()) {
