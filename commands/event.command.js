@@ -18,7 +18,7 @@ module.exports = (bot) => {
           return msg.channel.createMessage("Failed to parse event data.");
         }
         if (res.meta.eventInPast) {
-          return msg.channel.createMessage("Cannot create an event that starts in the past.");
+          return msg.channel.createMessage("Cannot create an event that starts or ends in the past.");
         }
         if (res.meta.noTimezone) {
           return msg.channel.createMessage("Timezone not set. Run the `init <timezone>` command to set the timezone first.");
@@ -96,7 +96,7 @@ module.exports = (bot) => {
           return msg.channel.createMessage("Failed to parse event data.");
         }
         if (res.meta.eventInPast) {
-          return msg.channel.createMessage("Cannot update to an event that starts in the past.");
+          return msg.channel.createMessage("Cannot update to an event that starts or ends in the past.");
         }
       }
       if (res.unauthorized()) {
