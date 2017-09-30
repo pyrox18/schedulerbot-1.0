@@ -1,18 +1,15 @@
 import { Message, CommandOptions } from 'eris';
 import * as moment from 'moment-timezone';
 
-import { SchedulerBot } from '../classes/schedulerbot.class';
 import { CommandController } from './command.controller';
 import { config } from '../config/bot.config';
 import { ParsedMS } from '../interfaces/parsed-ms.interface';
 
 export class MiscController extends CommandController {
-  protected bot: SchedulerBot;
   protected commandOptions: CommandOptions;
 
   constructor() {
     super();
-    this.bot = SchedulerBot.getInstance();
     this.commandOptions = {
       guildOnly: true
     }
