@@ -1,5 +1,6 @@
 .DS_Store
 node_modules/
-config/bot.config.js
+build/
 data/
+**/config/bot.config.*
 **/*.log
