@@ -36,6 +36,14 @@ export class MiscController extends CommandController {
     return output;
   }
 
+  public support(msg: Message, args: string[]): string {
+    return `Click the following link to join the bot's support server. https://discord.gg/CRxRn5X`;
+  }
+
+  public invite(msg: Message, args: string[]): string {
+    return `Click the following link to invite the bot to your server. https://discordapp.com/oauth2/authorize?client_id=339019867325726722&scope=bot&permissions=150536`;
+  }
+
   private convertMS(ms: number): ParsedMS { // https://gist.github.com/remino/1563878
     let parsedMS: ParsedMS = {
       s: 0,
@@ -56,6 +64,8 @@ export class MiscController extends CommandController {
   public registerCommands(): boolean {
     this.bot.registerCommand("ping", this.ping, this.commandOptions);
     this.bot.registerCommand("info", this.info, this.commandOptions);
+    this.bot.registerCommand("support", this.support, this.commandOptions);
+    this.bot.registerCommand("invite", this.invite, this.commandOptions);
     return true;
   }
 }
