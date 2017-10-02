@@ -1,5 +1,4 @@
 import { Message, CommandOptions, GuildChannel, EmbedOptions, Command } from 'eris';
-import { DocumentQuery } from 'mongoose';
 import * as moment from 'moment-timezone';
 import * as winston from 'winston';
 import * as chrono from 'chrono-node';
