@@ -1,8 +1,8 @@
 export class FlagParser {
   constructor() { }
 
-  public static parse(args: string[]): Object {
-    let flagData: Object = {};
+  public static parse(args: string[]): any {
+    let flagData: any = {};
     let i: number = 0;
     while (i < args.length) {
       if (args[i].includes('--')) {
