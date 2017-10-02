@@ -1,7 +1,8 @@
-import { Message, CommandOptions } from 'eris';
+import { Message, CommandOptions, GuildChannel } from 'eris';
 import * as moment from 'moment-timezone';
 
 import { CommandController } from './command.controller';
+import { CalendarModel as Calendar, CalendarDocument } from '../models/calendar.model';
 import { config } from '../config/bot.config';
 import { ParsedMS } from '../interfaces/parsed-ms.interface';
 
@@ -19,6 +20,26 @@ export class MiscController extends CommandController {
     let now: moment.Moment = moment();
     let diff: number = now.diff(moment(msg.timestamp));
     return `Pong! Time: ${diff}ms`
+  }
+
+  public prefix = async (msg: Message, args: string[]): Promise<string> => {
+    if (args.length > 1) return "Invalid input.";
+    try {
+      let calendar: CalendarDocument = await Calendar.findById((<GuildChannel>msg.channel).guild.id).exec();
+      if (args.length < 1) {
+        if (!calendar.checkPerm('prefix.show', msg)) return "You are not permitted to use this command.";
+        return calendar.prefix;
+      }
+      else {
+        if (!calendar.checkPerm('prefix.modify', msg)) return "You are not permitted to use this command.";
+        await calendar.updatePrefix(args[0]);
+        let prefixes: string[] = [args[0], "@mention "];
+        this.bot.registerGuildPrefix((<GuildChannel>msg.channel).guild.id, prefixes);
+        return `Prefix set to \`${prefixes[0]}\`.`;
+      }
+    } catch (err) {
+      return err.message;
+    }
   }
 
   public info = (msg: Message, args: string[]): string => {
@@ -61,6 +82,7 @@ export class MiscController extends CommandController {
   public registerCommands(): boolean {
     this.bot.registerCommand("ping", this.ping, this.commandOptions);
     this.bot.registerCommand("info", this.info, this.commandOptions);
+    this.bot.registerCommand("prefix", this.prefix, this.commandOptions);
     this.bot.registerCommand("support", this.support, this.commandOptions);
     this.bot.registerCommand("invite", this.invite, this.commandOptions);
     return true;
