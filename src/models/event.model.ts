@@ -1,9 +1,9 @@
-import { Document, Schema, Model, model } from 'mongoose';
+import { Document, Schema, Model, model, Types } from 'mongoose';
 
 import { Event } from '../interfaces/event.interface';
 
 export interface EventDocument extends Event, Document {
-
+  _id: Types.ObjectId
 }
 
 export let EventSchema: Schema = new Schema({
