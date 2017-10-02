@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "build": "tsc",
-    "start": "nodemon build/app.js --ignore data/",
+    "start": "nodemon --inspect=5858 build/app.js --ignore data/",
     "watch": "concurrently --kill-others \"tsc -w\" \"npm start\""
   },
   "repository": {
