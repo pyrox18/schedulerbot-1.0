@@ -5,6 +5,7 @@ import * as moment from 'moment-timezone';
 import { Calendar } from '../interfaces/calendar.interface';
 import { EventDocument, EventSchema, EventModel as Event } from './event.model';
 import { PermsDocument, PermsSchema, PermsModel as Perms } from './perms.model';
+import { EventScheduler } from '../classes/event-scheduler.class';
 
 export interface CalendarDocument extends Calendar, Document {
   _id: string;
@@ -61,7 +62,7 @@ CalendarSchema.methods.addEvent = function(eventName: string, startDate: moment.
     }
   }
 
-  // scheduler.scheduleEvent(bot, this, this.events[eventIndex]);
+  EventScheduler.getInstance().scheduleEvent(this, this.events[eventIndex]);
 
   return this.save();
 }
@@ -69,7 +70,7 @@ CalendarSchema.methods.addEvent = function(eventName: string, startDate: moment.
 CalendarSchema.methods.deleteEvent = function(eventIndex: number): Promise<any> {
   if (eventIndex >= 0 && eventIndex < this.events.length) {
     let event: EventDocument = this.events.splice(eventIndex, 1);
-    // scheduler.unscheduleEvent(event[0]._id.toString());
+    EventScheduler.getInstance().unscheduleEvent(event[0]);
     return this.save();
   }
   return Promise.reject("Event not found");
@@ -108,8 +109,7 @@ CalendarSchema.methods.updateEvent = function(eventIndex: number, eventName: str
       }
     }
 
-    // scheduler.unscheduleEvent(event._id.toString());
-    // scheduler.scheduleEvent(bot, this, event);
+    EventScheduler.getInstance().rescheduleEvent(this, event);
     return this.save();
   }
   return Promise.reject("Event not found");
