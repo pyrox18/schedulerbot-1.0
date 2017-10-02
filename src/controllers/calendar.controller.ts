@@ -1,12 +1,12 @@
 import { Message, CommandOptions, GuildChannel, EmbedOptions, Command } from 'eris';
 import * as moment from 'moment-timezone';
-import * as winston from 'winston';
 import * as chrono from 'chrono-node';
 
 import { CommandController } from './command.controller';
 import { config } from '../config/bot.config';
 import { CalendarModel as Calendar, CalendarDocument } from '../models/calendar.model';
 import { Event } from '../interfaces/event.interface';
+import { CommandError } from '../classes/command-error.class';
 
 export class CalendarController extends CommandController {
   protected commandOptions: CommandOptions;
@@ -42,7 +42,7 @@ export class CalendarController extends CommandController {
         return `Set calendar timezone to ${savedCalendar.timezone}.`;
       }
     } catch (err) {
-      return err;
+      return new CommandError(err).toString();
     }
   }
 
@@ -105,7 +105,7 @@ export class CalendarController extends CommandController {
         embed: embed
       });
     } catch (err) {
-      return err;
+      return new CommandError(err).toString();
     }
   }
 
@@ -142,7 +142,7 @@ export class CalendarController extends CommandController {
       resultString += "```";
       return resultString;
     } catch (err) {
-      return err;
+      return new CommandError(err).toString();
     }
   }
 
@@ -192,7 +192,7 @@ export class CalendarController extends CommandController {
         embed: embed
       });
     } catch (err) {
-      return err;
+      return new CommandError(err).toString();
     }
   }
 
@@ -258,7 +258,7 @@ export class CalendarController extends CommandController {
         embed: embed
       });
     } catch (err) {
-      return err;
+      return new CommandError(err).toString();
     }
   }
 

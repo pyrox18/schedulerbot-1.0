@@ -3,6 +3,7 @@ import * as moment from 'moment-timezone';
 
 import { CommandController } from './command.controller';
 import { CalendarModel as Calendar, CalendarDocument } from '../models/calendar.model';
+import { CommandError } from '../classes/command-error.class';
 import { config } from '../config/bot.config';
 import { ParsedMS } from '../interfaces/parsed-ms.interface';
 
@@ -24,7 +25,7 @@ export class MiscController extends CommandController {
       if (!calendar.checkPerm('ping', msg)) return "You are not permitted to use this command.";
       return `Pong! Time: ${diff}ms`
     } catch (err) {
-      return err.message;
+      return new CommandError(err).toString();
     }
   }
 
@@ -44,7 +45,7 @@ export class MiscController extends CommandController {
         return `Prefix set to \`${prefixes[0]}\`.`;
       }
     } catch (err) {
-      return err.message;
+      return new CommandError(err).toString();
     }
   }
 

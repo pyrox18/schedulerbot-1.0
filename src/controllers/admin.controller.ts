@@ -1,5 +1,6 @@
 import { Message, CommandOptions } from 'eris';
 import { CommandController } from './command.controller';
+import { CommandError } from '../classes/command-error.class';
 
 import { config } from '../config/bot.config';
 
@@ -24,7 +25,7 @@ export class AdminController extends CommandController {
     try {
       throw new Error("Test error");
     } catch (err) {
-      return err.message;
+      return new CommandError(err).toString();
     }
   }
 

@@ -1,5 +1,4 @@
 import { Message, CommandOptions, GuildChannel, Command, Collection, Role, Member } from 'eris';
-import * as winston from 'winston';
 import * as FuzzySet from 'fuzzyset.js';
 
 import { CommandController } from './command.controller';
@@ -7,6 +6,7 @@ import { config } from '../config/bot.config';
 import { CalendarModel as Calendar, CalendarDocument } from '../models/calendar.model';
 import { Perms } from '../interfaces/perms.interface';
 import { FlagParser } from '../classes/flag-parser.class';
+import { CommandError } from '../classes/command-error.class';
 
 export class PermsController extends CommandController {
   protected commandOptions: CommandOptions;
@@ -85,7 +85,7 @@ export class PermsController extends CommandController {
 
       return "Permission successfully modified.";
     } catch (err) {
-      return err.message;
+      return new CommandError(err).toString();
     }
   }
 
@@ -103,7 +103,7 @@ export class PermsController extends CommandController {
 
       return nodes;
     } catch (err) {
-      return err.message;
+      return new CommandError(err).toString();
     }
   }
 
@@ -199,7 +199,7 @@ export class PermsController extends CommandController {
         }
       }
     } catch (err) {
-      return err.message;
+      return new CommandError(err).toString();
     }
   }
 
