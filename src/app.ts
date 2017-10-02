@@ -7,6 +7,8 @@ import { loadCommands } from './loaders/command.loader';
 
 let bot: SchedulerBot = SchedulerBot.getInstance();
 
+(<any>mongoose).Promise = global.Promise;
+
 mongoose.connect(config.dbConnectionUrl, {
   useMongoClient: true
 });
