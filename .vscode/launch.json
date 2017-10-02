@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "node",
+        "request": "attach",
+        "name": "Attach",
+        "port": 5858
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "nodemon",
+        "runtimeExecutable": "nodemon",
+        "program": "${workspaceRoot}/build/app.js",
+        "restart": true,
+        "console": "integratedTerminal",
+        "internalConsoleOptions": "neverOpen",
+        "cwd": "${workspaceRoot}"
+      }
+    ]
+  }
