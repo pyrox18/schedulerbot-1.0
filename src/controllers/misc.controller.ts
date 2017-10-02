@@ -16,10 +16,16 @@ export class MiscController extends CommandController {
     }
   }
 
-  public ping(msg: Message, args: string[]): string {
+  public ping = async (msg: Message, args: string[]): Promise<string> => {
     let now: moment.Moment = moment();
     let diff: number = now.diff(moment(msg.timestamp));
-    return `Pong! Time: ${diff}ms`
+    try {
+      let calendar: CalendarDocument = await Calendar.findById((<GuildChannel>msg.channel).guild.id).exec();
+      if (!calendar.checkPerm('ping', msg)) return "You are not permitted to use this command.";
+      return `Pong! Time: ${diff}ms`
+    } catch (err) {
+      return err.message;
+    }
   }
 
   public prefix = async (msg: Message, args: string[]): Promise<string> => {
