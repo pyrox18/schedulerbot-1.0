@@ -5,6 +5,7 @@ import { SchedulerBot } from './classes/schedulerbot.class';
 import config from './config/bot.config';
 import { loadCommands } from './loaders/command.loader';
 import { loadEventHandlers } from './loaders/event-handler.loader';
+import { loadGuildData } from './loaders/guild-data.loader';
 
 let bot: SchedulerBot = SchedulerBot.getInstance();
 
@@ -26,11 +27,13 @@ db.once('open', () => {
   bot.connect();
 });
 
-bot.on('ready', () => { // Move this to handler file when ready
+bot.on('ready', () => {
   console.log("Loading commands... ");
   loadCommands();
   console.log("Loading event handlers...");
   loadEventHandlers();
+  console.log("Loading guild data...");
+  loadGuildData();
   console.log("Configuring bot status... ");
   bot.editStatus("online", config.game);
   console.log("Bot ready!");
