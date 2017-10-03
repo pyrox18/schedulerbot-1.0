@@ -4,6 +4,7 @@ import * as winston from 'winston';
 import { SchedulerBot } from './classes/schedulerbot.class';
 import config from './config/bot.config';
 import { loadCommands } from './loaders/command.loader';
+import { loadEventHandlers } from './loaders/event-handler.loader';
 
 let bot: SchedulerBot = SchedulerBot.getInstance();
 
@@ -28,6 +29,8 @@ db.once('open', () => {
 bot.on('ready', () => { // Move this to handler file when ready
   console.log("Loading commands... ");
   loadCommands();
+  console.log("Loading event handlers...");
+  loadEventHandlers();
   console.log("Configuring bot status... ");
   bot.editStatus("online", config.game);
   console.log("Bot ready!");
