@@ -38,6 +38,7 @@
     "@types/node-schedule": "^1.2.0",
     "@types/winston": "^2.3.6",
     "concurrently": "^3.5.0",
+    "gulp": "^3.9.1",
     "nodemon": "^1.12.1",
     "typescript": "^2.5.3"
   }
