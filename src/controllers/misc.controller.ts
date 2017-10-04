@@ -7,6 +7,7 @@ import { CommandError } from '../classes/command-error.class';
 import { ParsedMS } from '../interfaces/parsed-ms.interface';
 import { BotConfig } from '../interfaces/bot-config.interface';
 const config: BotConfig = require('../config/bot.config.json');
+const version: string = require('../../package.json').version;
 
 export class MiscController extends CommandController {
   protected commandOptions: CommandOptions;
@@ -54,7 +55,7 @@ export class MiscController extends CommandController {
     let uptimeParsed = this.convertMS(this.bot.uptime);
     let output = "```\n";
     output += "SchedulerBot\n\n";
-    output += "Version: " + config.version + "\n";
+    output += "Version: " + version + "\n";
     output += `Guilds serving: ${this.bot.guilds.size}\n`;
     output += `Users serving: ${this.bot.users.size}\n`;
     output += `Uptime: ${uptimeParsed.d} day(s), ${uptimeParsed.h} hour(s), ${uptimeParsed.m} minute(s), ${uptimeParsed.s} second(s)\n`;

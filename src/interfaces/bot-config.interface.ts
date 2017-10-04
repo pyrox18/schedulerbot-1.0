@@ -7,7 +7,6 @@ export interface BotConfig {
   readonly game: GamePresence, // Change the bot's status on Discord
   readonly dbConnectionUrl: string, // MongoDB instance URL
   readonly adminId: string, // Admin ID for admin-only command permission checks
-  readonly version: string // Bot version number
 }
 
 export default BotConfig;
