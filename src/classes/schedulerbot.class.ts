@@ -12,7 +12,8 @@ export class SchedulerBot extends CommandClient {
     super(config.botToken, {}, {
       description: "A Discord bot for scheduling events",
       owner: "Pyrox",
-      prefix: [config.prefix, "@mention "]
+      prefix: [config.prefix, "@mention "],
+      defaultHelpCommand: false
     });
   }
 
