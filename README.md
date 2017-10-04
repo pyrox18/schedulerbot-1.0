@@ -1,12 +1,12 @@
 # SchedulerBot
 
-A Discord bot for scheduling events. Currently in development.
+A Discord bot for scheduling events.
 
 This bot uses the [Eris](https://abal.moe/Eris/) library. Reference documentation can be found at https://abal.moe/Eris/docs.
 
 ## Installation
 
-This project requires [NodeJS](https://nodejs.org), [npm](https://npmjs.com) and [MongoDB](https://mongodb.com). Install these first before continuing. (**NOTE**: npm comes with NodeJS.)
+This project requires [NodeJS](https://nodejs.org) v7.6 or later, [npm](https://npmjs.com) and [MongoDB](https://mongodb.com). Install these first before continuing. (**NOTE**: npm comes with NodeJS.)
 
 Make sure you have set up SSH on GitLab. Then:
 
@@ -18,6 +18,8 @@ $ npm install
 
 ## Usage
 
+### First-time Setup
+
 Before running the bot, you will have to create a Discord Developer App at https://discordapp.com/developers/applications/me.
 
 1. Create a new app by clicking on 'New App'.
@@ -26,26 +28,41 @@ Before running the bot, you will have to create a Discord Developer App at https
 4. Uncheck "Public Bot" under the app bot user if you don't want anyone else inviting your bot to the server.
 5. Take note of the app bot user's token, which will be used in the bot's config.
 
-Next, copy `data/bot-example.config.js` into `data/bot.config.js`.
+Next, you will have to edit `src/config/bot.config.json`.
+
+- `botToken`: Replace this with your app bot user's token.
+- `prefix`: Change this if the default prefix conflicts with other bots on your server.
+- `game.name`: Modify this if you want to change the bot's status.
+- `dbConnectionUrl`: Defaults to the standard local MongoDB instance running on port 27017.
+- `adminId`: Used for admin-only commands. Change it to your ID.
+
+### Compile and Run
+
+Before starting the bot, make sure MongoDB is running. The bot will attempt to connect to the address specified by `dbConnectionUrl` in the config file.
+
+Then, you can compile the TypeScript code and start the bot.
 
 ```bash
-$ cp data/bot-example.config.js data/bot.config.js
-```
-
-Replace the botToken string with your app bot user's token, and change the prefix if necessary.
-
-Before starting the bot, make sure MongoDB is running. The bot will attempt to connect to the `schedulerbot` database on port 27017 by default; this can be changed in the `bot.config.js` file.
-
-Then, you can start the bot.
-
-```bash
+$ npm run build
 $ npm start
 ```
 
-nodemon is used to run the bot, which will auto-restart the bot when changes are made to the project files.
+Build tasks are managed and run using [Gulp](https://gulpjs.com/). nodemon is used to run the bot, which will auto-restart the bot when changes are detected in the generated `build` folder.
+
+Instead of running the build and start commands every time you make a change, you can run
+
+```bash
+$ npm run watch
+```
+
+to let Gulp observe for changes in the `src` folder, compile the source files, and restart the bot automatically.
 
 To invite the bot to your server, generate an invite link at https://discordapi.com/permissions.html. To make things easy, just give the bot the Administrator permission so it automatically has the permission to do everything on your server. You can get your bot's client ID from your Discord Developer App page.
 
-## Collaborating
+### Debugging
 
-Ideas for this project are tracked on a Trello board. Click [here](https://trello.com/invite/b/rHxsRYxW/908ddea37aa6122f15dcfa803c7cdc2a/schedulerbot) to get an invite to the board.
+The `npm start` script exposes port 5858 for debugging purposes. The build task also generates map files for the JavaScript files as well, so you can debug from your TypeScript code with a compatible debugger. Visual Studio Code debugging configurations are available for this project, should that be your editor of choice.
+
+## Contributing
+
+If there are issues with the bot, or you would like to suggest an enhancement, feel free to open a new issue with the issue tracker.
