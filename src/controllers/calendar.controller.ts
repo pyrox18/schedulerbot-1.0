@@ -3,10 +3,11 @@ import * as moment from 'moment-timezone';
 import * as chrono from 'chrono-node';
 
 import { CommandController } from './command.controller';
-import { config } from '../config/bot.config';
 import { CalendarModel as Calendar, CalendarDocument } from '../models/calendar.model';
 import { Event } from '../interfaces/event.interface';
 import { CommandError } from '../classes/command-error.class';
+import { BotConfig } from '../interfaces/bot-config.interface';
+const config: BotConfig = require('../config/bot.config.json');
 
 export class CalendarController extends CommandController {
   protected commandOptions: CommandOptions;

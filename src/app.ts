@@ -2,10 +2,11 @@ import * as mongoose from 'mongoose';
 import * as winston from 'winston';
 
 import { SchedulerBot } from './classes/schedulerbot.class';
-import config from './config/bot.config';
 import { loadCommands } from './loaders/command.loader';
 import { loadEventHandlers } from './loaders/event-handler.loader';
 import { loadGuildData } from './loaders/guild-data.loader';
+import { BotConfig } from './interfaces/bot-config.interface';
+const config: BotConfig = require('./config/bot.config.json');
 
 let bot: SchedulerBot = SchedulerBot.getInstance();
 

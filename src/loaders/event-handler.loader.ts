@@ -3,7 +3,8 @@ import * as winston from 'winston';
 import { SchedulerBot } from '../classes/schedulerbot.class';
 import { EventScheduler } from '../classes/event-scheduler.class';
 import { CalendarModel as Calendar, CalendarDocument } from '../models/calendar.model';
-import { config } from '../config/bot.config';
+import { BotConfig } from '../interfaces/bot-config.interface';
+const config: BotConfig = require('../config/bot.config.json');;
 
 export function loadEventHandlers(): void {
   let bot: SchedulerBot = SchedulerBot.getInstance();

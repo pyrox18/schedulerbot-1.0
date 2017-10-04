@@ -2,11 +2,12 @@ import { Message, CommandOptions, GuildChannel, Command, Collection, Role, Membe
 import * as FuzzySet from 'fuzzyset.js';
 
 import { CommandController } from './command.controller';
-import { config } from '../config/bot.config';
 import { CalendarModel as Calendar, CalendarDocument } from '../models/calendar.model';
 import { Perms } from '../interfaces/perms.interface';
 import { FlagParser } from '../classes/flag-parser.class';
 import { CommandError } from '../classes/command-error.class';
+import { BotConfig } from '../interfaces/bot-config.interface';
+const config: BotConfig = require('../config/bot.config.json');;
 
 export class PermsController extends CommandController {
   protected commandOptions: CommandOptions;

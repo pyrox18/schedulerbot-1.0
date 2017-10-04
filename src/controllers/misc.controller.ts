@@ -4,8 +4,9 @@ import * as moment from 'moment-timezone';
 import { CommandController } from './command.controller';
 import { CalendarModel as Calendar, CalendarDocument } from '../models/calendar.model';
 import { CommandError } from '../classes/command-error.class';
-import { config } from '../config/bot.config';
 import { ParsedMS } from '../interfaces/parsed-ms.interface';
+import { BotConfig } from '../interfaces/bot-config.interface';
+const config: BotConfig = require('../config/bot.config.json');
 
 export class MiscController extends CommandController {
   protected commandOptions: CommandOptions;

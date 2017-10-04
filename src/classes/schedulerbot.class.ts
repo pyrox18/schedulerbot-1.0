@@ -1,7 +1,8 @@
 import { CommandClient, GamePresence } from 'eris';
 
-import config from '../config/bot.config';
 import { loadCommands } from '../loaders/command.loader';
+import { BotConfig } from '../interfaces/bot-config.interface';
+const config: BotConfig = require('../config/bot.config.json');
 
 // Acts as a singleton
 export class SchedulerBot extends CommandClient {
