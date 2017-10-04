@@ -71,8 +71,8 @@ export class CalendarController extends CommandController {
         results[0].start.impliedValues.month = nowWithTimezone.month() + 1;
         results[0].start.impliedValues.year = nowWithTimezone.year();
       }
-      let startDate: moment.Moment = moment(results[0].start.date());
-      let endDate: moment.Moment = results[0].end ? moment(results[0].end.date()) : startDate.clone().add(1, 'h');
+      let startDate: moment.Moment = this.getOffsetMoment(moment(results[0].start.date()), calendar.timezone);
+      let endDate: moment.Moment = results[0].end ? this.getOffsetMoment(moment(results[0].end.date()), calendar.timezone) : startDate.clone().add(1, 'h');
 
       if (now.diff(startDate) > 0) return STRINGS.commandResponses.createEventInPast;
       
@@ -223,8 +223,8 @@ export class CalendarController extends CommandController {
         results[0].start.impliedValues.month = nowWithTimezone.month() + 1;
         results[0].start.impliedValues.year = nowWithTimezone.year();
       }
-      let startDate: moment.Moment = moment(results[0].start.date());
-      let endDate: moment.Moment = results[0].end ? moment(results[0].end.date()) : startDate.clone().add(1, 'h');
+      let startDate: moment.Moment = this.getOffsetMoment(moment(results[0].start.date()), calendar.timezone);
+      let endDate: moment.Moment = results[0].end ? this.getOffsetMoment(moment(results[0].end.date()), calendar.timezone) : startDate.clone().add(1, 'h');
       if (now.diff(startDate) > 0) return STRINGS.commandResponses.updateEventInPast;
       if (index < 0 || index >= calendar.events.length) return STRINGS.commandResponses.eventNotFound;
       if (now.diff(moment(calendar.events[index].startDate)) > 0) return STRINGS.commandResponses.updateActiveEvent;
@@ -271,6 +271,13 @@ export class CalendarController extends CommandController {
     eventAddCommand.registerSubcommand("delete", this.deleteEvent, this.commandOptions);
     eventAddCommand.registerSubcommand("update", this.updateEvent, this.commandOptions);
     return true;
+  }
+
+  private getOffsetMoment(date: moment.Moment, timezone: string): moment.Moment {
+    let another = date.clone();
+    another.tz(timezone);
+    another.add(date.utcOffset() - another.utcOffset(), 'minutes');
+    return another;
   }
 }
 
