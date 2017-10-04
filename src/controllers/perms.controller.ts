@@ -7,7 +7,8 @@ import { Perms } from '../interfaces/perms.interface';
 import { FlagParser } from '../classes/flag-parser.class';
 import { CommandError } from '../classes/command-error.class';
 import { BotConfig } from '../interfaces/bot-config.interface';
-const config: BotConfig = require('../config/bot.config.json');;
+const config: BotConfig = require('../config/bot.config.json');
+const STRINGS: any = require('../resources/strings.resource.json');
 
 export class PermsController extends CommandController {
   protected commandOptions: CommandOptions;
@@ -32,17 +33,16 @@ export class PermsController extends CommandController {
   }
 
   public modifyPerms = async (msg: Message, args: string[]): Promise<string> => {
-    if (args.length < 4 || (args[0] != "allow" && args[0] != "deny")) return "Usage: `perms <allow|deny> <permNode> < --role <role> | --user <user> >`\nRun `perms nodes` for a list of available nodes.";
+    if (args.length < 4 || (args[0] != "allow" && args[0] != "deny")) return `Usage: ${STRINGS.commandUsage.perms.modify}`;
     try {
       let calendar: CalendarDocument = await Calendar.findById((<GuildChannel>msg.channel).guild.id).exec();
-      if (!calendar) return "Calendar not found. Run `init <timezone>` to initialise the guild calendar.";
-      if (!calendar.checkPerm('perms.modify', msg)) return "You are not permitted to use this command.";
+      if (!calendar) return STRINGS.commandResponses.timezoneNotSet;
+      if (!calendar.checkPerm('perms.modify', msg)) return STRINGS.commandResponses.permissionDenied;
 
-      if (!PermsController.nodes.find(node => { return args[1] == node })) return "Node not found.";
+      if (!PermsController.nodes.find(node => { return args[1] == node })) return STRINGS.commandResponses.nodeNotFound;
 
       let flags: any = FlagParser.parse(args);
-      if (!flags.role && !flags.user) return "Usage: `perms <allow|deny> <permNode> < --role <role> | --user <user> >`\nRun `perms nodes` for a list of available nodes.";
-      if (Object.keys(flags).length > 1) return "Too many flags. Please select to modify the permission of a role or user.";
+      if ((!flags.role && !flags.user) || Object.keys(flags).length > 1) return `Usage: ${STRINGS.commandUsage.perms.modify}`;
 
       let results: any[];
       if (flags.role) {
@@ -51,7 +51,7 @@ export class PermsController extends CommandController {
       else {
         results = this.findEntityNames((<GuildChannel>msg.channel).guild.members, flags.user);
       }
-      if (results.length < 1) return "No matching role/user found.";
+      if (results.length < 1) return STRINGS.commandResponses.roleOrUserNotFound;
       if (results.length > 1) {
         let resultString: string = "```css\n";
         for (let i = 0; i < results.length; i++) {
@@ -84,7 +84,7 @@ export class PermsController extends CommandController {
         }
       }
 
-      return "Permission successfully modified.";
+      return STRINGS.commandResponses.permissionModifySuccess;
     } catch (err) {
       return new CommandError(err).toString();
     }
@@ -93,8 +93,8 @@ export class PermsController extends CommandController {
   public displayPermNodes = async (msg: Message, args: string[]): Promise<string> => {
     try {
       let calendar: CalendarDocument = await Calendar.findById((<GuildChannel>msg.channel).guild.id).exec();
-      if (!calendar) return "Calendar not found. Run `init <timezone>` to initialise the guild calendar.";
-      if (!calendar.checkPerm('perms.nodes', msg)) return "You are not permitted to use this command.";
+      if (!calendar) return STRINGS.commandResponses.timezoneNotSet;
+      if (!calendar.checkPerm('perms.nodes', msg)) return STRINGS.commandResponses.permissionDenied;
 
       let nodes: string = "```css\n";
       for (let node of PermsController.nodes) {
@@ -109,18 +109,17 @@ export class PermsController extends CommandController {
   }
 
   public showPerm = async (msg: Message, args: string[]): Promise<string> => {
-    if (args.length < 2) return "Usage: `perms show < --node <permNode> | --role <role> | --user <user> >`";
+    if (args.length < 2) return `Usage: ${STRINGS.commandUsage.perms.show}`;
     try {
       let calendar: CalendarDocument = await Calendar.findById((<GuildChannel>msg.channel).guild.id).exec();
-      if (!calendar) return "Calendar not found. Run `init <timezone>` to initialise the guild calendar.";
-      if (!calendar.checkPerm('perms.show', msg)) return "You are not permitted to use this command.";
+      if (!calendar) return STRINGS.commandResponses.timezoneNotSet;
+      if (!calendar.checkPerm('perms.show', msg)) return STRINGS.commandResponses.permissionDenied;
 
       let flags: any = FlagParser.parse(args);
-      if (!flags.node && !flags.role && !flags.user) return "Usage: `perms show < --node <permNode> | --role <role> | --user <user> >`";
-      if (Object.keys(flags).length > 1) return "Too many flags. Please select to show permissions for a node, role or user.";
+      if ((!flags.node && !flags.role && !flags.user) || Object.keys(flags).length > 1) return `Usage: ${STRINGS.commandUsage.perms.show}`;
 
       if (flags.node) {
-        if (!PermsController.nodes.find(node => { return node == flags.node })) return "The node does not exist.";
+        if (!PermsController.nodes.find(node => { return node == flags.node })) return STRINGS.commandResponses.nodeNotFound;
         let permNode: Perms = calendar.permissions.find(perm => {
           return perm.node == flags.node;
         });
@@ -165,7 +164,7 @@ export class PermsController extends CommandController {
         else {
           results = this.findEntityNames((<GuildChannel>msg.channel).guild.members, flags.user);
         }
-        if (results.length < 1) return "No match found.";
+        if (results.length < 1) return STRINGS.commandResponses.roleOrUserNotFound;
         if (results.length > 1) {
           let resultString: string = "```css\n";
           for (let i = 0; i < results.length; i++) {

@@ -8,6 +8,7 @@ import { Event } from '../interfaces/event.interface';
 import { CommandError } from '../classes/command-error.class';
 import { BotConfig } from '../interfaces/bot-config.interface';
 const config: BotConfig = require('../config/bot.config.json');
+const STRINGS: any = require('../resources/strings.resource.json');
 
 export class CalendarController extends CommandController {
   protected commandOptions: CommandOptions;
@@ -22,7 +23,7 @@ export class CalendarController extends CommandController {
   public initializeCalendar = async (msg: Message, args: string[]): Promise<string> => {
     try {
       if (args.length > 1 || args.length < 1) {
-        return "Not enough arguments.";
+        return `Usage: ${STRINGS.commandUsage.init} - see https://goo.gl/NzNMon under the TZ column for a list of valid timezones.`;
       }
       
       let calendar: CalendarDocument = await Calendar.findById((<GuildChannel>msg.channel).guild.id).exec();
@@ -36,7 +37,7 @@ export class CalendarController extends CommandController {
       }
       
       if (calendar.timezone) {
-        return "Timezone already initialized.";
+        return STRINGS.commandResponses.timezoneInitialized;
       }
       else {
         let savedCalendar: CalendarDocument = await calendar.setTimezone(args[0]);
@@ -50,15 +51,15 @@ export class CalendarController extends CommandController {
   public addEvent = async (msg: Message, args: string[]): Promise<string> => {
     try {
       let now: moment.Moment = moment();
-      if (args.length < 1) return "Usage: `event <event details>` Example: `event CSGO Scrims 7pm-9pm tomorrow`";
+      if (args.length < 1) return `Usage: ${STRINGS.commandUsage.event.create}`;
 
       let calendar: CalendarDocument = await Calendar.findById((<GuildChannel>msg.channel).guild.id).exec();
-      if (!calendar || !calendar.timezone) return "Timezone not set. Run the `init <timezone>` command to set the timezone first.";
-      if (!calendar.checkPerm('event.create', msg)) return "You are not permitted to use this command.";
+      if (!calendar || !calendar.timezone) return STRINGS.commandResponses.timezoneNotSet;
+      if (!calendar.checkPerm('event.create', msg)) return STRINGS.commandResponses.permissionDenied;
 
       let inputString: string = args.join(' ');
       let results: any = chrono.parse(inputString);
-      if (!results[0]) return "Failed to parse event data.";
+      if (!results[0]) return STRINGS.commandResponses.eventParseFail;
 
       let eventName: string = inputString.replace(results[0].text, "").trim();
       // If no date supplied by user, assign the current date based on the timezone
@@ -73,7 +74,7 @@ export class CalendarController extends CommandController {
       let startDate: moment.Moment = moment(results[0].start.date());
       let endDate: moment.Moment = results[0].end ? moment(results[0].end.date()) : startDate.clone().add(1, 'h');
 
-      if (now.diff(startDate) > 0) return "Cannot create an event that starts or ends in the past.";
+      if (now.diff(startDate) > 0) return STRINGS.commandResponses.createEventInPast;
       
       await calendar.addEvent(eventName, startDate, endDate);
       let embed: EmbedOptions = {
@@ -113,8 +114,8 @@ export class CalendarController extends CommandController {
   public listEvents = async (msg: Message, args: string[]): Promise<string> => {
     try {
       let calendar: CalendarDocument = await Calendar.findById((<GuildChannel>msg.channel).guild.id).exec();
-      if (!calendar || !calendar.timezone) return "Timezone not set. Run the `init <timezone>` command to set the timezone first.";
-      if (!calendar.checkPerm('event.list', msg)) return "You are not permitted to use this command.";
+      if (!calendar || !calendar.timezone) return STRINGS.commandResponses.timezoneNotSet;
+      if (!calendar.checkPerm('event.list', msg)) return STRINGS.commandResponses.permissionDenied;
       
       let now: moment.Moment = moment();
       let resultString: string = "```css\n";
@@ -149,17 +150,17 @@ export class CalendarController extends CommandController {
 
   public deleteEvent = async (msg: Message, args: string[]): Promise<string> => {
     try {
-      if (args.length < 1 || args.length > 1) return "Usage: `event delete <eventIndex>` (eventIndex can be checked by running `event list`)";
+      if (args.length < 1 || args.length > 1) return `Usage: ${STRINGS.commandUsage.event.delete}`;
 
       let index: number = parseInt(args[0]);
-      if (isNaN(index)) return "Usage: `event delete <eventIndex>` (eventIndex can be checked by running `event list`)";
+      if (isNaN(index)) return `Usage: ${STRINGS.commandUsage.event.delete}`;
 
       let calendar: CalendarDocument = await Calendar.findById((<GuildChannel>msg.channel).guild.id).exec();
-      if (!calendar) return "Calendar not found. Run `init <timezone>` to initialise the guild calendar."
-      if (!calendar.checkPerm('event.delete', msg)) return "You are not permitted to use this command.";
+      if (!calendar) return STRINGS.commandResponses.timezoneNotSet;
+      if (!calendar.checkPerm('event.delete', msg)) return STRINGS.commandResponses.permissionDenied;
 
       index--;
-      if (index < 0 || index >= calendar.events.length) return "Event not found.";
+      if (index < 0 || index >= calendar.events.length) return STRINGS.commandResponses.eventNotFound;
 
       let deletedEvent: Event = calendar.events[index];
       await calendar.deleteEvent(index);
@@ -200,19 +201,19 @@ export class CalendarController extends CommandController {
   public updateEvent = async (msg: Message, args: string[]): Promise<string> => {
     try {
       let now: moment.Moment = moment();
-      if (args.length < 2) return "Usage: `event update <eventIndex> <eventData>` (eventIndex can be checked by running `event list`)";
+      if (args.length < 2) return `Usage: ${STRINGS.commandUsage.event.update}`;
 
       let index: number = parseInt(args[0]);
-      if (isNaN(index)) return "Usage: `event update <eventIndex> <eventData>` (eventIndex can be checked by running `event list`)";
+      if (isNaN(index)) return `Usage: ${STRINGS.commandUsage.event.update}`;
 
       let calendar: CalendarDocument = await Calendar.findById((<GuildChannel>msg.channel).guild.id).exec();
-      if (!calendar) return "Calendar not found. Run `init <timezone>` to initialise the guild calendar.";
-      if (!calendar.checkPerm('event.update', msg)) return "You are not permitted to use this command.";
+      if (!calendar) return STRINGS.commandResponses.timezoneNotSet;
+      if (!calendar.checkPerm('event.update', msg)) return STRINGS.commandResponses.permissionDenied;
 
       index--;
       let inputString: string = args.slice(1).join(' ');
       let results: any = chrono.parse(inputString);
-      if (!results[0]) return "Failed to parse event data.";
+      if (!results[0]) return STRINGS.commandResponses.eventParseFail;
 
       let eventName: string = inputString.replace(results[0].text, "").trim();
       // If no date supplied by user, assign the current date based on the timezone
@@ -224,9 +225,9 @@ export class CalendarController extends CommandController {
       }
       let startDate: moment.Moment = moment(results[0].start.date());
       let endDate: moment.Moment = results[0].end ? moment(results[0].end.date()) : startDate.clone().add(1, 'h');
-      if (now.diff(startDate) > 0) return "Cannot update to an event that starts or ends in the past.";
-      if (index < 0 || index >= calendar.events.length) return "Event not found.";
-      if (now.diff(moment(calendar.events[index].startDate)) > 0) return "Cannot update an event that is currently active.";
+      if (now.diff(startDate) > 0) return STRINGS.commandResponses.updateEventInPast;
+      if (index < 0 || index >= calendar.events.length) return STRINGS.commandResponses.eventNotFound;
+      if (now.diff(moment(calendar.events[index].startDate)) > 0) return STRINGS.commandResponses.updateActiveEvent;
 
       await calendar.updateEvent(index, eventName, startDate, endDate);
       let embed: EmbedOptions = {

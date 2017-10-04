@@ -8,6 +8,8 @@ gulp.task("compile", tsc);
 gulp.task("build", ["compile"], function() {
   gulp.src('./src/config/**/*.json')
   .pipe(gulp.dest('./build/config'));
+  gulp.src('./src/resources/**/*.json')
+  .pipe(gulp.dest('./build/resources'));
   return;
 });
 
