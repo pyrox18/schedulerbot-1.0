@@ -9,16 +9,18 @@ export class CommandError {
   constructor(error: any, msg: Message) {
     this.error = error;
     this.message = msg;
-    raven.captureException(error, {
-      user: {
-        id: msg.author.id,
-        username: `${msg.author.username}#${msg.author.discriminator}`
-      },
-      extra: {
-        guildID: (<GuildChannel>msg.channel).guild.id,
-        messageContent: msg.content
-      }
-    });
+    if (process.env.NODE_ENV == "production") {
+      raven.captureException(error, {
+        user: {
+          id: msg.author.id,
+          username: `${msg.author.username}#${msg.author.discriminator}`
+        },
+        extra: {
+          guildID: (<GuildChannel>msg.channel).guild.id,
+          messageContent: msg.content
+        }
+      });
+    }
     winston.error(error);
   }
 

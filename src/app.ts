@@ -1,3 +1,4 @@
+import * as dotenv from 'dotenv';
 import * as mongoose from 'mongoose';
 import * as winston from 'winston';
 import * as raven from 'raven';
@@ -9,7 +10,12 @@ import { loadGuildData } from './loaders/guild-data.loader';
 import { BotConfig } from './interfaces/bot-config.interface';
 const config: BotConfig = require('./config/bot.config.json');
 
-raven.config(config.ravenDSN, config.ravenConfigOptions).install();
+dotenv.config();
+
+// Only setup Raven for prod
+if (process.env.NODE_ENV == "production") {
+  raven.config(config.ravenDSN, config.ravenConfigOptions).install();
+}
 
 let bot: SchedulerBot = SchedulerBot.getInstance();
 
