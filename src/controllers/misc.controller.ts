@@ -23,7 +23,7 @@ export class MiscController extends CommandController {
       if (!calendar.checkPerm('ping', msg)) return STRINGS.commandResponses.permissionDenied;
       return `Pong! Time: ${diff}ms`
     } catch (err) {
-      return new CommandError(err).toString();
+      return new CommandError(err, msg).toString();
     }
   }
 
@@ -43,7 +43,7 @@ export class MiscController extends CommandController {
         return `Prefix set to \`${prefixes[0]}\`.`;
       }
     } catch (err) {
-      return new CommandError(err).toString();
+      return new CommandError(err, msg).toString();
     }
   }
 

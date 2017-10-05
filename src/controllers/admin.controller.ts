@@ -26,7 +26,7 @@ export class AdminController extends CommandController {
     try {
       throw new Error("Test error");
     } catch (err) {
-      return new CommandError(err).toString();
+      return new CommandError(err, msg).toString();
     }
   }
 

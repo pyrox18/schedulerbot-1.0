@@ -39,7 +39,7 @@ export class CalendarController extends CommandController {
         return `Set calendar timezone to ${savedCalendar.timezone}.`;
       }
     } catch (err) {
-      return new CommandError(err).toString();
+      return new CommandError(err, msg).toString();
     }
   }
 
@@ -102,7 +102,7 @@ export class CalendarController extends CommandController {
         embed: embed
       });
     } catch (err) {
-      return new CommandError(err).toString();
+      return new CommandError(err, msg).toString();
     }
   }
 
@@ -139,7 +139,7 @@ export class CalendarController extends CommandController {
       resultString += "```";
       return resultString;
     } catch (err) {
-      return new CommandError(err).toString();
+      return new CommandError(err, msg).toString();
     }
   }
 
@@ -189,7 +189,7 @@ export class CalendarController extends CommandController {
         embed: embed
       });
     } catch (err) {
-      return new CommandError(err).toString();
+      return new CommandError(err, msg).toString();
     }
   }
 
@@ -255,7 +255,7 @@ export class CalendarController extends CommandController {
         embed: embed
       });
     } catch (err) {
-      return new CommandError(err).toString();
+      return new CommandError(err, msg).toString();
     }
   }
 
