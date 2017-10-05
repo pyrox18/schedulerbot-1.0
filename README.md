@@ -70,3 +70,7 @@ The SchedulerBot source code is distributed under the GNU General Public License
 ## Contributing
 
 Refer to the CONTRIBUTING.md file for more information on how to contribute to the development of SchedulerBot.
+
+## Discussions
+
+Discuss about the development of SchedulerBot on the \#development channel of the [SchedulerBot support server](https://discord.gg/CRxRn5X). I usually hang around there.
