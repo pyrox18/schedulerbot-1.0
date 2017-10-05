@@ -2,6 +2,30 @@
 
 This changelog is formatted based on [Keep a Changelog](http://keepachangelog.com/) and this project attempts to adhere to [Semantic Versioning](http://semver.org) as much as possible.
 
+## v0.5.0 - 2017-10-05
+
+This release features a complete migration of the codebase to TypeScript, as well as a complete restructure of the bot's source code tree. As a result, this release breaks pretty much everything in the source code from the previous releases, but users should be able to use the same commands and functionality as before.
+
+### Added
+
+- All commands now have a default cooldown of 1 second. ([`9242a39`](https://github.com/pyrox18/schedulerbot/commit/9242a397d9e8cf711683b43bf89976933184420c))
+- Common response strings are now stored in an independent resource file (`src/config/strings.resource.json`). ([`d0d76e5`](https://github.com/pyrox18/schedulerbot/commit/d0d76e58219f3d0925265c65f2797cc82ec17e9d))
+
+### Changed
+
+- Migrated the entire codebase to TypeScript.
+- The `help` command and its subcommands now display rich embeds for the base help information and information for the `init`, `event`, `perms` and `prefix` commands. ([`e745d8d`](https://github.com/pyrox18/schedulerbot/commit/e745d8d763f87cccc9bfb75a9a28178f36712397))
+- The `info` command now displays information in a rich embed. ([`0a9405d`](https://github.com/pyrox18/schedulerbot/commit/0a9405dd868657b74477f194873b1dfa44ab0c30))
+- EventScheduler (previously Scheduler before the migration) now uses the ES6 Map data structure to store jobs. Map keys are now set to the actual ObjectID of the event document instead of the string equivalent. ([`cdf622c`](https://github.com/pyrox18/schedulerbot/commit/cdf622cf53cf363e754893b906bd835839f78a6c))
+
+### Fixed
+
+- Fixed a bug where event dates were being assigned timezones, but the dates themselves were not adjusted back to the values given by the user. ([`5946d22`](https://github.com/pyrox18/schedulerbot/commit/5946d225af459399c87aa776d61da35ae4e8e8ee))
+
+### Removed
+
+- Removed certain npm dependencies that are no longer used by the bot. ([`ecd91b5`](https://github.com/pyrox18/schedulerbot/commit/ecd91b5fbf3c79fd75235a2270284b1c7adfac17))
+
 ## v0.4.2 - 2017-08-23
 
 ### Changed
