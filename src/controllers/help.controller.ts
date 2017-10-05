@@ -5,13 +5,8 @@ const STRINGS: any = require('../resources/strings.resource.json');
 const HELP_EMBEDS: any = require('../resources/help-embeds.resource.json');
 
 export class HelpController extends CommandController {
-  protected commandOptions: CommandOptions;
-
   constructor() {
     super();
-    this.commandOptions = {
-      guildOnly: true
-    }
   }
 
   public help = (msg: Message, args: string[]): void => {
@@ -51,15 +46,15 @@ export class HelpController extends CommandController {
   }
 
   public registerCommands(): boolean {
-    let helpCommand: Command = this.bot.registerCommand("help", this.help, this.commandOptions);
-    helpCommand.registerSubcommand("init", this.initHelp, this.commandOptions);
-    helpCommand.registerSubcommand("event", this.eventHelp, this.commandOptions);
-    helpCommand.registerSubcommand("perms", this.permsHelp, this.commandOptions);
-    helpCommand.registerSubcommand("prefix", this.prefixHelp, this.commandOptions);
-    helpCommand.registerSubcommand("ping", this.pingHelp, this.commandOptions);
-    helpCommand.registerSubcommand("info", this.infoHelp, this.commandOptions);
-    helpCommand.registerSubcommand("support", this.supportHelp, this.commandOptions);
-    helpCommand.registerSubcommand("invite", this.inviteHelp, this.commandOptions);
+    let helpCommand: Command = this.bot.registerCommand("help", this.help);
+    helpCommand.registerSubcommand("init", this.initHelp);
+    helpCommand.registerSubcommand("event", this.eventHelp);
+    helpCommand.registerSubcommand("perms", this.permsHelp);
+    helpCommand.registerSubcommand("prefix", this.prefixHelp);
+    helpCommand.registerSubcommand("ping", this.pingHelp);
+    helpCommand.registerSubcommand("info", this.infoHelp);
+    helpCommand.registerSubcommand("support", this.supportHelp);
+    helpCommand.registerSubcommand("invite", this.inviteHelp);
     return true;
   }
 }

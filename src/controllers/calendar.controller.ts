@@ -11,13 +11,8 @@ const config: BotConfig = require('../config/bot.config.json');
 const STRINGS: any = require('../resources/strings.resource.json');
 
 export class CalendarController extends CommandController {
-  protected commandOptions: CommandOptions;
-
   constructor() {
     super();
-    this.commandOptions = {
-      guildOnly: true
-    }
   }
 
   public initializeCalendar = async (msg: Message, args: string[]): Promise<string> => {
@@ -265,11 +260,11 @@ export class CalendarController extends CommandController {
   }
 
   public registerCommands(): boolean {
-    this.bot.registerCommand("init", this.initializeCalendar, this.commandOptions);
-    let eventAddCommand: Command = this.bot.registerCommand("event", this.addEvent, this.commandOptions);
-    eventAddCommand.registerSubcommand("list", this.listEvents, this.commandOptions);
-    eventAddCommand.registerSubcommand("delete", this.deleteEvent, this.commandOptions);
-    eventAddCommand.registerSubcommand("update", this.updateEvent, this.commandOptions);
+    this.bot.registerCommand("init", this.initializeCalendar);
+    let eventAddCommand: Command = this.bot.registerCommand("event", this.addEvent);
+    eventAddCommand.registerSubcommand("list", this.listEvents);
+    eventAddCommand.registerSubcommand("delete", this.deleteEvent);
+    eventAddCommand.registerSubcommand("update", this.updateEvent);
     return true;
   }
 

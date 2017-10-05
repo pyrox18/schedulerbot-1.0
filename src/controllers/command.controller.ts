@@ -3,7 +3,7 @@ import { SchedulerBot } from '../classes/schedulerbot.class';
 
 export abstract class CommandController {
   protected bot: SchedulerBot;
-  protected abstract commandOptions: CommandOptions;
+  protected commandOptions: CommandOptions;
 
   constructor() {
     this.bot = SchedulerBot.getInstance();

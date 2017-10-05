@@ -11,7 +11,6 @@ const config: BotConfig = require('../config/bot.config.json');
 const STRINGS: any = require('../resources/strings.resource.json');
 
 export class PermsController extends CommandController {
-  protected commandOptions: CommandOptions;
   public static readonly nodes: string[] = [
     'event.create',
     'event.update',
@@ -27,9 +26,6 @@ export class PermsController extends CommandController {
 
   constructor() {
     super();
-    this.commandOptions = {
-      guildOnly: true
-    }
   }
 
   public modifyPerms = async (msg: Message, args: string[]): Promise<string> => {
@@ -204,9 +200,9 @@ export class PermsController extends CommandController {
   }
 
   public registerCommands(): boolean {
-    let permsCommand = this.bot.registerCommand("perms", this.modifyPerms, this.commandOptions);
-    permsCommand.registerSubcommand("nodes", this.displayPermNodes, this.commandOptions);
-    permsCommand.registerSubcommand("show", this.showPerm, this.commandOptions);
+    let permsCommand = this.bot.registerCommand("perms", this.modifyPerms);
+    permsCommand.registerSubcommand("nodes", this.displayPermNodes);
+    permsCommand.registerSubcommand("show", this.showPerm);
     return true;
   }
 

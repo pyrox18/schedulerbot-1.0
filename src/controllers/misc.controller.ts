@@ -11,13 +11,8 @@ const version: string = require('../../package.json').version;
 const STRINGS: any = require('../resources/strings.resource.json');
 
 export class MiscController extends CommandController {
-  protected commandOptions: CommandOptions;
-
   constructor() {
     super();
-    this.commandOptions = {
-      guildOnly: true
-    }
   }
 
   public ping = async (msg: Message, args: string[]): Promise<string> => {
@@ -90,11 +85,11 @@ export class MiscController extends CommandController {
   }
 
   public registerCommands(): boolean {
-    this.bot.registerCommand("ping", this.ping, this.commandOptions);
-    this.bot.registerCommand("info", this.info, this.commandOptions);
-    this.bot.registerCommand("prefix", this.prefix, this.commandOptions);
-    this.bot.registerCommand("support", this.support, this.commandOptions);
-    this.bot.registerCommand("invite", this.invite, this.commandOptions);
+    this.bot.registerCommand("ping", this.ping);
+    this.bot.registerCommand("info", this.info);
+    this.bot.registerCommand("prefix", this.prefix);
+    this.bot.registerCommand("support", this.support);
+    this.bot.registerCommand("invite", this.invite);
     return true;
   }
 }
