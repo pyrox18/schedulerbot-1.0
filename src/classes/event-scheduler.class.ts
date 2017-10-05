@@ -8,17 +8,18 @@ import { SchedulerBot } from './schedulerbot.class';
 import { CalendarDocument } from '../models/calendar.model';
 import { EventDocument } from '../models/event.model';
 import { Event } from '../interfaces/event.interface';
+import { JobMap } from '../classes/job-map.class';
 
 // Acts as a singleton
 export class EventScheduler {
-  private notifierJobs: Map<Types.ObjectId, Job>;
-  private deleteJobs: Map<Types.ObjectId, Job>;
+  private notifierJobs: JobMap;
+  private deleteJobs: JobMap;
   private bot: SchedulerBot;
   private static instance: EventScheduler = new EventScheduler();
 
   private constructor() {
-    this.notifierJobs = new Map<Types.ObjectId, Job>();
-    this.deleteJobs = new Map<Types.ObjectId, Job>();
+    this.notifierJobs = new JobMap();
+    this.deleteJobs = new JobMap();
     this.bot = SchedulerBot.getInstance();
   }
 
