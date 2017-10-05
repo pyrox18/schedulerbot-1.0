@@ -8,11 +8,11 @@ This bot uses the [Eris](https://abal.moe/Eris/) library. Reference documentatio
 
 This project requires [NodeJS](https://nodejs.org) v7.6 or later, [npm](https://npmjs.com) and [MongoDB](https://mongodb.com). Install these first before continuing. (**NOTE**: npm comes with NodeJS.)
 
-Make sure you have set up SSH on GitLab. Then:
+To get started, clone the repository:
 
 ```bash
-$ git clone git@gitlab.com:<your username here>/scheduler-discord.git
-$ cd scheduler-discord
+$ git clone https://github.com/pyrox18/schedulerbot.git
+$ cd schedulerbot
 $ npm install
 ```
 
@@ -63,6 +63,10 @@ To invite the bot to your server, generate an invite link at https://discordapi.
 
 The `npm start` script exposes port 5858 for debugging purposes. The build task also generates map files for the JavaScript files as well, so you can debug from your TypeScript code with a compatible debugger. Visual Studio Code debugging configurations are available for this project, should that be your editor of choice.
 
+## License
+
+The SchedulerBot source code is distributed under the GNU General Public License v3.0.
+
 ## Contributing
 
-If there are issues with the bot, or you would like to suggest an enhancement, feel free to open a new issue with the issue tracker.
+Refer to the CONTRIBUTING.md file for more information on how to contribute to the development of SchedulerBot.
