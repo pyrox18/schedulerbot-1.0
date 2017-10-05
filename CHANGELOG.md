@@ -2,6 +2,12 @@
 
 This changelog is formatted based on [Keep a Changelog](http://keepachangelog.com/) and this project attempts to adhere to [Semantic Versioning](http://semver.org) as much as possible.
 
+## v0.5.1 - 2017-10-06
+
+### Fixed
+
+- Fixed an issue where event notification jobs were not being unscheduled properly when updating or deleting events. ([`6ec58bf`](https://github.com/pyrox18/schedulerbot/commit/6ec58bf385db7b4c820513b578d16d569bfe8186))
+
 ## v0.5.0 - 2017-10-05
 
 This release features a complete migration of the codebase to TypeScript, as well as a complete restructure of the bot's source code tree. As a result, this release breaks pretty much everything in the source code from the previous releases, but users should be able to use the same commands and functionality as before.
