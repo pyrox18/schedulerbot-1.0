@@ -1,4 +1,4 @@
-import { Message, CommandOptions, GuildChannel } from 'eris';
+import { Message, CommandOptions, GuildChannel, EmbedOptions } from 'eris';
 import * as moment from 'moment-timezone';
 
 import { CommandController } from './command.controller';
@@ -47,16 +47,42 @@ export class MiscController extends CommandController {
     }
   }
 
-  public info = (msg: Message, args: string[]): string => {
+  public info = (msg: Message, args: string[]): void => {
     let uptimeParsed = this.convertMS(this.bot.uptime);
-    let output = "```\n";
-    output += "SchedulerBot\n\n";
-    output += "Version: " + version + "\n";
-    output += `Guilds serving: ${this.bot.guilds.size}\n`;
-    output += `Users serving: ${this.bot.users.size}\n`;
-    output += `Uptime: ${uptimeParsed.d} day(s), ${uptimeParsed.h} hour(s), ${uptimeParsed.m} minute(s), ${uptimeParsed.s} second(s)\n`;
-    output += "```"
-    return output;
+    let embed: EmbedOptions = {
+      description: "A Discord bot for scheduling events.",
+      color: 13893595,
+      footer: {
+        text: "Powered by the Eris library (https://abal.moe/Eris)"
+      },
+      author: {
+        name: "SchedulerBot",
+        icon_url: "https://cdn.discordapp.com/avatars/339019867325726722/e5fca7dbae7156e05c013766fa498fe1.png"
+      },
+      fields: [
+        {
+          name: "Version",
+          value: version.toString(),
+          inline: true
+        },
+        {
+          name: "Guilds",
+          value: this.bot.guilds.size.toString(),
+          inline: true
+        },
+        {
+          name: "Users",
+          value: this.bot.users.size.toString(),
+          inline: true
+        },
+        {
+          name: "Uptime",
+          value: `${uptimeParsed.d} day(s), ${uptimeParsed.h} hour(s), ${uptimeParsed.m} minute(s), ${uptimeParsed.s} second(s)`
+        }
+      ]
+    }
+
+    this.bot.createMessage(msg.channel.id, { embed: embed });
   }
 
   public support(msg: Message, args: string[]): string {
