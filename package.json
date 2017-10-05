@@ -1,6 +1,6 @@
 {
-  "name": "scheduler-discord",
-  "version": "0.5.0",
+  "name": "schedulerbot",
+  "version": "0.5.1",
   "description": "A Discord bot for scheduling events",
   "main": "build/app.js",
   "scripts": {
@@ -12,14 +12,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@gitlab.com/pyrox18/scheduler-discord.git"
+    "url": "https://github.com/pyrox18/schedulerbot"
   },
-  "author": "Pyrox",
-  "license": "MIT",
+  "author": "pyrox18",
+  "license": "GPL-3.0",
   "bugs": {
-    "url": "https://gitlab.com/pyrox18/scheduler-discord/issues"
+    "url": "https://github.com/pyrox18/schedulerbot/issues"
   },
-  "homepage": "https://gitlab.com/pyrox18/scheduler-discord#README",
+  "homepage": "https://github.com/pyrox18/schedulerbot",
   "dependencies": {
     "chrono-node": "^1.3.5",
     "eris": "^0.7.2",
