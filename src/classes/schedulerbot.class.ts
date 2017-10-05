@@ -15,7 +15,10 @@ export class SchedulerBot extends CommandClient {
       prefix: [config.prefix, "@mention "],
       defaultHelpCommand: false,
       defaultCommandOptions: {
-        guildOnly: true
+        guildOnly: true,
+        cooldown: 1000,
+        cooldownMessage: "Command is on cooldown.",
+        cooldownReturns: 1
       }
     });
   }
