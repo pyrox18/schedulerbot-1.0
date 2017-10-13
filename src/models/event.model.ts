@@ -9,7 +9,8 @@ export interface EventDocument extends Event, Document {
 export let EventSchema: Schema = new Schema({
   name: String,
   startDate: Date,
-  endDate: Date
+  endDate: Date,
+  description: String
 });
 
 export let EventModel: Model<EventDocument> = model<EventDocument>("Event", EventSchema);

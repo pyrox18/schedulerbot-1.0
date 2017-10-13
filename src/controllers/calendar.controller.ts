@@ -2,8 +2,10 @@ import { Message, CommandOptions, GuildChannel, EmbedOptions, Command } from 'er
 import * as moment from 'moment-timezone';
 import * as chrono from 'chrono-node';
 
+import { FlagParser } from '../classes/flag-parser.class';
 import { CommandController } from './command.controller';
 import { CalendarModel as Calendar, CalendarDocument } from '../models/calendar.model';
+import { EventDocument } from '../models/event.model';
 import { Event } from '../interfaces/event.interface';
 import { CommandError } from '../classes/command-error.class';
 import { BotConfig } from '../interfaces/bot-config.interface';
@@ -53,7 +55,8 @@ export class CalendarController extends CommandController {
       if (!calendar || !calendar.timezone) return STRINGS.commandResponses.timezoneNotSet;
       if (!calendar.checkPerm('event.create', msg)) return STRINGS.commandResponses.permissionDenied;
 
-      let inputString: string = args.join(' ');
+      let parsedArgs: any = FlagParser.parse(args);
+      let inputString: string = parsedArgs._body;
       let results: any = chrono.parse(inputString);
       if (!results[0]) return STRINGS.commandResponses.eventParseFail;
 
@@ -69,10 +72,11 @@ export class CalendarController extends CommandController {
       }
       let startDate: moment.Moment = this.getOffsetMoment(moment(results[0].start.date()), calendar.timezone);
       let endDate: moment.Moment = results[0].end ? this.getOffsetMoment(moment(results[0].end.date()), calendar.timezone) : startDate.clone().add(1, 'h');
+      let eventDescription: string = parsedArgs.desc || null;
 
       if (now.diff(startDate) > 0) return STRINGS.commandResponses.createEventInPast;
       
-      await calendar.addEvent(eventName, startDate, endDate);
+      await calendar.addEvent(eventName, startDate, endDate, eventDescription);
       let embed: EmbedOptions = {
         title: "New Event",
         color: 8171263,
@@ -84,6 +88,10 @@ export class CalendarController extends CommandController {
           {
             name: "Event Name",
             value: eventName
+          },
+          {
+            name: "Description",
+            value: eventDescription || "*N/A*"
           },
           {
             name: "Start Date",
@@ -127,6 +135,9 @@ export class CalendarController extends CommandController {
             resultString += "[Active Events]\n\n";
           }
           resultString += `${i+1} : ${calendar.events[i].name} /* ${moment(calendar.events[i].startDate).tz(calendar.timezone).toString()} to ${moment(calendar.events[i].endDate).tz(calendar.timezone).toString()} */\n`;
+          if (calendar.events[i].description) {
+            resultString += `    # ${calendar.events[i].description}\n`;
+          }
           i++;
         }
         if (i < calendar.events.length) {
@@ -134,6 +145,9 @@ export class CalendarController extends CommandController {
         }
         while (i < calendar.events.length) {
           resultString += `${i+1} : ${calendar.events[i].name} /* ${moment(calendar.events[i].startDate).tz(calendar.timezone).toString()} to ${moment(calendar.events[i].endDate).tz(calendar.timezone).toString()} */\n`;
+          if (calendar.events[i].description) {
+            resultString += `    # ${calendar.events[i].description}\n`;
+          }
           i++;
         }
       }
@@ -173,6 +187,10 @@ export class CalendarController extends CommandController {
             value: deletedEvent.name
           },
           {
+            name: "Description",
+            value: deletedEvent.description || "*N/A*"
+          },
+          {
             name: "Start Date",
             value: moment(deletedEvent.startDate).tz(calendar.timezone).toString(),
             inline: true
@@ -207,25 +225,39 @@ export class CalendarController extends CommandController {
       if (!calendar.checkPerm('event.update', msg)) return STRINGS.commandResponses.permissionDenied;
 
       index--;
-      let inputString: string = args.slice(1).join(' ');
-      let results: any = chrono.parse(inputString);
-      if (!results[0]) return STRINGS.commandResponses.eventParseFail;
+      let parsedArgs: any = FlagParser.parse(args.slice(1));
+      if (!parsedArgs._body && !parsedArgs.desc) return STRINGS.commandUsage.event.update;
 
-      let eventName: string = inputString.replace(results[0].text, "").trim();
-      // If no date supplied by user, assign the current date based on the timezone
-      if (results[0].start.impliedValues.day && results[0].start.impliedValues.month && results[0].start.impliedValues.year) {
-        let nowWithTimezone: moment.Moment = now.tz(calendar.timezone);
-        results[0].start.impliedValues.day = nowWithTimezone.date();
-        results[0].start.impliedValues.month = nowWithTimezone.month() + 1;
-        results[0].start.impliedValues.year = nowWithTimezone.year();
+      let eventName: string;
+      let startDate: moment.Moment;
+      let endDate: moment.Moment;
+      let eventDescription: string;
+
+      if (parsedArgs._body) {
+        let inputString: string = parsedArgs._body;
+        let results: any = chrono.parse(inputString);
+        if (!results[0]) return STRINGS.commandResponses.eventParseFail;
+  
+        eventName = inputString.replace(results[0].text, "").trim();
+        // If no date supplied by user, assign the current date based on the timezone
+        if (results[0].start.impliedValues.day && results[0].start.impliedValues.month && results[0].start.impliedValues.year) {
+          let nowWithTimezone: moment.Moment = now.tz(calendar.timezone);
+          results[0].start.impliedValues.day = nowWithTimezone.date();
+          results[0].start.impliedValues.month = nowWithTimezone.month() + 1;
+          results[0].start.impliedValues.year = nowWithTimezone.year();
+        }
+        startDate = this.getOffsetMoment(moment(results[0].start.date()), calendar.timezone);
+        endDate = results[0].end ? this.getOffsetMoment(moment(results[0].end.date()), calendar.timezone) : startDate.clone().add(1, 'h');
+        if (now.diff(startDate) > 0) return STRINGS.commandResponses.updateEventInPast;
+        if (now.diff(moment(calendar.events[index].startDate)) > 0) return STRINGS.commandResponses.updateActiveEvent;
       }
-      let startDate: moment.Moment = this.getOffsetMoment(moment(results[0].start.date()), calendar.timezone);
-      let endDate: moment.Moment = results[0].end ? this.getOffsetMoment(moment(results[0].end.date()), calendar.timezone) : startDate.clone().add(1, 'h');
-      if (now.diff(startDate) > 0) return STRINGS.commandResponses.updateEventInPast;
-      if (index < 0 || index >= calendar.events.length) return STRINGS.commandResponses.eventNotFound;
-      if (now.diff(moment(calendar.events[index].startDate)) > 0) return STRINGS.commandResponses.updateActiveEvent;
+      if (parsedArgs.desc) {
+        eventDescription = parsedArgs.desc;
+      }
 
-      await calendar.updateEvent(index, eventName, startDate, endDate);
+      if (index < 0 || index >= calendar.events.length) return STRINGS.commandResponses.eventNotFound;
+
+      let updatedEvent: EventDocument = await calendar.updateEvent(index, eventName, startDate, endDate, eventDescription);
       let embed: EmbedOptions = {
         title: "Update Event",
         color: 16775221,
@@ -236,16 +268,20 @@ export class CalendarController extends CommandController {
         fields: [
           {
             name: "Event Name",
-            value: eventName
+            value: updatedEvent.name
+          },
+          {
+            name: "Description",
+            value: updatedEvent.description || "*N/A*"
           },
           {
             name: "Start Date",
-            value: moment(startDate).tz(calendar.timezone).toString(),
+            value: moment(updatedEvent.startDate).tz(calendar.timezone).toString(),
             inline: true
           },
           {
             name: "End Date",
-            value: moment(endDate).tz(calendar.timezone).toString(),
+            value: moment(updatedEvent.endDate).tz(calendar.timezone).toString(),
             inline: true
           }
         ]
