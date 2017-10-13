@@ -33,12 +33,13 @@ export let CalendarSchema: Schema = new Schema({
   _id: false
 });
 
-CalendarSchema.methods.addEvent = function(eventName: string, startDate: moment.Moment, endDate: moment.Moment, eventDescription?: string): Promise<any> {
+CalendarSchema.methods.addEvent = function(eventName: string, startDate: moment.Moment, endDate: moment.Moment, eventDescription?: string, repeat?: string): Promise<any> {
   let event: Document = new Event({
     name: eventName,
     startDate: startDate.toDate(),
     endDate: endDate.toDate(),
-    description: eventDescription
+    description: eventDescription,
+    repeat: repeat
   });
 
   let eventIndex: number;
@@ -85,7 +86,7 @@ CalendarSchema.methods.deleteEventById = function(eventId: string): Promise<any>
   return this.save();
 }
 
-CalendarSchema.methods.updateEvent = async function(eventIndex: number, eventName?: string, startDate?: moment.Moment, endDate?: moment.Moment, eventDescription?: string): Promise<EventDocument> {
+CalendarSchema.methods.updateEvent = async function(eventIndex: number, eventName?: string, startDate?: moment.Moment, endDate?: moment.Moment, eventDescription?: string, repeat?: string): Promise<EventDocument> {
   if (eventIndex >= 0 && eventIndex < this.events.length) {
     let eventArray: EventDocument[] = this.events.splice(eventIndex, 1);
     let event: EventDocument = eventArray[0];
@@ -94,6 +95,7 @@ CalendarSchema.methods.updateEvent = async function(eventIndex: number, eventNam
     event.startDate = startDate ? startDate.toDate() : event.startDate;
     event.endDate = endDate ? endDate.toDate() : event.endDate;
     event.description = eventDescription || event.description;
+    event.repeat = repeat || event.repeat;
 
     if (this.events.length == 0) {
       this.events.push(event);

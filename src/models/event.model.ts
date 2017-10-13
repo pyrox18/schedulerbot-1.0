@@ -10,7 +10,8 @@ export let EventSchema: Schema = new Schema({
   name: String,
   startDate: Date,
   endDate: Date,
-  description: String
+  description: String,
+  repeat: String
 });
 
 export let EventModel: Model<EventDocument> = model<EventDocument>("Event", EventSchema);
