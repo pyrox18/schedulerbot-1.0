@@ -15,11 +15,11 @@ export class FlagParser {
 
     // Parse the flags in args
     while (i < args.length) {
-      if (args[i].includes('--')) {
+      if (args[i].startsWith('--')) {
         let key: string = args[i].slice(2);
         let values: string[] = [];
         i++;
-        while (i < args.length && !args[i].includes('--')) {
+        while (i < args.length && !args[i].startsWith('--')) {
           values.push(args[i]);
           i++;
         }
