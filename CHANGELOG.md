@@ -2,6 +2,16 @@
 
 This changelog is formatted based on [Keep a Changelog](http://keepachangelog.com/) and this project attempts to adhere to [Semantic Versioning](http://semver.org) as much as possible.
 
+## v0.5.2 - 2017-10-13
+
+### Changed
+
+- The Eris library has been updated to v0.8.0, so TypeScript compilation now works without having to use any workarounds. ([`aaf80f5`](https://github.com/pyrox18/schedulerbot/commit/aaf80f5070e3e7892200f32c9518e0eb8226a94d))
+
+### Fixed
+
+- Entering an invalid timezone in the `init` command should now provide a proper response. ([`9b564b7`](https://github.com/pyrox18/schedulerbot/commit/9b564b77e8afaee89db58c43c71a6056d7239afc))
+
 ## v0.5.1 - 2017-10-06
 
 ### Fixed
