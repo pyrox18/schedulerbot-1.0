@@ -38,16 +38,6 @@ Next, you will have to edit `src/config/bot.config.json`.
 
 ### Compile and Run
 
-**IMPORTANT**: *As of the release of v0.5.0 (2017-10-05), the TypeScript code will not compile if you install the stable version of the Eris library (v0.7.2). This is due to the fact that certain typings are currently missing in the 0.7.2 release, and are only available on the dev branch of Eris. To install the dev branch, run the following command:*
-
-```bash
-$ npm install --no-optional abalabahaha/eris#dev
-```
-
-*Additionally, a PR is still active to add more missing data to Eris's typings file, which you can find [here](https://github.com/abalabahaha/eris/pull/311). If this PR is still open when you're installing the bot's dependencies, you need to implement [the changes introduced in the PR](https://github.com/abalabahaha/eris/pull/311/files) in `node_modules/eris/index.d.ts` yourself to allow the TypeScript compiler to work. If the PR is closed and resolved, disregard this line - installing the dev version of Eris should be sufficient.*
-
-*The above notice will be removed once a new stable version of Eris is released with the fixes.*
-
 Before starting the bot, make sure MongoDB is running. The bot will attempt to connect to the address specified by `dbConnectionUrl` in the config file.
 
 Then, you can compile the TypeScript code and start the bot.

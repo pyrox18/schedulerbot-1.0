@@ -6,6 +6,7 @@
     "botInviteLink": "Click the following link to invite the bot to your server. https://goo.gl/E7hLK9",
     "timezoneInitialized": "Timezone already initialized.",
     "timezoneNotSet": "Calendar timezone not set. Run the `init <timezone>` command to set the timezone first.",
+    "timezoneNotFound": "Timezone not found. See https://goo.gl/NzNMon under the TZ column for a list of valid timezones.",
     "eventParseFail": "Failed to parse event data.",
     "createEventInPast": "Cannot create an event that starts or ends in the past.",
     "updateEventInPast": "Cannot update to an event that starts or ends in the past.",
