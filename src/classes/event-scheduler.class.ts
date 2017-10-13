@@ -71,6 +71,10 @@ export class EventScheduler {
             value: event.name
           },
           {
+            name: "Description",
+            value: event.description || "*N/A*"
+          },
+          {
             name: "Start Date",
             value: moment(event.startDate).tz(calendar.timezone).toString(),
             inline: true
@@ -79,6 +83,10 @@ export class EventScheduler {
             name: "End Date",
             value: moment(event.endDate).tz(calendar.timezone).toString(),
             inline: true
+          },
+          {
+            name: "Repeat",
+            value: event.repeat ? (event.repeat == "d" ? "Daily" : (event.repeat == "w" ? "Weekly" : "Monthly")) : "*N/A*"
           }
         ]
       }
