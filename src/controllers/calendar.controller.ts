@@ -73,10 +73,12 @@ export class CalendarController extends CommandController {
       let startDate: moment.Moment = this.getOffsetMoment(moment(results[0].start.date()), calendar.timezone);
       let endDate: moment.Moment = results[0].end ? this.getOffsetMoment(moment(results[0].end.date()), calendar.timezone) : startDate.clone().add(1, 'h');
       let eventDescription: string = parsedArgs.desc || null;
+      let repeat: string = parsedArgs.repeat || null;
 
+      if (repeat && repeat != "d" && repeat != "w" && repeat != "m") return `Usage: ${STRINGS.commandUsage.event.create}`;
       if (now.diff(startDate) > 0) return STRINGS.commandResponses.createEventInPast;
       
-      await calendar.addEvent(eventName, startDate, endDate, eventDescription);
+      await calendar.addEvent(eventName, startDate, endDate, eventDescription, repeat);
       let embed: EmbedOptions = {
         title: "New Event",
         color: 8171263,
@@ -102,6 +104,10 @@ export class CalendarController extends CommandController {
             name: "End Date",
             value: moment(endDate).tz(calendar.timezone).toString(),
             inline: true
+          },
+          {
+            name: "Repeat",
+            value: repeat ? (repeat == "d" ? "Daily" : (repeat == "w" ? "Weekly" : "Monthly")) : "*N/A*"
           }
         ]
       }
@@ -138,6 +144,9 @@ export class CalendarController extends CommandController {
           if (calendar.events[i].description) {
             resultString += `    # ${calendar.events[i].description}\n`;
           }
+          if (calendar.events[i].repeat) {
+            resultString += `    # Repeat: ${calendar.events[i].repeat}\n`;
+          }
           i++;
         }
         if (i < calendar.events.length) {
@@ -147,6 +156,9 @@ export class CalendarController extends CommandController {
           resultString += `${i+1} : ${calendar.events[i].name} /* ${moment(calendar.events[i].startDate).tz(calendar.timezone).toString()} to ${moment(calendar.events[i].endDate).tz(calendar.timezone).toString()} */\n`;
           if (calendar.events[i].description) {
             resultString += `    # ${calendar.events[i].description}\n`;
+          }
+          if (calendar.events[i].repeat) {
+            resultString += `    # Repeat: ${calendar.events[i].repeat}\n`;
           }
           i++;
         }
@@ -199,6 +211,10 @@ export class CalendarController extends CommandController {
             name: "End Date",
             value: moment(deletedEvent.endDate).tz(calendar.timezone).toString(),
             inline: true
+          },
+          {
+            name: "Repeat",
+            value: deletedEvent.repeat ? (deletedEvent.repeat == "d" ? "Daily" : (deletedEvent.repeat == "w" ? "Weekly" : "Monthly")) : "*N/A*"
           }
         ]
       }
@@ -226,12 +242,13 @@ export class CalendarController extends CommandController {
 
       index--;
       let parsedArgs: any = FlagParser.parse(args.slice(1));
-      if (!parsedArgs._body && !parsedArgs.desc) return STRINGS.commandUsage.event.update;
+      if (!parsedArgs._body && !parsedArgs.desc && !parsedArgs.repeat) return `Usage: ${STRINGS.commandUsage.event.update}`;
 
       let eventName: string;
       let startDate: moment.Moment;
       let endDate: moment.Moment;
       let eventDescription: string;
+      let repeat: string;
 
       if (parsedArgs._body) {
         let inputString: string = parsedArgs._body;
@@ -254,10 +271,14 @@ export class CalendarController extends CommandController {
       if (parsedArgs.desc) {
         eventDescription = parsedArgs.desc;
       }
+      if (parsedArgs.repeat) {
+        repeat = parsedArgs.repeat;
+        if (repeat != "d" && repeat != "w" && repeat != "m" && repeat != "off") return `Usage: ${STRINGS.commandUsage.event.update}`;
+      }
 
       if (index < 0 || index >= calendar.events.length) return STRINGS.commandResponses.eventNotFound;
 
-      let updatedEvent: EventDocument = await calendar.updateEvent(index, eventName, startDate, endDate, eventDescription);
+      let updatedEvent: EventDocument = await calendar.updateEvent(index, eventName, startDate, endDate, eventDescription, repeat);
       let embed: EmbedOptions = {
         title: "Update Event",
         color: 16775221,
@@ -283,6 +304,10 @@ export class CalendarController extends CommandController {
             name: "End Date",
             value: moment(updatedEvent.endDate).tz(calendar.timezone).toString(),
             inline: true
+          },
+          {
+            name: "Repeat",
+            value: updatedEvent.repeat ? (updatedEvent.repeat == "d" ? "Daily" : (updatedEvent.repeat == "w" ? "Weekly" : "Monthly")) : "*N/A*"
           }
         ]
       }

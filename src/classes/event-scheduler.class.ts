@@ -92,7 +92,7 @@ export class EventScheduler {
     let eventID = event._id;
     let deleteJob: Job = scheduleJob(event.endDate, async (): Promise<void> => {
       try {
-        await calendar.deleteEventById(eventID.toHexString());
+        await calendar.scheduledDeleteEvent(eventID.toHexString());
       } catch (err) {
         winston.log('error', err);
       }

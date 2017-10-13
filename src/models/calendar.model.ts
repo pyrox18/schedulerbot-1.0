@@ -9,10 +9,10 @@ import { EventScheduler } from '../classes/event-scheduler.class';
 
 export interface CalendarDocument extends Calendar, Document {
   _id: string;
-  addEvent(eventName: string, startDate: moment.Moment, endDate: moment.Moment, eventDescription?: string): Promise<any>;
+  addEvent(eventName: string, startDate: moment.Moment, endDate: moment.Moment, eventDescription?: string, repeat?: string): Promise<any>;
   deleteEvent(eventIndex: number): Promise<any>;
-  deleteEventById(eventId: string): Promise<any>;
-  updateEvent(eventIndex: number, eventName?: string, startDate?: moment.Moment, endDate?: moment.Moment, eventDescription?: string): Promise<EventDocument>;
+  scheduledDeleteEvent(eventId: string): Promise<any>;
+  updateEvent(eventIndex: number, eventName?: string, startDate?: moment.Moment, endDate?: moment.Moment, eventDescription?: string, repeat?: string): Promise<EventDocument>;
   updatePrefix(prefix: string): Promise<any>;
   setTimezone(timezone: string): Promise<any>;
   denyRolePerm(roleId: string, node: string): Promise<any>;
@@ -78,11 +78,16 @@ CalendarSchema.methods.deleteEvent = function(eventIndex: number): Promise<any> 
   return Promise.reject("Event not found");
 }
 
-CalendarSchema.methods.deleteEventById = function(eventId: string): Promise<any> {
+CalendarSchema.methods.scheduledDeleteEvent = function(eventId: string): Promise<any> {
   let index: number = this.events.findIndex((event) => {
     return event._id.toString() == eventId;
   });
-  this.events.splice(index, 1);
+  if (!this.events[index].repeat) {
+    this.events.splice(index, 1);
+  }
+  else {
+    this.repeatUpdateEvent(index);
+  }
   return this.save();
 }
 
@@ -95,7 +100,49 @@ CalendarSchema.methods.updateEvent = async function(eventIndex: number, eventNam
     event.startDate = startDate ? startDate.toDate() : event.startDate;
     event.endDate = endDate ? endDate.toDate() : event.endDate;
     event.description = eventDescription || event.description;
-    event.repeat = repeat || event.repeat;
+    if (repeat && repeat == "off") {
+      event.repeat = null;
+    }
+    else {
+      event.repeat = repeat || event.repeat;
+    }
+
+    if (this.events.length == 0) {
+      this.events.push(event);
+    }
+    else {
+      for (let i = 0; i < this.events.length; i++) {
+        if (moment(this.events[i].startDate).isSameOrAfter(event.startDate)) {
+          this.events.splice(i, 0, event);
+          break;
+        }
+        if (i == this.events.length - 1) {
+          this.events.push(event);
+          break;
+        }
+      }
+    }
+
+    EventScheduler.getInstance().rescheduleEvent(this, event);
+    await this.save();
+    return event;
+  }
+  return Promise.reject("Event not found");
+}
+
+CalendarSchema.methods.repeatUpdateEvent = async function(eventIndex: number) {
+  if (eventIndex >= 0 && eventIndex < this.events.length) {
+    let eventArray: EventDocument[] = this.events.splice(eventIndex, 1);
+    let event: EventDocument = eventArray[0];
+
+    if (event.repeat == "m") {
+      event.startDate = moment(event.startDate).add(1, "M").toDate();
+      event.endDate = moment(event.endDate).add(1, "M").toDate();
+    }
+    else {
+      event.startDate = moment(event.startDate).add(1, (<moment.DurationInputArg2>event.repeat)).toDate();
+      event.endDate = moment(event.endDate).add(1, (<moment.DurationInputArg2>event.repeat)).toDate();
+    }
 
     if (this.events.length == 0) {
       this.events.push(event);
