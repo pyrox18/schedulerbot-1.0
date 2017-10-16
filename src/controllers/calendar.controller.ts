@@ -9,12 +9,16 @@ import { EventDocument } from '../models/event.model';
 import { Event } from '../interfaces/event.interface';
 import { CommandError } from '../classes/command-error.class';
 import { BotConfig } from '../interfaces/bot-config.interface';
+import { CalendarLock } from '../classes/calendar-lock.class';
 const config: BotConfig = require('../config/bot.config.json');
 const STRINGS: any = require('../resources/strings.resource.json');
 
 export class CalendarController extends CommandController {
+  private lock: any;
+
   constructor() {
     super();
+    this.lock = CalendarLock.instance.lock;
   }
 
   public initializeCalendar = async (msg: Message, args: string[]): Promise<string> => {
@@ -49,73 +53,79 @@ export class CalendarController extends CommandController {
   public addEvent = async (msg: Message, args: string[]): Promise<string> => {
     try {
       let now: moment.Moment = moment();
+      let guildID: string = (<GuildChannel>msg.channel).guild.id;
       if (args.length < 1) return `Usage: ${STRINGS.commandUsage.event.create}`;
 
-      let calendar: CalendarDocument = await Calendar.findById((<GuildChannel>msg.channel).guild.id).exec();
-      if (!calendar || !calendar.timezone) return STRINGS.commandResponses.timezoneNotSet;
-      if (!calendar.checkPerm('event.create', msg)) return STRINGS.commandResponses.permissionDenied;
-
-      let parsedArgs: any = FlagParser.parse(args);
-      let inputString: string = parsedArgs._body;
-      let results: any = chrono.parse(inputString);
-      if (!results[0]) return STRINGS.commandResponses.eventParseFail;
-
-      let eventName: string = inputString.replace(results[0].text, "").trim();
-      // If no date supplied by user, assign the current date based on the timezone
-      if (results[0].start.impliedValues.day &&
-          results[0].start.impliedValues.month &&
-          results[0].start.impliedValues.year) {
-        let nowWithTimezone: moment.Moment = now.tz(calendar.timezone);
-        results[0].start.impliedValues.day = nowWithTimezone.date();
-        results[0].start.impliedValues.month = nowWithTimezone.month() + 1;
-        results[0].start.impliedValues.year = nowWithTimezone.year();
-      }
-      let startDate: moment.Moment = this.getOffsetMoment(moment(results[0].start.date()), calendar.timezone);
-      let endDate: moment.Moment = results[0].end ? this.getOffsetMoment(moment(results[0].end.date()), calendar.timezone) : startDate.clone().add(1, 'h');
-      let eventDescription: string = parsedArgs.desc || null;
-      let repeat: string = parsedArgs.repeat || null;
-
-      if (repeat && repeat != "d" && repeat != "w" && repeat != "m") return `Usage: ${STRINGS.commandUsage.event.create}`;
-      if (now.diff(startDate) > 0) return STRINGS.commandResponses.createEventInPast;
-      
-      await calendar.addEvent(eventName, startDate, endDate, eventDescription, repeat);
-      let embed: EmbedOptions = {
-        title: "New Event",
-        color: 8171263,
-        author: {
-          name: "SchedulerBot",
-          icon_url: "https://cdn.discordapp.com/avatars/339019867325726722/e5fca7dbae7156e05c013766fa498fe1.png"
-        },
-        fields: [
-          {
-            name: "Event Name",
-            value: eventName
-          },
-          {
-            name: "Description",
-            value: eventDescription || "*N/A*"
-          },
-          {
-            name: "Start Date",
-            value: moment(startDate).tz(calendar.timezone).toString(),
-            inline: true
-          },
-          {
-            name: "End Date",
-            value: moment(endDate).tz(calendar.timezone).toString(),
-            inline: true
-          },
-          {
-            name: "Repeat",
-            value: repeat ? (repeat == "d" ? "Daily" : (repeat == "w" ? "Weekly" : "Monthly")) : "*N/A*"
+      await this.lock.acquire(guildID);
+      let calendar: CalendarDocument = await Calendar.findById(guildID).exec();
+      if (!calendar || !calendar.timezone) this.bot.createMessage(msg.channel.id, STRINGS.commandResponses.timezoneNotSet);
+      else if (!calendar.checkPerm('event.create', msg)) this.bot.createMessage(msg.channel.id, STRINGS.commandResponses.permissionDenied);
+      else {
+        let parsedArgs: any = FlagParser.parse(args);
+        let inputString: string = parsedArgs._body;
+        let results: any = chrono.parse(inputString);
+        if (!results[0]) this.bot.createMessage(msg.channel.id, STRINGS.commandResponses.eventParseFail);
+        else {
+          let eventName: string = inputString.replace(results[0].text, "").trim();
+          // If no date supplied by user, assign the current date based on the timezone
+          if (results[0].start.impliedValues.day &&
+              results[0].start.impliedValues.month &&
+              results[0].start.impliedValues.year) {
+            let nowWithTimezone: moment.Moment = now.tz(calendar.timezone);
+            results[0].start.impliedValues.day = nowWithTimezone.date();
+            results[0].start.impliedValues.month = nowWithTimezone.month() + 1;
+            results[0].start.impliedValues.year = nowWithTimezone.year();
           }
-        ]
+          let startDate: moment.Moment = this.getOffsetMoment(moment(results[0].start.date()), calendar.timezone);
+          let endDate: moment.Moment = results[0].end ? this.getOffsetMoment(moment(results[0].end.date()), calendar.timezone) : startDate.clone().add(1, 'h');
+          let eventDescription: string = parsedArgs.desc || null;
+          let repeat: string = parsedArgs.repeat || null;
+    
+          if (repeat && repeat != "d" && repeat != "w" && repeat != "m") this.bot.createMessage(msg.channel.id, `Usage: ${STRINGS.commandUsage.event.create}`);
+          else if (now.diff(startDate) > 0) this.bot.createMessage(msg.channel.id, STRINGS.commandResponses.createEventInPast);
+          else {
+            await calendar.addEvent(eventName, startDate, endDate, eventDescription, repeat);
+            let embed: EmbedOptions = {
+              title: "New Event",
+              color: 8171263,
+              author: {
+                name: "SchedulerBot",
+                icon_url: "https://cdn.discordapp.com/avatars/339019867325726722/e5fca7dbae7156e05c013766fa498fe1.png"
+              },
+              fields: [
+                {
+                  name: "Event Name",
+                  value: eventName
+                },
+                {
+                  name: "Description",
+                  value: eventDescription || "*N/A*"
+                },
+                {
+                  name: "Start Date",
+                  value: moment(startDate).tz(calendar.timezone).toString(),
+                  inline: true
+                },
+                {
+                  name: "End Date",
+                  value: moment(endDate).tz(calendar.timezone).toString(),
+                  inline: true
+                },
+                {
+                  name: "Repeat",
+                  value: repeat ? (repeat == "d" ? "Daily" : (repeat == "w" ? "Weekly" : "Monthly")) : "*N/A*"
+                }
+              ]
+            }
+            
+            this.bot.createMessage(msg.channel.id, {
+              content: "New event created.",
+              embed: embed
+            });
+          }
+        }
       }
-      
-      this.bot.createMessage(msg.channel.id, {
-        content: "New event created.",
-        embed: embed
-      });
+      await this.lock.release();
     } catch (err) {
       return new CommandError(err, msg).toString();
     }
@@ -177,52 +187,56 @@ export class CalendarController extends CommandController {
       let index: number = parseInt(args[0]);
       if (isNaN(index)) return `Usage: ${STRINGS.commandUsage.event.delete}`;
 
-      let calendar: CalendarDocument = await Calendar.findById((<GuildChannel>msg.channel).guild.id).exec();
-      if (!calendar) return STRINGS.commandResponses.timezoneNotSet;
-      if (!calendar.checkPerm('event.delete', msg)) return STRINGS.commandResponses.permissionDenied;
-
       index--;
-      if (index < 0 || index >= calendar.events.length) return STRINGS.commandResponses.eventNotFound;
+      let guildID: string = (<GuildChannel>msg.channel).guild.id;
 
-      let deletedEvent: Event = calendar.events[index];
-      await calendar.deleteEvent(index);
-      let embed: EmbedOptions = {
-        title: "Delete Event",
-        color: 16722731,
-        author: {
-          name: "SchedulerBot",
-          icon_url: "https://cdn.discordapp.com/avatars/339019867325726722/e5fca7dbae7156e05c013766fa498fe1.png"
-        },
-        fields: [
-          {
-            name: "Event Name",
-            value: deletedEvent.name
+      await this.lock.acquire(guildID);
+      let calendar: CalendarDocument = await Calendar.findById(guildID).exec();
+      if (!calendar) this.bot.createMessage(msg.channel.id, STRINGS.commandResponses.timezoneNotSet);
+      else if (!calendar.checkPerm('event.delete', msg)) this.bot.createMessage(msg.channel.id, STRINGS.commandResponses.permissionDenied);
+      else if (index < 0 || index >= calendar.events.length) this.bot.createMessage(msg.channel.id, STRINGS.commandResponses.eventNotFound);
+      else {
+        let deletedEvent: Event = calendar.events[index];
+        await calendar.deleteEvent(index);
+        let embed: EmbedOptions = {
+          title: "Delete Event",
+          color: 16722731,
+          author: {
+            name: "SchedulerBot",
+            icon_url: "https://cdn.discordapp.com/avatars/339019867325726722/e5fca7dbae7156e05c013766fa498fe1.png"
           },
-          {
-            name: "Description",
-            value: deletedEvent.description || "*N/A*"
-          },
-          {
-            name: "Start Date",
-            value: moment(deletedEvent.startDate).tz(calendar.timezone).toString(),
-            inline: true
-          },
-          {
-            name: "End Date",
-            value: moment(deletedEvent.endDate).tz(calendar.timezone).toString(),
-            inline: true
-          },
-          {
-            name: "Repeat",
-            value: deletedEvent.repeat ? (deletedEvent.repeat == "d" ? "Daily" : (deletedEvent.repeat == "w" ? "Weekly" : "Monthly")) : "*N/A*"
-          }
-        ]
+          fields: [
+            {
+              name: "Event Name",
+              value: deletedEvent.name
+            },
+            {
+              name: "Description",
+              value: deletedEvent.description || "*N/A*"
+            },
+            {
+              name: "Start Date",
+              value: moment(deletedEvent.startDate).tz(calendar.timezone).toString(),
+              inline: true
+            },
+            {
+              name: "End Date",
+              value: moment(deletedEvent.endDate).tz(calendar.timezone).toString(),
+              inline: true
+            },
+            {
+              name: "Repeat",
+              value: deletedEvent.repeat ? (deletedEvent.repeat == "d" ? "Daily" : (deletedEvent.repeat == "w" ? "Weekly" : "Monthly")) : "*N/A*"
+            }
+          ]
+        }
+  
+        this.bot.createMessage(msg.channel.id, {
+          content: "Event deleted.",
+          embed: embed
+        });
       }
-
-      this.bot.createMessage(msg.channel.id, {
-        content: "Event deleted.",
-        embed: embed
-      });
+      await this.lock.release();
     } catch (err) {
       return new CommandError(err, msg).toString();
     }
@@ -235,87 +249,106 @@ export class CalendarController extends CommandController {
 
       let index: number = parseInt(args[0]);
       if (isNaN(index)) return `Usage: ${STRINGS.commandUsage.event.update}`;
-
-      let calendar: CalendarDocument = await Calendar.findById((<GuildChannel>msg.channel).guild.id).exec();
-      if (!calendar) return STRINGS.commandResponses.timezoneNotSet;
-      if (!calendar.checkPerm('event.update', msg)) return STRINGS.commandResponses.permissionDenied;
-
       index--;
-      let parsedArgs: any = FlagParser.parse(args.slice(1));
-      if (!parsedArgs._body && !parsedArgs.desc && !parsedArgs.repeat) return `Usage: ${STRINGS.commandUsage.event.update}`;
-
-      let eventName: string;
-      let startDate: moment.Moment;
-      let endDate: moment.Moment;
-      let eventDescription: string;
-      let repeat: string;
-
-      if (parsedArgs._body) {
-        let inputString: string = parsedArgs._body;
-        let results: any = chrono.parse(inputString);
-        if (!results[0]) return STRINGS.commandResponses.eventParseFail;
-  
-        eventName = inputString.replace(results[0].text, "").trim();
-        // If no date supplied by user, assign the current date based on the timezone
-        if (results[0].start.impliedValues.day && results[0].start.impliedValues.month && results[0].start.impliedValues.year) {
-          let nowWithTimezone: moment.Moment = now.tz(calendar.timezone);
-          results[0].start.impliedValues.day = nowWithTimezone.date();
-          results[0].start.impliedValues.month = nowWithTimezone.month() + 1;
-          results[0].start.impliedValues.year = nowWithTimezone.year();
+      
+      let guildID: string = (<GuildChannel>msg.channel).guild.id;
+      this.lock.acquire(guildID);
+      let badInput: boolean = false;
+      let calendar: CalendarDocument = await Calendar.findById(guildID).exec();
+      if (!calendar) this.bot.createMessage(msg.channel.id, STRINGS.commandResponses.timezoneNotSet);
+      else if (!calendar.checkPerm('event.update', msg)) this.bot.createMessage(msg.channel.id, STRINGS.commandResponses.permissionDenied);
+      else {
+        let parsedArgs: any = FlagParser.parse(args.slice(1));
+        if (!parsedArgs._body && !parsedArgs.desc && !parsedArgs.repeat) {
+          this.bot.createMessage(msg.channel.id, `Usage: ${STRINGS.commandUsage.event.update}`);
+          badInput = true;
         }
-        startDate = this.getOffsetMoment(moment(results[0].start.date()), calendar.timezone);
-        endDate = results[0].end ? this.getOffsetMoment(moment(results[0].end.date()), calendar.timezone) : startDate.clone().add(1, 'h');
-        if (now.diff(startDate) > 0) return STRINGS.commandResponses.updateEventInPast;
-        if (now.diff(moment(calendar.events[index].startDate)) > 0) return STRINGS.commandResponses.updateActiveEvent;
-      }
-      if (parsedArgs.desc) {
-        eventDescription = parsedArgs.desc;
-      }
-      if (parsedArgs.repeat) {
-        repeat = parsedArgs.repeat;
-        if (repeat != "d" && repeat != "w" && repeat != "m" && repeat != "off") return `Usage: ${STRINGS.commandUsage.event.update}`;
-      }
-
-      if (index < 0 || index >= calendar.events.length) return STRINGS.commandResponses.eventNotFound;
-
-      let updatedEvent: EventDocument = await calendar.updateEvent(index, eventName, startDate, endDate, eventDescription, repeat);
-      let embed: EmbedOptions = {
-        title: "Update Event",
-        color: 16775221,
-        author: {
-          name: "SchedulerBot",
-          icon_url: "https://cdn.discordapp.com/avatars/339019867325726722/e5fca7dbae7156e05c013766fa498fe1.png"
-        },
-        fields: [
-          {
-            name: "Event Name",
-            value: updatedEvent.name
-          },
-          {
-            name: "Description",
-            value: updatedEvent.description || "*N/A*"
-          },
-          {
-            name: "Start Date",
-            value: moment(updatedEvent.startDate).tz(calendar.timezone).toString(),
-            inline: true
-          },
-          {
-            name: "End Date",
-            value: moment(updatedEvent.endDate).tz(calendar.timezone).toString(),
-            inline: true
-          },
-          {
-            name: "Repeat",
-            value: updatedEvent.repeat ? (updatedEvent.repeat == "d" ? "Daily" : (updatedEvent.repeat == "w" ? "Weekly" : "Monthly")) : "*N/A*"
+  
+        let eventName: string;
+        let startDate: moment.Moment;
+        let endDate: moment.Moment;
+        let eventDescription: string;
+        let repeat: string;
+  
+        if (parsedArgs._body) {
+          let inputString: string = parsedArgs._body;
+          let results: any = chrono.parse(inputString);
+          if (!results[0]) this.bot.createMessage(msg.channel.id, STRINGS.commandResponses.eventParseFail);
+          else {
+            eventName = inputString.replace(results[0].text, "").trim();
+            // If no date supplied by user, assign the current date based on the timezone
+            if (results[0].start.impliedValues.day && results[0].start.impliedValues.month && results[0].start.impliedValues.year) {
+              let nowWithTimezone: moment.Moment = now.tz(calendar.timezone);
+              results[0].start.impliedValues.day = nowWithTimezone.date();
+              results[0].start.impliedValues.month = nowWithTimezone.month() + 1;
+              results[0].start.impliedValues.year = nowWithTimezone.year();
+            }
+            startDate = this.getOffsetMoment(moment(results[0].start.date()), calendar.timezone);
+            endDate = results[0].end ? this.getOffsetMoment(moment(results[0].end.date()), calendar.timezone) : startDate.clone().add(1, 'h');
+            if (now.diff(startDate) > 0) {
+              this.bot.createMessage(msg.channel.id, STRINGS.commandResponses.updateEventInPast);
+              badInput = true;
+            }
+            else if (now.diff(moment(calendar.events[index].startDate)) > 0) {
+              this.bot.createMessage(msg.channel.id, STRINGS.commandResponses.updateActiveEvent);
+              badInput = true;
+            }
           }
-        ]
+        }
+        if (parsedArgs.desc) {
+          eventDescription = parsedArgs.desc;
+        }
+        if (parsedArgs.repeat) {
+          repeat = parsedArgs.repeat;
+          if (repeat != "d" && repeat != "w" && repeat != "m" && repeat != "off") {
+            this.bot.createMessage(msg.channel.id, `Usage: ${STRINGS.commandUsage.event.update}`);
+            badInput = true;
+          }
+        }
+  
+        if (index < 0 || index >= calendar.events.length) return STRINGS.commandResponses.eventNotFound;
+        else if (!badInput) {
+          let updatedEvent: EventDocument = await calendar.updateEvent(index, eventName, startDate, endDate, eventDescription, repeat);
+          let embed: EmbedOptions = {
+            title: "Update Event",
+            color: 16775221,
+            author: {
+              name: "SchedulerBot",
+              icon_url: "https://cdn.discordapp.com/avatars/339019867325726722/e5fca7dbae7156e05c013766fa498fe1.png"
+            },
+            fields: [
+              {
+                name: "Event Name",
+                value: updatedEvent.name
+              },
+              {
+                name: "Description",
+                value: updatedEvent.description || "*N/A*"
+              },
+              {
+                name: "Start Date",
+                value: moment(updatedEvent.startDate).tz(calendar.timezone).toString(),
+                inline: true
+              },
+              {
+                name: "End Date",
+                value: moment(updatedEvent.endDate).tz(calendar.timezone).toString(),
+                inline: true
+              },
+              {
+                name: "Repeat",
+                value: updatedEvent.repeat ? (updatedEvent.repeat == "d" ? "Daily" : (updatedEvent.repeat == "w" ? "Weekly" : "Monthly")) : "*N/A*"
+              }
+            ]
+          }
+    
+          this.bot.createMessage(msg.channel.id, {
+            content: "Event updated.",
+            embed: embed
+          });
+        }
       }
-
-      this.bot.createMessage(msg.channel.id, {
-        content: "Event updated.",
-        embed: embed
-      });
+      await this.lock.release();
     } catch (err) {
       return new CommandError(err, msg).toString();
     }
