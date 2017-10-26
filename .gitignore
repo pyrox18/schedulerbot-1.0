@@ -5,3 +5,4 @@ data/
 **/config/bot.config.*
 **/*.log
 .env
+*.rdb
