@@ -80,7 +80,7 @@
       "fields": [
         {
           "name": "Usage: Creating events",
-          "value": "`event <event details> [--desc <event description>]`\n- `event details` The details for your event. Simply type the details as how you would say it. For example, you can type `CS:GO Scrims at 7pm tomorrow` or `Game Reveal Livestream from 9am to 11am next Thursday`.\n- `event description` An optional description for your event."
+          "value": "`event <event details> [--desc <event description>] [--repeat <d|w|m>]`\n- `event details` The details for your event. Simply type the details as how you would say it. For example, you can type `CS:GO Scrims at 7pm tomorrow` or `Game Reveal Livestream from 9am to 11am next Thursday`.\n- `event description` An optional description for your event.\n- `d|w|m` Specifies whether to repeat the event daily, weekly or monthly."
         },
         {
           "name": "Usage: Listing existing events",
@@ -88,7 +88,7 @@
         },
         {
           "name": "Usage: Updating events",
-          "value": "`event update <event number> [<event details> | --desc <event description>]`\n- `event number` The number of the event that you want to update, which you can check with the `event list` command.\n- `event details` The details for your event. Simply type the details as how you would say it. For example, you can type `CS:GO Scrims at 7pm tomorrow` or `Game Reveal Livestream from 9am to 11am next Thursday`.\n- `event description` An optional description for your event."
+          "value": "`event update <event number> [event details] [--desc <event description>] [--repeat <d|w|m|off>]`\n- `event number` The number of the event that you want to update, which you can check with the `event list` command.\n- `event details` The details for your event. Simply type the details as how you would say it. For example, you can type `CS:GO Scrims at 7pm tomorrow` or `Game Reveal Livestream from 9am to 11am next Thursday`.\n- `event description` An optional description for your event.\n- `d|w|m|off` Specifies whether to repeat the event daily, weekly or monthly, or turn repeat off."
         },
         {
           "name": "Usage: Deleting events",
