@@ -24,10 +24,10 @@
     "invite": "`invite`",
     "init": "`init <timezone>`",
     "event": {
-      "create": "`event <event details>`",
+      "create": "`event <event details> [--desc <event description>] [--repeat <d|w|m>]`",
       "list": "`event list`",
       "delete": "`event delete <eventNumber>`",
-      "update": "`event update <eventNumber> <eventData>`"
+      "update": "`event update <eventNumber> [<event details>] [--desc <event description>] [--repeat <d|w|m|off>]`"
     },
     "perms": {
       "modify": "`perms <allow | deny> <permNode> [--role <role> | --user <user>]`",

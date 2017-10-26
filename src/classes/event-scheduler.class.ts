@@ -5,10 +5,11 @@ import { Types } from 'mongoose';
 import { scheduleJob, cancelJob, Job } from 'node-schedule';
 
 import { SchedulerBot } from './schedulerbot.class';
-import { CalendarDocument } from '../models/calendar.model';
+import { CalendarDocument, CalendarModel as Calendar } from '../models/calendar.model';
 import { EventDocument } from '../models/event.model';
 import { Event } from '../interfaces/event.interface';
 import { JobMap } from '../classes/job-map.class';
+import { CalendarLock } from '../classes/calendar-lock.class';
 
 // Acts as a singleton
 export class EventScheduler {
@@ -16,11 +17,13 @@ export class EventScheduler {
   private deleteJobs: JobMap;
   private bot: SchedulerBot;
   private static instance: EventScheduler = new EventScheduler();
+  private lock: any;
 
   private constructor() {
     this.notifierJobs = new JobMap();
     this.deleteJobs = new JobMap();
     this.bot = SchedulerBot.getInstance();
+    this.lock = CalendarLock.instance.lock;
   }
 
   public static getInstance(): EventScheduler {
@@ -35,14 +38,14 @@ export class EventScheduler {
       }
 
       if (now.diff(moment(event.endDate)) <= 0) {
-        this.scheduleDeleteJob(calendar, event);
+        this.scheduleDeleteJob(calendar._id, event);
       }
     }
   }
 
   public scheduleEvent(calendar: CalendarDocument, event: EventDocument | Event): void {
     this.scheduleNotifierJob(calendar, event);
-    this.scheduleDeleteJob(calendar, event);
+    this.scheduleDeleteJob(calendar._id, event);
   }
 
   public unscheduleEvent(event: EventDocument | Event) {
@@ -71,6 +74,10 @@ export class EventScheduler {
             value: event.name
           },
           {
+            name: "Description",
+            value: event.description || "*N/A*"
+          },
+          {
             name: "Start Date",
             value: moment(event.startDate).tz(calendar.timezone).toString(),
             inline: true
@@ -79,6 +86,10 @@ export class EventScheduler {
             name: "End Date",
             value: moment(event.endDate).tz(calendar.timezone).toString(),
             inline: true
+          },
+          {
+            name: "Repeat",
+            value: event.repeat ? (event.repeat == "d" ? "Daily" : (event.repeat == "w" ? "Weekly" : "Monthly")) : "*N/A*"
           }
         ]
       }
@@ -88,11 +99,14 @@ export class EventScheduler {
     this.notifierJobs.set(eventID, notifierJob);
   }
 
-  private scheduleDeleteJob(calendar: CalendarDocument, event: EventDocument | Event): void {
+  private scheduleDeleteJob(guildID: string, event: EventDocument | Event): void {
     let eventID = event._id;
     let deleteJob: Job = scheduleJob(event.endDate, async (): Promise<void> => {
       try {
-        await calendar.deleteEventById(eventID.toHexString());
+        await this.lock.acquire(guildID);
+        let calendar: CalendarDocument = await Calendar.findById(guildID).exec();
+        await calendar.scheduledDeleteEvent(eventID.toHexString());
+        await this.lock.release();
       } catch (err) {
         winston.log('error', err);
       }

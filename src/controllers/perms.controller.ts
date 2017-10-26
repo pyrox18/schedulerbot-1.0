@@ -82,7 +82,7 @@ export class PermsController extends CommandController {
 
       return STRINGS.commandResponses.permissionModifySuccess;
     } catch (err) {
-      return new CommandError(err).toString();
+      return new CommandError(err, msg).toString();
     }
   }
 
@@ -100,7 +100,7 @@ export class PermsController extends CommandController {
 
       return nodes;
     } catch (err) {
-      return new CommandError(err).toString();
+      return new CommandError(err, msg).toString();
     }
   }
 
@@ -195,7 +195,7 @@ export class PermsController extends CommandController {
         }
       }
     } catch (err) {
-      return new CommandError(err).toString();
+      return new CommandError(err, msg).toString();
     }
   }
 
