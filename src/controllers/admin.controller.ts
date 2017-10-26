@@ -59,8 +59,12 @@ export class AdminController extends CommandController {
     try {
       const { stdout, stderr } = await execFile(args[0], args.slice(1));
       let finalOutput: string = "";
-      if (stdout) finalOutput += "stdout:\n```bash\n" + stdout + "\n```";
-      if (stderr) finalOutput += "stderr:\n```bash\n" + stderr + "\n```";
+      if (stdout) finalOutput += "stdout:\n```bash\n" + this.clean(stdout) + "\n```";
+      if (stderr) finalOutput += "stderr:\n```bash\n" + this.clean(stderr) + "\n```";
+      if (finalOutput.length > 1990) {
+        finalOutput = finalOutput.substr(0, 1986);
+        finalOutput += "\nTruncated\n```"
+      }
       outputMessage.edit(finalOutput);
     } catch (err) {
       outputMessage.edit(`ERROR:\n\`\`\`\n${err}\n\`\`\``);
