@@ -6,7 +6,7 @@ This bot uses the [Eris](https://abal.moe/Eris/) library. Reference documentatio
 
 ## Installation
 
-This project requires [NodeJS](https://nodejs.org) v7.6 or later, [npm](https://npmjs.com) and [MongoDB](https://mongodb.com). Install these first before continuing. (**NOTE**: npm comes with NodeJS.)
+This project requires [NodeJS](https://nodejs.org) v7.6 or later, [npm](https://npmjs.com), [MongoDB](https://mongodb.com) and [Redis](https://redis.io). Install these first before continuing. (**NOTE**: npm comes with NodeJS.)
 
 To get started, clone the repository:
 
@@ -39,6 +39,8 @@ Next, you will have to edit `src/config/bot.config.json`.
 ### Compile and Run
 
 Before starting the bot, make sure MongoDB is running. The bot will attempt to connect to the address specified by `dbConnectionUrl` in the config file.
+
+Next, make sure a local Redis server instance is running. The bot will attempt to connect to the port specified by the `REDIS_PORT` environment variable, or port 6379 by default if none is specified.
 
 Then, you can compile the TypeScript code and start the bot.
 
