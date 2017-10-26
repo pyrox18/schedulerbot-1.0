@@ -26,6 +26,9 @@ export class SchedulerBot extends CommandClient {
 
     let redisPort = process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT) : 6379;
     this._redisClient = createClient(redisPort);
+    this._redisClient.on('ready', () => {
+      console.log("Connected to Redis server");
+    });
   }
 
   public static getInstance() {
