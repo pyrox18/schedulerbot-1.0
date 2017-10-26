@@ -1,5 +1,6 @@
 import { Message, CommandOptions } from 'eris';
-import { inspect } from 'util';
+import { inspect, promisify } from 'util';
+const execFile = promisify(require('child_process').execFile);
 
 import { CommandController } from './command.controller';
 import { CommandError } from '../classes/command-error.class';
@@ -52,10 +53,25 @@ export class AdminController extends CommandController {
     }
   }
 
+  public shell = async (msg: Message, args: string[]): Promise<void> => {
+    if (msg.author.id !== config.adminId) return; // safety
+    let outputMessage: Message = await this.bot.createMessage(msg.channel.id, "Executing...");
+    try {
+      const { stdout, stderr } = await execFile(args[0], args.slice(1));
+      let finalOutput: string = "";
+      if (stdout) finalOutput += "stdout:\n```bash\n" + stdout + "\n```";
+      if (stderr) finalOutput += "stderr:\n```bash\n" + stderr + "\n```";
+      outputMessage.edit(finalOutput);
+    } catch (err) {
+      outputMessage.edit(`ERROR:\n\`\`\`\n${err}\n\`\`\``);
+    }
+  }
+
   public registerCommands(): boolean {
     this.bot.registerCommand("admincheck", this.adminCheck, this.commandOptions);
     this.bot.registerCommand("forceerror", this.forceError, this.commandOptions);
     this.bot.registerCommand("eval", this.eval, this.commandOptions);
+    this.bot.registerCommand("shell", this.shell, this.commandOptions);
     return true;
   }
 
