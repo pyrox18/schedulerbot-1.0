@@ -2,6 +2,23 @@
 
 This changelog is formatted based on [Keep a Changelog](http://keepachangelog.com/) and this project attempts to adhere to [Semantic Versioning](http://semver.org) as much as possible.
 
+## v0.6.0 - 2017-10-26
+
+### Added
+
+- Events may now have descriptions attached to them via the `--desc` flag in the `event` and `event update` commands. e.g. `event Scrims 6p to 7p --desc Scrims on CS:GO` ([`69fb638`](https://github.com/pyrox18/schedulerbot/commit/69fb638a32d7963788d152b52ef79dbb9612ecd5))
+- Events may now be repeated daily, weekly or monthly via the `--repeat` flag in the `event` and `event update` commands. e.g. `event Scrims 6p to 7p --repeat d` ([`005bb1c`](https://github.com/pyrox18/schedulerbot/commit/005bb1c8d30f33a42ada55e95088ace72e946d46))
+- Sentry error tracking is now enabled for production environments.
+- Added `eval` and `shell` admin commands. ([#3](https://github.com/pyrox18/schedulerbot/pull/3), [`480dea9`](https://github.com/pyrox18/schedulerbot/commit/480dea9e6e6c85cd43a39b8bb2e55b13ce1798d4))
+
+### Changed
+
+- The npm postinstall script now copies the example bot config file to a new file named `bot.config.json` instead of renaming the example itself. ([`c295c99`](https://github.com/pyrox18/schedulerbot/commit/c295c997378a8ce9d7c1a2aa5432bfa2e401da10))
+
+### Fixed
+
+- Event modification operations should no longer cause read/write conflicts with each other. This also applies to automated delete operations performed by the event scheduler class. ([#1](https://github.com/pyrox18/schedulerbot/issues/1), [#2](https://github.com/pyrox18/schedulerbot/pull/2), [`3416249`](https://github.com/pyrox18/schedulerbot/commit/34162499970e39a9981270ce18de9ecf4ebfbd05))
+
 ## v0.5.2 - 2017-10-13
 
 ### Changed
