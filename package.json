@@ -8,7 +8,7 @@
     "build": "gulp build",
     "start": "nodemon --inspect=5858 build/app.js --ignore data/",
     "watch": "concurrently --kill-others \"gulp watch\" \"npm start\"",
-    "postinstall": "mv src/config/bot-example.config.json src/config/bot.config.json"
+    "postinstall": "cp src/config/bot-example.config.json src/config/bot.config.json"
   },
   "repository": {
     "type": "git",
