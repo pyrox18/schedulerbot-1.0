@@ -2,6 +2,12 @@
 
 This changelog is formatted based on [Keep a Changelog](http://keepachangelog.com/) and this project attempts to adhere to [Semantic Versioning](http://semver.org) as much as possible.
 
+## v0.6.1 - 2017-10-31
+
+### Fixed
+
+- Added a missing default channel assignment statement in the `init` command. ([`6012080`](https://github.com/pyrox18/schedulerbot/commit/60120805095747f86c2365881937547ab72dac90))
+
 ## v0.6.0 - 2017-10-26
 
 ### Added
