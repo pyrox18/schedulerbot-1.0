@@ -43,6 +43,8 @@ export class CalendarController extends CommandController {
       else {
         if (!moment.tz.zone(args[0])) return STRINGS.commandResponses.timezoneNotFound;
         let savedCalendar: CalendarDocument = await calendar.setTimezone(args[0]);
+        savedCalendar.defaultChannel = msg.channel.id;
+        await savedCalendar.save();
         return `Set calendar timezone to ${savedCalendar.timezone}.`;
       }
     } catch (err) {
