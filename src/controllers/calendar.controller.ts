@@ -254,7 +254,7 @@ export class CalendarController extends CommandController {
       index--;
       
       let guildID: string = (<GuildChannel>msg.channel).guild.id;
-      this.lock.acquire(guildID);
+      await this.lock.acquire(guildID);
       let badInput: boolean = false;
       let calendar: CalendarDocument = await Calendar.findById(guildID).exec();
       if (!calendar) this.bot.createMessage(msg.channel.id, STRINGS.commandResponses.timezoneNotSet);
