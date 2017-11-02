@@ -2,6 +2,12 @@
 
 This changelog is formatted based on [Keep a Changelog](http://keepachangelog.com/) and this project attempts to adhere to [Semantic Versioning](http://semver.org) as much as possible.
 
+## v0.6.2 - 2017-11-02
+
+### Fixed
+
+- Added a missing `await` keyword for calendar lock acquisition in the update event command handler. This reduces/eliminates the chance of users encountering a lock acquisition error. ([`be0cb2b`](https://github.com/pyrox18/schedulerbot/commit/be0cb2b325b60d5411de72c3dfbadbe7f349dee2))
+
 ## v0.6.1 - 2017-10-31
 
 ### Fixed
