@@ -2,6 +2,12 @@
 
 This changelog is formatted based on [Keep a Changelog](http://keepachangelog.com/) and this project attempts to adhere to [Semantic Versioning](http://semver.org) as much as possible.
 
+## v0.6.3 - 2017-11-06
+
+### Fixed
+
+- Fixed the incorrect usage of redislock to lock calendars. ([#4](https://github.com/pyrox18/schedulerbot/issues/4), [`f3b43d2`](https://github.com/pyrox18/schedulerbot/commit/f3b43d2bf60818e798c888614baadc610676afa9))
+
 ## v0.6.2 - 2017-11-02
 
 ### Fixed

@@ -17,13 +17,11 @@ export class EventScheduler {
   private deleteJobs: JobMap;
   private bot: SchedulerBot;
   private static instance: EventScheduler = new EventScheduler();
-  private lock: any;
 
   private constructor() {
     this.notifierJobs = new JobMap();
     this.deleteJobs = new JobMap();
     this.bot = SchedulerBot.getInstance();
-    this.lock = CalendarLock.instance.lock;
   }
 
   public static getInstance(): EventScheduler {
@@ -103,10 +101,10 @@ export class EventScheduler {
     let eventID = event._id;
     let deleteJob: Job = scheduleJob(event.endDate, async (): Promise<void> => {
       try {
-        await this.lock.acquire(guildID);
+        let lock = await CalendarLock.acquire(guildID);
         let calendar: CalendarDocument = await Calendar.findById(guildID).exec();
         await calendar.scheduledDeleteEvent(eventID.toHexString());
-        await this.lock.release();
+        await lock.release();
       } catch (err) {
         winston.log('error', err);
       }
