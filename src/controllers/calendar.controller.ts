@@ -14,11 +14,8 @@ const config: BotConfig = require('../config/bot.config.json');
 const STRINGS: any = require('../resources/strings.resource.json');
 
 export class CalendarController extends CommandController {
-  private lock: any;
-
   constructor() {
     super();
-    this.lock = CalendarLock.instance.lock;
   }
 
   public initializeCalendar = async (msg: Message, args: string[]): Promise<string> => {
@@ -58,7 +55,7 @@ export class CalendarController extends CommandController {
       let guildID: string = (<GuildChannel>msg.channel).guild.id;
       if (args.length < 1) return `Usage: ${STRINGS.commandUsage.event.create}`;
 
-      await this.lock.acquire(guildID);
+      let lock = await CalendarLock.acquire(guildID);
       let calendar: CalendarDocument = await Calendar.findById(guildID).exec();
       if (!calendar || !calendar.timezone) this.bot.createMessage(msg.channel.id, STRINGS.commandResponses.timezoneNotSet);
       else if (!calendar.checkPerm('event.create', msg)) this.bot.createMessage(msg.channel.id, STRINGS.commandResponses.permissionDenied);
@@ -127,7 +124,7 @@ export class CalendarController extends CommandController {
           }
         }
       }
-      await this.lock.release();
+      await lock.release();
     } catch (err) {
       return new CommandError(err, msg).toString();
     }
@@ -192,7 +189,7 @@ export class CalendarController extends CommandController {
       index--;
       let guildID: string = (<GuildChannel>msg.channel).guild.id;
 
-      await this.lock.acquire(guildID);
+      let lock = await CalendarLock.acquire(guildID);
       let calendar: CalendarDocument = await Calendar.findById(guildID).exec();
       if (!calendar) this.bot.createMessage(msg.channel.id, STRINGS.commandResponses.timezoneNotSet);
       else if (!calendar.checkPerm('event.delete', msg)) this.bot.createMessage(msg.channel.id, STRINGS.commandResponses.permissionDenied);
@@ -238,7 +235,7 @@ export class CalendarController extends CommandController {
           embed: embed
         });
       }
-      await this.lock.release();
+      await lock.release();
     } catch (err) {
       return new CommandError(err, msg).toString();
     }
@@ -254,7 +251,7 @@ export class CalendarController extends CommandController {
       index--;
       
       let guildID: string = (<GuildChannel>msg.channel).guild.id;
-      await this.lock.acquire(guildID);
+      let lock = await CalendarLock.acquire(guildID);
       let badInput: boolean = false;
       let calendar: CalendarDocument = await Calendar.findById(guildID).exec();
       if (!calendar) this.bot.createMessage(msg.channel.id, STRINGS.commandResponses.timezoneNotSet);
@@ -350,7 +347,7 @@ export class CalendarController extends CommandController {
           });
         }
       }
-      await this.lock.release();
+      await lock.release();
     } catch (err) {
       return new CommandError(err, msg).toString();
     }
