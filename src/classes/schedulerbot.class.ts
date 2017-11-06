@@ -1,4 +1,5 @@
 import { CommandClient, GamePresence } from 'eris';
+import * as mongoose from 'mongoose';
 import { RedisClient, createClient } from 'redis';
 
 import { loadCommands } from '../loaders/command.loader';
@@ -9,6 +10,7 @@ const config: BotConfig = require('../config/bot.config.json');
 export class SchedulerBot extends CommandClient {
   private _redisClient: RedisClient;
   private static _instance: SchedulerBot;
+  private _db: mongoose.Connection;
 
   private constructor() {
     super(config.botToken, {}, {
@@ -24,6 +26,19 @@ export class SchedulerBot extends CommandClient {
       }
     });
 
+    mongoose.connect(config.dbConnectionUrl, {
+      useMongoClient: true
+    });
+    this._db = mongoose.connection;
+    this._db.on('open', () => {
+      console.log("Connected to database");
+      // TODO: Add MongoDB transport for winston if fixed
+    });
+    this._db.on('error', err => {
+      console.log("Mongoose error: " + err);
+      process.exit();
+    });
+
     let redisPort = process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT) : 6379;
     this._redisClient = createClient(redisPort);
     this._redisClient.on('ready', () => {
@@ -36,6 +51,10 @@ export class SchedulerBot extends CommandClient {
       this._instance = new SchedulerBot();
     }
     return this._instance;
+  }
+
+  public get db() {
+    return this._db;
   }
 
   public get redisClient() {

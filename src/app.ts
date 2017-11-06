@@ -12,30 +12,14 @@ const config: BotConfig = require('./config/bot.config.json');
 
 dotenv.config();
 
+(<any>mongoose).Promise = global.Promise;
+
 // Only setup Raven for prod
 if (process.env.NODE_ENV == "production") {
   raven.config(config.ravenDSN, config.ravenConfigOptions).install();
 }
 
 let bot: SchedulerBot = SchedulerBot.instance;
-
-(<any>mongoose).Promise = global.Promise;
-
-mongoose.connect(config.dbConnectionUrl, {
-  useMongoClient: true
-});
-let db: mongoose.Connection = mongoose.connection;
-
-db.on('error', (err) => {
-  winston.error('DB connection error: ' + err);
-  process.exit(1);
-});
-
-db.once('open', () => {
-  console.log("Connected to database");
-  //TODO: Add MongoDB transport for winston if fixed
-  bot.connect();
-});
 
 bot.on('ready', () => {
   console.log("Loading commands... ");
@@ -47,4 +31,16 @@ bot.on('ready', () => {
   console.log("Configuring bot status... ");
   bot.editStatus("online", config.game);
   console.log("Bot ready!");
+});
+
+// Wait for data stores to connect, then connect bot
+let p1: Promise<boolean> = new Promise((resolve, reject) => {
+  bot.db.on('open', () => { resolve(true) });
+});
+let p2: Promise<boolean> = new Promise((resolve, reject) => {
+  bot.redisClient.on('ready', () => { resolve(true) });
+});
+
+Promise.all([p1, p2]).then(values => {
+  bot.connect();
 });
