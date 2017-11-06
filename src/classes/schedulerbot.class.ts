@@ -44,6 +44,10 @@ export class SchedulerBot extends CommandClient {
     this._redisClient.on('ready', () => {
       console.log("Connected to Redis server");
     });
+    this._redisClient.on('error', err => {
+      console.log("Redis error: " + err);
+      process.exit();
+    });
   }
 
   public static get instance() {
