@@ -17,7 +17,7 @@ if (process.env.NODE_ENV == "production") {
   raven.config(config.ravenDSN, config.ravenConfigOptions).install();
 }
 
-let bot: SchedulerBot = SchedulerBot.getInstance();
+let bot: SchedulerBot = SchedulerBot.instance;
 
 (<any>mongoose).Promise = global.Promise;
 

@@ -6,7 +6,7 @@ export abstract class CommandController {
   protected commandOptions: CommandOptions;
 
   constructor() {
-    this.bot = SchedulerBot.getInstance();
+    this.bot = SchedulerBot.instance;
   }
 
   public abstract registerCommands(): boolean;

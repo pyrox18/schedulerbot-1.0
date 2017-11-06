@@ -21,7 +21,7 @@ export class EventScheduler {
   private constructor() {
     this.notifierJobs = new JobMap();
     this.deleteJobs = new JobMap();
-    this.bot = SchedulerBot.getInstance();
+    this.bot = SchedulerBot.instance;
   }
 
   public static getInstance(): EventScheduler {

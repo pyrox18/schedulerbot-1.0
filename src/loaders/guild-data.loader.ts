@@ -6,7 +6,7 @@ import { CalendarModel as Calendar, CalendarDocument } from '../models/calendar.
 
 export async function loadGuildData(): Promise<void> {
   try {
-    let bot: SchedulerBot = SchedulerBot.getInstance();
+    let bot: SchedulerBot = SchedulerBot.instance;
     let scheduler: EventScheduler = EventScheduler.getInstance();
     let calendars: CalendarDocument[] = await Calendar.find().exec();
     for (let calendar of calendars) {

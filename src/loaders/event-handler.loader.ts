@@ -7,7 +7,7 @@ import { BotConfig } from '../interfaces/bot-config.interface';
 const config: BotConfig = require('../config/bot.config.json');;
 
 export function loadEventHandlers(): void {
-  let bot: SchedulerBot = SchedulerBot.getInstance();
+  let bot: SchedulerBot = SchedulerBot.instance;
 
   bot.on("guildCreate", async guild => {
     try {

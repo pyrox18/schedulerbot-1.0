@@ -8,7 +8,7 @@ const config: BotConfig = require('../config/bot.config.json');
 // Acts as a singleton
 export class SchedulerBot extends CommandClient {
   private _redisClient: RedisClient;
-  private static instance: SchedulerBot = new SchedulerBot();
+  private static _instance: SchedulerBot;
 
   private constructor() {
     super(config.botToken, {}, {
@@ -31,8 +31,11 @@ export class SchedulerBot extends CommandClient {
     });
   }
 
-  public static getInstance() {
-    return this.instance;
+  public static get instance() {
+    if (!this._instance) {
+      this._instance = new SchedulerBot();
+    }
+    return this._instance;
   }
 
   public get redisClient() {
