@@ -38,7 +38,7 @@ export class PermsController extends CommandController {
       if (!PermsController.nodes.find(node => { return args[1] == node })) return STRINGS.commandResponses.nodeNotFound;
 
       let flags: any = FlagParser.parse(args);
-      if ((!flags.role && !flags.user) || Object.keys(flags).length > 1) return `Usage: ${STRINGS.commandUsage.perms.modify}`;
+      if ((!flags.role && !flags.user) || Object.keys(flags).length < 2) return `Usage: ${STRINGS.commandUsage.perms.modify}`;
 
       let results: any[];
       if (flags.role) {
@@ -112,7 +112,7 @@ export class PermsController extends CommandController {
       if (!calendar.checkPerm('perms.show', msg)) return STRINGS.commandResponses.permissionDenied;
 
       let flags: any = FlagParser.parse(args);
-      if ((!flags.node && !flags.role && !flags.user) || Object.keys(flags).length > 1) return `Usage: ${STRINGS.commandUsage.perms.show}`;
+      if ((!flags.node && !flags.role && !flags.user) || Object.keys(flags).length < 2) return `Usage: ${STRINGS.commandUsage.perms.show}`;
 
       if (flags.node) {
         if (!PermsController.nodes.find(node => { return node == flags.node })) return STRINGS.commandResponses.nodeNotFound;
