@@ -2,6 +2,12 @@
 
 This changelog is formatted based on [Keep a Changelog](http://keepachangelog.com/) and this project attempts to adhere to [Semantic Versioning](http://semver.org) as much as possible.
 
+## v0.6.4 - 2017-11-16
+
+### Fixed
+
+- Corrected the checking for the number of flags passed in the `perms` and `perms show` commands. ([`24578e0`](https://github.com/pyrox18/schedulerbot/commit/24578e099e2a6b9d9580b4cdd40bc3c07ff70515))
+
 ## v0.6.3 - 2017-11-06
 
 ### Fixed
