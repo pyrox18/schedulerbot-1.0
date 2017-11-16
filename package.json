@@ -1,6 +1,6 @@
 {
   "name": "schedulerbot",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "description": "A Discord bot for scheduling events",
   "main": "build/app.js",
   "scripts": {
