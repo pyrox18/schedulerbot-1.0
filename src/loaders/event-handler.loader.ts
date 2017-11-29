@@ -24,7 +24,7 @@ export function loadEventHandlers(): void {
   bot.on("guildDelete", async guild => {
     try {
       let calendar: CalendarDocument = await Calendar.findByIdAndRemove(guild.id).exec();
-      let scheduler: EventScheduler = EventScheduler.getInstance();
+      let scheduler: EventScheduler = bot.eventScheduler;
       for (let event of calendar.events) {
         scheduler.unscheduleEvent(event);
       }

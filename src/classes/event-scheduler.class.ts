@@ -11,21 +11,15 @@ import { Event } from '../interfaces/event.interface';
 import { JobMap } from '../classes/job-map.class';
 import { CalendarLock } from '../classes/calendar-lock.class';
 
-// Acts as a singleton
 export class EventScheduler {
   private notifierJobs: JobMap;
   private deleteJobs: JobMap;
   private bot: SchedulerBot;
-  private static instance: EventScheduler = new EventScheduler();
 
-  private constructor() {
+  public constructor(bot: SchedulerBot) {
     this.notifierJobs = new JobMap();
     this.deleteJobs = new JobMap();
-    this.bot = SchedulerBot.instance;
-  }
-
-  public static getInstance(): EventScheduler {
-    return this.instance;
+    this.bot = bot;
   }
 
   public scheduleExistingEvents(calendar: CalendarDocument): void {

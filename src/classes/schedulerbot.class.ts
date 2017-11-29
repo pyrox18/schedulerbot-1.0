@@ -2,6 +2,7 @@ import { CommandClient, GamePresence } from 'eris';
 import * as mongoose from 'mongoose';
 import { RedisClient, createClient } from 'redis';
 
+import { EventScheduler } from './event-scheduler.class';
 import { loadCommands } from '../loaders/command.loader';
 import { BotConfig } from '../interfaces/bot-config.interface';
 const config: BotConfig = require('../config/bot.config.json');
@@ -11,6 +12,7 @@ export class SchedulerBot extends CommandClient {
   private _redisClient: RedisClient;
   private static _instance: SchedulerBot;
   private _db: mongoose.Connection;
+  private _eventScheduler: EventScheduler;
 
   private constructor() {
     super(config.botToken, {}, {
@@ -48,6 +50,8 @@ export class SchedulerBot extends CommandClient {
       console.log("Redis error: " + err);
       process.exit();
     });
+
+    this._eventScheduler = new EventScheduler(this);
   }
 
   public static get instance() {
@@ -63,6 +67,10 @@ export class SchedulerBot extends CommandClient {
 
   public get redisClient() {
     return this._redisClient;
+  }
+
+  public get eventScheduler() {
+    return this._eventScheduler;
   }
 }
 

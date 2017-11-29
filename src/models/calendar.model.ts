@@ -2,10 +2,10 @@ import { Message, GuildChannel } from 'eris';
 import { Document, Schema, Model, model } from 'mongoose';
 import * as moment from 'moment-timezone';
 
+import { SchedulerBot } from '../classes/schedulerbot.class';
 import { Calendar } from '../interfaces/calendar.interface';
 import { EventDocument, EventSchema, EventModel as Event } from './event.model';
 import { PermsDocument, PermsSchema, PermsModel as Perms } from './perms.model';
-import { EventScheduler } from '../classes/event-scheduler.class';
 
 export interface CalendarDocument extends Calendar, Document {
   _id: string;
@@ -64,7 +64,7 @@ CalendarSchema.methods.addEvent = function(eventName: string, startDate: moment.
     }
   }
 
-  EventScheduler.getInstance().scheduleEvent(this, this.events[eventIndex]);
+  SchedulerBot.instance.eventScheduler.scheduleEvent(this, this.events[eventIndex]);
 
   return this.save();
 }
@@ -72,7 +72,7 @@ CalendarSchema.methods.addEvent = function(eventName: string, startDate: moment.
 CalendarSchema.methods.deleteEvent = function(eventIndex: number): Promise<any> {
   if (eventIndex >= 0 && eventIndex < this.events.length) {
     let event: EventDocument = this.events.splice(eventIndex, 1);
-    EventScheduler.getInstance().unscheduleEvent(event[0]);
+    SchedulerBot.instance.eventScheduler.unscheduleEvent(event[0]);
     return this.save();
   }
   return Promise.reject("Event not found");
@@ -123,7 +123,7 @@ CalendarSchema.methods.updateEvent = async function(eventIndex: number, eventNam
       }
     }
 
-    EventScheduler.getInstance().rescheduleEvent(this, event);
+    SchedulerBot.instance.eventScheduler.rescheduleEvent(this, event);
     await this.save();
     return event;
   }
@@ -160,7 +160,7 @@ CalendarSchema.methods.repeatUpdateEvent = async function(eventIndex: number) {
       }
     }
 
-    EventScheduler.getInstance().rescheduleEvent(this, event);
+    SchedulerBot.instance.eventScheduler.rescheduleEvent(this, event);
     await this.save();
     return event;
   }
