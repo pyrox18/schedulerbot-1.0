@@ -22,8 +22,6 @@ if (process.env.NODE_ENV == "production") {
 let bot: SchedulerBot = SchedulerBot.instance;
 
 bot.on('ready', () => {
-  console.log("Loading commands... ");
-  loadCommands();
   console.log("Loading event handlers...");
   loadEventHandlers();
   console.log("Loading guild data...");

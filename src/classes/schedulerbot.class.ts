@@ -5,6 +5,12 @@ import { RedisClient, createClient } from 'redis';
 import { EventScheduler } from './event-scheduler.class';
 import { loadCommands } from '../loaders/command.loader';
 import { BotConfig } from '../interfaces/bot-config.interface';
+import { CommandController } from '../controllers/command.controller';
+import { MiscController } from '../controllers/misc.controller';
+import { CalendarController } from '../controllers/calendar.controller';
+import { AdminController } from '../controllers/admin.controller';
+import { PermsController } from '../controllers/perms.controller';
+import { HelpController } from '../controllers/help.controller';
 const config: BotConfig = require('../config/bot.config.json');
 
 // Acts as a singleton
@@ -13,6 +19,7 @@ export class SchedulerBot extends CommandClient {
   private static _instance: SchedulerBot;
   private _db: mongoose.Connection;
   private _eventScheduler: EventScheduler;
+  private controllers: CommandController[];
 
   private constructor() {
     super(config.botToken, {}, {
@@ -27,6 +34,9 @@ export class SchedulerBot extends CommandClient {
         cooldownReturns: 1
       }
     });
+
+    this.controllers = [];
+    this._eventScheduler = new EventScheduler(this);
 
     mongoose.connect(config.dbConnectionUrl, {
       useMongoClient: true
@@ -51,7 +61,16 @@ export class SchedulerBot extends CommandClient {
       process.exit();
     });
 
-    this._eventScheduler = new EventScheduler(this);
+    this.on('ready', () => {
+      console.log("Loading command controllers... ");
+      this.loadControllers([
+        new MiscController(),
+        new CalendarController(),
+        new AdminController(),
+        new PermsController(),
+        new HelpController()
+      ]);
+    });
   }
 
   public static get instance() {
@@ -71,6 +90,13 @@ export class SchedulerBot extends CommandClient {
 
   public get eventScheduler() {
     return this._eventScheduler;
+  }
+
+  public loadControllers(controllers: CommandController[]) {
+    for (let controller of controllers) {
+      this.controllers.push(controller);
+      controller.registerCommands();
+    }
   }
 }
 
