@@ -21,12 +21,6 @@ if (process.env.NODE_ENV == "production") {
 
 let bot: SchedulerBot = SchedulerBot.instance;
 
-bot.on('ready', () => {
-  console.log("Configuring bot status... ");
-  bot.editStatus("online", config.game);
-  console.log("Bot ready!");
-});
-
 // Wait for data stores to connect, then connect bot
 let p1: Promise<boolean> = new Promise((resolve, reject) => {
   bot.db.on('open', () => { resolve(true) });

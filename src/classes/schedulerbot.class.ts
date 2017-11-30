@@ -76,6 +76,9 @@ export class SchedulerBot extends CommandClient {
       this.loadEventHandlers();
       console.log("Loading guild data...");
       (async () => await this.loadGuildData())();
+      console.log("Configuring bot status... ");
+      this.editStatus("online", config.game);
+      console.log("Bot ready!");
     });
   }
 
