@@ -1,9 +1,11 @@
 import { CommandClient, GamePresence } from 'eris';
 import * as mongoose from 'mongoose';
 import { RedisClient, createClient } from 'redis';
+import * as winston from 'winston';
 
 import { EventScheduler } from './event-scheduler.class';
-import { loadCommands } from '../loaders/command.loader';
+import { CalendarDocument, CalendarModel as Calendar } from '../models/calendar.model';
+import { loadCommands } from '../loaders/command.loader'; // Remove later
 import { BotConfig } from '../interfaces/bot-config.interface';
 import { CommandController } from '../controllers/command.controller';
 import { MiscController } from '../controllers/misc.controller';
@@ -70,6 +72,8 @@ export class SchedulerBot extends CommandClient {
         new PermsController(),
         new HelpController()
       ]);
+      console.log("Loading event handlers...");
+      this.loadEventHandlers();
     });
   }
 
@@ -97,6 +101,64 @@ export class SchedulerBot extends CommandClient {
       this.controllers.push(controller);
       controller.registerCommands();
     }
+  }
+
+  public loadEventHandlers(): void {
+    this.on("guildCreate", async guild => {
+      try {
+        let newGuild: CalendarDocument = new Calendar({
+          _id: guild.id,
+          prefix: config.prefix
+        });
+        await newGuild.save();
+      } catch (err) {
+        winston.error("guildCreate handler error", err);
+      }
+    });
+  
+    this.on("guildDelete", async guild => {
+      try {
+        let calendar: CalendarDocument = await Calendar.findByIdAndRemove(guild.id).exec();
+        let scheduler: EventScheduler = this.eventScheduler;
+        for (let event of calendar.events) {
+          scheduler.unscheduleEvent(event);
+        }
+      } catch (err) {
+        winston.error("guildDelete handler error", err);
+      }
+    });
+  
+    this.on("guildMemberRemove", async (guild, member) => {
+      try {
+        let calendar: CalendarDocument = await Calendar.findById(guild.id).exec();
+        for (let perm of calendar.permissions) {
+          let index: number = perm.deniedUsers.findIndex(id => { return id == member.id });
+          if (index >= 0) {
+            perm.deniedUsers.splice(index, 1);
+          }
+        }
+    
+        await calendar.save();
+      } catch (err) {
+        winston.error("guildMemberRemove handler error", err);
+      }
+    });
+  
+    this.on("guildRoleDelete", async (guild, role) => {
+      try {
+        let calendar: CalendarDocument = await Calendar.findById(guild.id).exec();
+        for (let perm of calendar.permissions) {
+          let index: number = perm.deniedRoles.findIndex(id => { return id == role.id });
+          if (index >= 0) {
+            perm.deniedRoles.splice(index, 1);
+          }
+        }
+  
+        await calendar.save();
+      } catch (err) {
+        winston.error("guildRoleDelete handler error", err);
+      }
+    });
   }
 }
 
