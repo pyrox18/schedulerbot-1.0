@@ -21,14 +21,4 @@ if (process.env.NODE_ENV == "production") {
 
 let bot: SchedulerBot = SchedulerBot.instance;
 
-// Wait for data stores to connect, then connect bot
-let p1: Promise<boolean> = new Promise((resolve, reject) => {
-  bot.db.on('open', () => { resolve(true) });
-});
-let p2: Promise<boolean> = new Promise((resolve, reject) => {
-  bot.redisClient.on('ready', () => { resolve(true) });
-});
-
-Promise.all([p1, p2]).then(values => {
-  bot.connect();
-});
+bot.on('dbconnect', () => bot.connect());

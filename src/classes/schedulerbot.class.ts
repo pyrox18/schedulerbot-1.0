@@ -63,6 +63,18 @@ export class SchedulerBot extends CommandClient {
       process.exit();
     });
 
+    // Emit 'dbconnect' event when both data stores are connected
+    let p1: Promise<boolean> = new Promise((resolve, reject) => {
+      this.db.on('open', () => { resolve(true) });
+    });
+    let p2: Promise<boolean> = new Promise((resolve, reject) => {
+      this.redisClient.on('ready', () => { resolve(true) });
+    });
+    Promise.all([p1, p2]).then(values => {
+      this.emit('dbconnect');
+    });
+
+    // Load controllers, event handlers and data when ready
     this.on('ready', () => {
       console.log("Loading command controllers... ");
       this.loadControllers([
