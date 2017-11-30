@@ -74,6 +74,8 @@ export class SchedulerBot extends CommandClient {
       ]);
       console.log("Loading event handlers...");
       this.loadEventHandlers();
+      console.log("Loading guild data...");
+      (async () => await this.loadGuildData())();
     });
   }
 
@@ -159,6 +161,19 @@ export class SchedulerBot extends CommandClient {
         winston.error("guildRoleDelete handler error", err);
       }
     });
+  }
+
+  public async loadGuildData(): Promise<void> {
+    try {
+      let calendars: CalendarDocument[] = await Calendar.find().exec();
+      for (let calendar of calendars) {
+        let prefixes: string[] = [calendar.prefix, "@mention "];
+        this.registerGuildPrefix(calendar._id, prefixes);
+        this.eventScheduler.scheduleExistingEvents(calendar);
+      }
+    } catch (err) {
+      winston.error("Prefix load error", err);
+    }
   }
 }
 

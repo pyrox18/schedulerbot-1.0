@@ -22,8 +22,6 @@ if (process.env.NODE_ENV == "production") {
 let bot: SchedulerBot = SchedulerBot.instance;
 
 bot.on('ready', () => {
-  console.log("Loading guild data...");
-  loadGuildData();
   console.log("Configuring bot status... ");
   bot.editStatus("online", config.game);
   console.log("Bot ready!");
