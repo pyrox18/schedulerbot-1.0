@@ -5,7 +5,6 @@ import * as winston from 'winston';
 
 import { EventScheduler } from './event-scheduler.class';
 import { CalendarDocument, CalendarModel as Calendar } from '../models/calendar.model';
-import { loadCommands } from '../loaders/command.loader'; // Remove later
 import { BotConfig } from '../interfaces/bot-config.interface';
 import { CommandController } from '../controllers/command.controller';
 import { MiscController } from '../controllers/misc.controller';
