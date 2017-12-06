@@ -83,7 +83,8 @@ export class CalendarController extends CommandController {
           if (repeat && repeat != "d" && repeat != "w" && repeat != "m") this.bot.createMessage(msg.channel.id, `Usage: ${STRINGS.commandUsage.event.create}`);
           else if (now.diff(startDate) > 0) this.bot.createMessage(msg.channel.id, STRINGS.commandResponses.createEventInPast);
           else {
-            await calendar.addEvent(eventName, startDate, endDate, eventDescription, repeat);
+            let event: EventDocument = await calendar.addEvent(eventName, startDate, endDate, eventDescription, repeat);
+            this.bot.eventScheduler.scheduleEvent(calendar, event);
             let embed: EmbedOptions = {
               title: "New Event",
               color: 8171263,
@@ -195,8 +196,8 @@ export class CalendarController extends CommandController {
       else if (!calendar.checkPerm('event.delete', msg)) this.bot.createMessage(msg.channel.id, STRINGS.commandResponses.permissionDenied);
       else if (index < 0 || index >= calendar.events.length) this.bot.createMessage(msg.channel.id, STRINGS.commandResponses.eventNotFound);
       else {
-        let deletedEvent: Event = calendar.events[index];
-        await calendar.deleteEvent(index);
+        let deletedEvent: EventDocument = await calendar.deleteEvent(index);
+        this.bot.eventScheduler.unscheduleEvent(deletedEvent);
         let embed: EmbedOptions = {
           title: "Delete Event",
           color: 16722731,
@@ -308,6 +309,7 @@ export class CalendarController extends CommandController {
         if (index < 0 || index >= calendar.events.length) return STRINGS.commandResponses.eventNotFound;
         else if (!badInput) {
           let updatedEvent: EventDocument = await calendar.updateEvent(index, eventName, startDate, endDate, eventDescription, repeat);
+          this.bot.eventScheduler.rescheduleEvent(calendar, updatedEvent);
           let embed: EmbedOptions = {
             title: "Update Event",
             color: 16775221,

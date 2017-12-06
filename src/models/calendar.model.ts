@@ -9,8 +9,8 @@ import { PermsDocument, PermsSchema, PermsModel as Perms } from './perms.model';
 
 export interface CalendarDocument extends Calendar, Document {
   _id: string;
-  addEvent(eventName: string, startDate: moment.Moment, endDate: moment.Moment, eventDescription?: string, repeat?: string): Promise<any>;
-  deleteEvent(eventIndex: number): Promise<any>;
+  addEvent(eventName: string, startDate: moment.Moment, endDate: moment.Moment, eventDescription?: string, repeat?: string): Promise<EventDocument>;
+  deleteEvent(eventIndex: number): Promise<EventDocument>;
   scheduledDeleteEvent(eventId: string): Promise<any>;
   updateEvent(eventIndex: number, eventName?: string, startDate?: moment.Moment, endDate?: moment.Moment, eventDescription?: string, repeat?: string): Promise<EventDocument>;
   updatePrefix(prefix: string): Promise<any>;
@@ -33,7 +33,7 @@ export let CalendarSchema: Schema = new Schema({
   _id: false
 });
 
-CalendarSchema.methods.addEvent = function(eventName: string, startDate: moment.Moment, endDate: moment.Moment, eventDescription?: string, repeat?: string): Promise<any> {
+CalendarSchema.methods.addEvent = async function(eventName: string, startDate: moment.Moment, endDate: moment.Moment, eventDescription?: string, repeat?: string): Promise<EventDocument> {
   let event: Document = new Event({
     name: eventName,
     startDate: startDate.toDate(),
@@ -64,16 +64,15 @@ CalendarSchema.methods.addEvent = function(eventName: string, startDate: moment.
     }
   }
 
-  SchedulerBot.instance.eventScheduler.scheduleEvent(this, this.events[eventIndex]);
-
-  return this.save();
+  await this.save();
+  return this.events[eventIndex];
 }
 
-CalendarSchema.methods.deleteEvent = function(eventIndex: number): Promise<any> {
+CalendarSchema.methods.deleteEvent = async function(eventIndex: number): Promise<EventDocument> {
   if (eventIndex >= 0 && eventIndex < this.events.length) {
     let event: EventDocument = this.events.splice(eventIndex, 1);
-    SchedulerBot.instance.eventScheduler.unscheduleEvent(event[0]);
-    return this.save();
+    await this.save();
+    return event[0];
   }
   return Promise.reject("Event not found");
 }
@@ -123,7 +122,6 @@ CalendarSchema.methods.updateEvent = async function(eventIndex: number, eventNam
       }
     }
 
-    SchedulerBot.instance.eventScheduler.rescheduleEvent(this, event);
     await this.save();
     return event;
   }
