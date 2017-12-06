@@ -97,7 +97,10 @@ export class EventScheduler {
       try {
         let lock = await CalendarLock.acquire(guildID);
         let calendar: CalendarDocument = await Calendar.findById(guildID).exec();
-        await calendar.scheduledDeleteEvent(eventID.toHexString());
+        let repeatEvent = await calendar.scheduledDeleteEvent(eventID.toHexString());
+        if (repeatEvent) {
+          this.rescheduleEvent(calendar, event);
+        }
         await lock.release();
       } catch (err) {
         winston.log('error', err);

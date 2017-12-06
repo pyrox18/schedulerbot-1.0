@@ -11,7 +11,7 @@ export interface CalendarDocument extends Calendar, Document {
   _id: string;
   addEvent(eventName: string, startDate: moment.Moment, endDate: moment.Moment, eventDescription?: string, repeat?: string): Promise<EventDocument>;
   deleteEvent(eventIndex: number): Promise<EventDocument>;
-  scheduledDeleteEvent(eventId: string): Promise<any>;
+  scheduledDeleteEvent(eventId: string): Promise<boolean>;
   updateEvent(eventIndex: number, eventName?: string, startDate?: moment.Moment, endDate?: moment.Moment, eventDescription?: string, repeat?: string): Promise<EventDocument>;
   updatePrefix(prefix: string): Promise<any>;
   setTimezone(timezone: string): Promise<any>;
@@ -77,7 +77,8 @@ CalendarSchema.methods.deleteEvent = async function(eventIndex: number): Promise
   return Promise.reject("Event not found");
 }
 
-CalendarSchema.methods.scheduledDeleteEvent = function(eventId: string): Promise<any> {
+CalendarSchema.methods.scheduledDeleteEvent = async function(eventId: string): Promise<EventDocument> {
+  let repeatEvent: EventDocument = null;
   let index: number = this.events.findIndex((event) => {
     return event._id.toString() == eventId;
   });
@@ -85,9 +86,10 @@ CalendarSchema.methods.scheduledDeleteEvent = function(eventId: string): Promise
     this.events.splice(index, 1);
   }
   else {
-    this.repeatUpdateEvent(index);
+    repeatEvent = await this.repeatUpdateEvent(index);
   }
-  return this.save();
+  await this.save();
+  return repeatEvent;
 }
 
 CalendarSchema.methods.updateEvent = async function(eventIndex: number, eventName?: string, startDate?: moment.Moment, endDate?: moment.Moment, eventDescription?: string, repeat?: string): Promise<EventDocument> {
@@ -128,7 +130,7 @@ CalendarSchema.methods.updateEvent = async function(eventIndex: number, eventNam
   return Promise.reject("Event not found");
 }
 
-CalendarSchema.methods.repeatUpdateEvent = async function(eventIndex: number) {
+CalendarSchema.methods.repeatUpdateEvent = async function(eventIndex: number): Promise<EventDocument> {
   if (eventIndex >= 0 && eventIndex < this.events.length) {
     let eventArray: EventDocument[] = this.events.splice(eventIndex, 1);
     let event: EventDocument = eventArray[0];
@@ -157,8 +159,7 @@ CalendarSchema.methods.repeatUpdateEvent = async function(eventIndex: number) {
         }
       }
     }
-
-    SchedulerBot.instance.eventScheduler.rescheduleEvent(this, event);
+    
     await this.save();
     return event;
   }
