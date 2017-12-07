@@ -95,7 +95,7 @@ export class EventScheduler {
     let eventID = event._id;
     let deleteJob: Job = scheduleJob(event.endDate, async (): Promise<void> => {
       try {
-        let lock = await CalendarLock.acquire(guildID);
+        let lock = await this.bot.calendarLock.acquire(guildID);
         let calendar: CalendarDocument = await Calendar.findById(guildID).exec();
         let repeatEvent = await calendar.scheduledDeleteEvent(eventID.toHexString());
         if (repeatEvent) {

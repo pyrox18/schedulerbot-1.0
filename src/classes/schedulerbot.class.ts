@@ -12,6 +12,7 @@ import { CalendarController } from '../controllers/calendar.controller';
 import { AdminController } from '../controllers/admin.controller';
 import { PermsController } from '../controllers/perms.controller';
 import { HelpController } from '../controllers/help.controller';
+import { CalendarLock } from './calendar-lock.class';
 const config: BotConfig = require('../config/bot.config.json');
 
 // Acts as a singleton
@@ -20,6 +21,7 @@ export class SchedulerBot extends CommandClient {
   private static _instance: SchedulerBot;
   private _db: mongoose.Connection;
   private _eventScheduler: EventScheduler;
+  private _calendarLock: CalendarLock;
   private controllers: CommandController[];
 
   private constructor() {
@@ -61,6 +63,8 @@ export class SchedulerBot extends CommandClient {
       console.log("Redis error: " + err);
       process.exit();
     });
+
+    this._calendarLock = new CalendarLock(this._redisClient);
 
     // Emit 'dbconnect' event when both data stores are connected
     let p1: Promise<boolean> = new Promise((resolve, reject) => {
@@ -110,6 +114,10 @@ export class SchedulerBot extends CommandClient {
 
   public get eventScheduler() {
     return this._eventScheduler;
+  }
+
+  public get calendarLock() {
+    return this._calendarLock;
   }
 
   public loadControllers(controllers: CommandController[]) {

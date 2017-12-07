@@ -55,7 +55,7 @@ export class CalendarController extends CommandController {
       let guildID: string = (<GuildChannel>msg.channel).guild.id;
       if (args.length < 1) return `Usage: ${STRINGS.commandUsage.event.create}`;
 
-      let lock = await CalendarLock.acquire(guildID);
+      let lock = await this.bot.calendarLock.acquire(guildID);
       let calendar: CalendarDocument = await Calendar.findById(guildID).exec();
       if (!calendar || !calendar.timezone) this.bot.createMessage(msg.channel.id, STRINGS.commandResponses.timezoneNotSet);
       else if (!calendar.checkPerm('event.create', msg)) this.bot.createMessage(msg.channel.id, STRINGS.commandResponses.permissionDenied);
@@ -190,7 +190,7 @@ export class CalendarController extends CommandController {
       index--;
       let guildID: string = (<GuildChannel>msg.channel).guild.id;
 
-      let lock = await CalendarLock.acquire(guildID);
+      let lock = await this.bot.calendarLock.acquire(guildID);
       let calendar: CalendarDocument = await Calendar.findById(guildID).exec();
       if (!calendar) this.bot.createMessage(msg.channel.id, STRINGS.commandResponses.timezoneNotSet);
       else if (!calendar.checkPerm('event.delete', msg)) this.bot.createMessage(msg.channel.id, STRINGS.commandResponses.permissionDenied);
@@ -252,7 +252,7 @@ export class CalendarController extends CommandController {
       index--;
       
       let guildID: string = (<GuildChannel>msg.channel).guild.id;
-      let lock = await CalendarLock.acquire(guildID);
+      let lock = await this.bot.calendarLock.acquire(guildID);
       let badInput: boolean = false;
       let calendar: CalendarDocument = await Calendar.findById(guildID).exec();
       if (!calendar) this.bot.createMessage(msg.channel.id, STRINGS.commandResponses.timezoneNotSet);
