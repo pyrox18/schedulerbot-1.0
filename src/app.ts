@@ -16,6 +16,6 @@ if (process.env.NODE_ENV == "production") {
   raven.config(config.ravenDSN, config.ravenConfigOptions).install();
 }
 
-let bot: SchedulerBot = SchedulerBot.instance;
+let bot: SchedulerBot = new SchedulerBot();
 
 bot.on('dbconnect', () => bot.connect());

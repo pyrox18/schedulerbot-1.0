@@ -18,13 +18,12 @@ const config: BotConfig = require('../config/bot.config.json');
 // Acts as a singleton
 export class SchedulerBot extends CommandClient {
   private _redisClient: RedisClient;
-  private static _instance: SchedulerBot;
   private _db: mongoose.Connection;
   private _eventScheduler: EventScheduler;
   private _calendarLock: CalendarLock;
   private controllers: CommandController[];
 
-  private constructor() {
+  public constructor() {
     super(config.botToken, {}, {
       description: "A Discord bot for scheduling events",
       owner: "Pyrox",
@@ -95,13 +94,6 @@ export class SchedulerBot extends CommandClient {
       this.editStatus("online", config.game);
       console.log("Bot ready!");
     });
-  }
-
-  public static get instance() {
-    if (!this._instance) {
-      this._instance = new SchedulerBot();
-    }
-    return this._instance;
   }
 
   public get db() {
