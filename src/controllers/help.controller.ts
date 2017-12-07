@@ -1,12 +1,13 @@
 import { Message, CommandOptions, Command } from 'eris';
 
 import { CommandController } from './command.controller';
+import { SchedulerBot } from '../classes/schedulerbot.class';
 const STRINGS: any = require('../resources/strings.resource.json');
 const HELP_EMBEDS: any = require('../resources/help-embeds.resource.json');
 
 export class HelpController extends CommandController {
-  constructor() {
-    super();
+  constructor(bot: SchedulerBot) {
+    super(bot);
   }
 
   public help = (msg: Message, args: string[]): void => {

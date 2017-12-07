@@ -81,11 +81,11 @@ export class SchedulerBot extends CommandClient {
     this.on('ready', () => {
       console.log("Loading command controllers... ");
       this.loadControllers([
-        new MiscController(),
-        new CalendarController(),
-        new AdminController(),
-        new PermsController(),
-        new HelpController()
+        new MiscController(this),
+        new CalendarController(this),
+        new AdminController(this),
+        new PermsController(this),
+        new HelpController(this)
       ]);
       console.log("Loading event handlers...");
       this.loadEventHandlers();

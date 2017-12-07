@@ -10,12 +10,13 @@ import { Event } from '../interfaces/event.interface';
 import { CommandError } from '../classes/command-error.class';
 import { BotConfig } from '../interfaces/bot-config.interface';
 import { CalendarLock } from '../classes/calendar-lock.class';
+import { SchedulerBot } from '../classes/schedulerbot.class';
 const config: BotConfig = require('../config/bot.config.json');
 const STRINGS: any = require('../resources/strings.resource.json');
 
 export class CalendarController extends CommandController {
-  constructor() {
-    super();
+  constructor(bot: SchedulerBot) {
+    super(bot);
   }
 
   public initializeCalendar = async (msg: Message, args: string[]): Promise<string> => {

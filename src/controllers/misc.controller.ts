@@ -6,13 +6,14 @@ import { CalendarModel as Calendar, CalendarDocument } from '../models/calendar.
 import { CommandError } from '../classes/command-error.class';
 import { ParsedMS } from '../interfaces/parsed-ms.interface';
 import { BotConfig } from '../interfaces/bot-config.interface';
+import { SchedulerBot } from '../classes/schedulerbot.class';
 const config: BotConfig = require('../config/bot.config.json');
 const version: string = require('../../package.json').version;
 const STRINGS: any = require('../resources/strings.resource.json');
 
 export class MiscController extends CommandController {
-  constructor() {
-    super();
+  constructor(bot: SchedulerBot) {
+    super(bot);
   }
 
   public ping = async (msg: Message, args: string[]): Promise<string> => {
