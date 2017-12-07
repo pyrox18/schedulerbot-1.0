@@ -35,22 +35,22 @@ export class EventScheduler {
     }
   }
 
-  public scheduleEvent(calendar: CalendarDocument, event: EventDocument | Event): void {
+  public scheduleEvent(calendar: CalendarDocument, event: EventDocument): void {
     this.scheduleNotifierJob(calendar, event);
     this.scheduleDeleteJob(calendar._id, event);
   }
 
-  public unscheduleEvent(event: EventDocument | Event) {
+  public unscheduleEvent(event: EventDocument) {
     this.unscheduleNotifierJob(event);
     this.unscheduleDeleteJob(event);
   }
 
-  public rescheduleEvent(calendar: CalendarDocument, event: EventDocument | Event) {
+  public rescheduleEvent(calendar: CalendarDocument, event: EventDocument) {
     this.unscheduleEvent(event);
     this.scheduleEvent(calendar, event);
   }
 
-  private scheduleNotifierJob = (calendar: CalendarDocument, event: EventDocument | Event): void => {
+  private scheduleNotifierJob = (calendar: CalendarDocument, event: EventDocument): void => {
     let eventID: Types.ObjectId = event._id;
     let notifierJob: Job = scheduleJob(event.startDate, (): void => {
       let embed: EmbedBase = {
@@ -91,7 +91,7 @@ export class EventScheduler {
     this.notifierJobs.set(eventID, notifierJob);
   }
 
-  private scheduleDeleteJob(guildID: string, event: EventDocument | Event): void {
+  private scheduleDeleteJob(guildID: string, event: EventDocument): void {
     let eventID = event._id;
     let deleteJob: Job = scheduleJob(event.endDate, async (): Promise<void> => {
       try {
@@ -110,7 +110,7 @@ export class EventScheduler {
     this.deleteJobs.set(eventID, deleteJob);
   }
 
-  private unscheduleNotifierJob(event: EventDocument | Event) {
+  private unscheduleNotifierJob(event: EventDocument) {
     let eventID = event._id;
     let job: Job = this.notifierJobs.get(eventID);
     if (job) {
@@ -119,7 +119,7 @@ export class EventScheduler {
     }
   }
 
-  private unscheduleDeleteJob(event: EventDocument | Event) {
+  private unscheduleDeleteJob(event: EventDocument) {
     let eventID = event._id;
     let job: Job = this.deleteJobs.get(eventID);
     if (job) {
