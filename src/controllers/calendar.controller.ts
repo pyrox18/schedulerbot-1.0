@@ -1,4 +1,4 @@
-import { Message, CommandOptions, GuildChannel, EmbedOptions, Command } from 'eris';
+import { Message, CommandOptions, GuildChannel, EmbedBase, Command } from 'eris';
 import * as moment from 'moment-timezone';
 import * as chrono from 'chrono-node';
 
@@ -12,12 +12,16 @@ import { BotConfig } from '../interfaces/bot-config.interface';
 import { CalendarLock } from '../classes/calendar-lock.class';
 import { SchedulerBot } from '../classes/schedulerbot.class';
 import { EventParser } from '../classes/event-parser.class';
+import { EventEmbedFactory } from '../classes/event-embed-factory.class';
 import { config } from '../config/bot.config';
 const STRINGS: any = require('../resources/strings.resource.json');
 
 export class CalendarController extends CommandController {
+  private eventEmbedFactory: EventEmbedFactory;
+
   constructor(bot: SchedulerBot) {
     super(bot);
+    this.eventEmbedFactory = new EventEmbedFactory();
   }
 
   public initializeCalendar = async (msg: Message, args: string[]): Promise<string> => {
@@ -69,38 +73,7 @@ export class CalendarController extends CommandController {
         else {
           let event: EventDocument = await calendar.addEvent(parsedEvent);
           this.bot.eventScheduler.scheduleEvent(calendar, event);
-          let embed: EmbedOptions = {
-            title: "New Event",
-            color: 8171263,
-            author: {
-              name: "SchedulerBot",
-              icon_url: "https://cdn.discordapp.com/avatars/339019867325726722/e5fca7dbae7156e05c013766fa498fe1.png"
-            },
-            fields: [
-              {
-                name: "Event Name",
-                value: event.name
-              },
-              {
-                name: "Description",
-                value: event.description || "*N/A*"
-              },
-              {
-                name: "Start Date",
-                value: moment(event.startDate).tz(calendar.timezone).toString(),
-                inline: true
-              },
-              {
-                name: "End Date",
-                value: moment(event.endDate).tz(calendar.timezone).toString(),
-                inline: true
-              },
-              {
-                name: "Repeat",
-                value: event.repeat ? (event.repeat == "d" ? "Daily" : (event.repeat == "w" ? "Weekly" : "Monthly")) : "*N/A*"
-              }
-            ]
-          }
+          let embed: EmbedBase = this.eventEmbedFactory.getNewEventEmbed(event, calendar.timezone);
           
           this.bot.createMessage(msg.channel.id, {
             content: "New event created.",
@@ -181,38 +154,7 @@ export class CalendarController extends CommandController {
       else {
         let deletedEvent: EventDocument = await calendar.deleteEvent(index);
         this.bot.eventScheduler.unscheduleEvent(deletedEvent);
-        let embed: EmbedOptions = {
-          title: "Delete Event",
-          color: 16722731,
-          author: {
-            name: "SchedulerBot",
-            icon_url: "https://cdn.discordapp.com/avatars/339019867325726722/e5fca7dbae7156e05c013766fa498fe1.png"
-          },
-          fields: [
-            {
-              name: "Event Name",
-              value: deletedEvent.name
-            },
-            {
-              name: "Description",
-              value: deletedEvent.description || "*N/A*"
-            },
-            {
-              name: "Start Date",
-              value: moment(deletedEvent.startDate).tz(calendar.timezone).toString(),
-              inline: true
-            },
-            {
-              name: "End Date",
-              value: moment(deletedEvent.endDate).tz(calendar.timezone).toString(),
-              inline: true
-            },
-            {
-              name: "Repeat",
-              value: deletedEvent.repeat ? (deletedEvent.repeat == "d" ? "Daily" : (deletedEvent.repeat == "w" ? "Weekly" : "Monthly")) : "*N/A*"
-            }
-          ]
-        }
+        let embed: EmbedBase = this.eventEmbedFactory.getDeleteEventEmbed(deletedEvent, calendar.timezone);
   
         this.bot.createMessage(msg.channel.id, {
           content: "Event deleted.",
@@ -270,38 +212,7 @@ export class CalendarController extends CommandController {
         else if (!badInput) {
           let updatedEvent: EventDocument = await calendar.updateEvent(index, parsedEvent);
           this.bot.eventScheduler.rescheduleEvent(calendar, updatedEvent);
-          let embed: EmbedOptions = {
-            title: "Update Event",
-            color: 16775221,
-            author: {
-              name: "SchedulerBot",
-              icon_url: "https://cdn.discordapp.com/avatars/339019867325726722/e5fca7dbae7156e05c013766fa498fe1.png"
-            },
-            fields: [
-              {
-                name: "Event Name",
-                value: updatedEvent.name
-              },
-              {
-                name: "Description",
-                value: updatedEvent.description || "*N/A*"
-              },
-              {
-                name: "Start Date",
-                value: moment(updatedEvent.startDate).tz(calendar.timezone).toString(),
-                inline: true
-              },
-              {
-                name: "End Date",
-                value: moment(updatedEvent.endDate).tz(calendar.timezone).toString(),
-                inline: true
-              },
-              {
-                name: "Repeat",
-                value: updatedEvent.repeat ? (updatedEvent.repeat == "d" ? "Daily" : (updatedEvent.repeat == "w" ? "Weekly" : "Monthly")) : "*N/A*"
-              }
-            ]
-          }
+          let embed: EmbedBase = this.eventEmbedFactory.getUpdateEventEmbed(updatedEvent, calendar.timezone);
     
           this.bot.createMessage(msg.channel.id, {
             content: "Event updated.",
