@@ -179,7 +179,16 @@ export class SchedulerBot extends CommandClient {
 
   public async loadGuildData(): Promise<void> {
     try {
-      let calendars: CalendarDocument[] = await Calendar.find().exec();
+      let clientGuildIDs: string[] = new Array<string>();
+      for (let guildID in this.guildShardMap) {
+        let shardID: number = this.guildShardMap[guildID];
+        if (shardID >= this.options.firstShardID && shardID <= this.options.lastShardID) {
+          clientGuildIDs.push(guildID);
+        }
+      }
+      let calendars: CalendarDocument[] = await Calendar.find({
+        _id: { $in: clientGuildIDs }
+      }).exec();
       for (let calendar of calendars) {
         let prefixes: string[] = [calendar.prefix, "@mention "];
         this.registerGuildPrefix(calendar._id, prefixes);
