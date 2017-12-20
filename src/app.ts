@@ -13,7 +13,7 @@ dotenv.config();
 
 // Only setup Raven for prod
 if (process.env.NODE_ENV == "production") {
-  raven.config(config.ravenDSN, config.ravenConfigOptions).install();
+  raven.config(process.env.SENTRY_DSN, config.ravenConfigOptions).install();
 }
 
 let bot: SchedulerBot = new SchedulerBot();

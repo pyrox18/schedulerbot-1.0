@@ -28,12 +28,24 @@ Before running the bot, you will have to create a Discord Developer App at https
 4. Uncheck "Public Bot" under the app bot user if you don't want anyone else inviting your bot to the server.
 5. Take note of the app bot user's token, which will be used in the bot's config.
 
+Next, copy `.env.example` into a new `.env` file.
+
+```bash
+$ cp .env.example .env
+```
+
+The following fields in the `.env` file can be modified:
+
+- `NODE_ENV`: Defaults to `development` for a development environment. No need to change this unless you're deploying the bot on a production environment.
+- `BOT_TOKEN`: Replace this with your app bot user's token.
+- `MONGODB_URI`: Defaults to a local MongoDB instance running on port 27017. Replace this if you use a different configuration.
+- `SENTRY_DSN`: Unless you're in a production environment and use Sentry for error logging, this doesn't have to be configured.
+- `REDIS_PORT`: Defaults to port 6379 of a local redis-server instance. Replace this if you have a different configuration.
+
 Next, you will have to edit `src/config/bot.config.json`.
 
-- `botToken`: Replace this with your app bot user's token.
 - `prefix`: Change this if the default prefix conflicts with other bots on your server.
 - `game.name`: Modify this if you want to change the bot's status.
-- `dbConnectionUrl`: Defaults to the standard local MongoDB instance running on port 27017.
 - `adminId`: Used for admin-only commands. Change it to your ID.
 
 ### Compile and Run

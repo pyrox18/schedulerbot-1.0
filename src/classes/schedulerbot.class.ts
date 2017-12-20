@@ -24,7 +24,7 @@ export class SchedulerBot extends CommandClient {
   private controllers: CommandController[];
 
   public constructor() {
-    super(config.botToken, {}, {
+    super(process.env.BOT_TOKEN, {}, {
       description: "A Discord bot for scheduling events",
       owner: "Pyrox",
       prefix: [config.prefix, "@mention "],
@@ -40,7 +40,7 @@ export class SchedulerBot extends CommandClient {
     this.controllers = [];
     this._eventScheduler = new EventScheduler(this);
 
-    mongoose.connect(config.dbConnectionUrl, {
+    mongoose.connect(process.env.MONGODB_URI, {
       useMongoClient: true
     });
     this._db = mongoose.connection;

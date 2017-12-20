@@ -1,10 +1,7 @@
 {
-  "botToken": "copyAndPasteYourEntireAppBotUserTokenHere",
   "prefix": "+",
   "game": {
     "name": "+help | In development"
   },
-  "dbConnectionUrl": "mongodb://localhost:27017/schedulerbot",
-  "adminId": "1234567890123456",
-  "ravenDSN": "{PROTOCOL}://{PUBLIC_KEY}:{SECRET_KEY}@{HOST}/{PATH}{PROJECT_ID}"
+  "adminId": "1234567890123456"
 }
