@@ -5,13 +5,14 @@ const execFile = promisify(require('child_process').execFile);
 import { CommandController } from './command.controller';
 import { CommandError } from '../classes/command-error.class';
 import { BotConfig } from '../interfaces/bot-config.interface';
-const config: BotConfig = require('../config/bot.config.json');;
+import { SchedulerBot } from '../classes/schedulerbot.class';
+import { config } from '../config/bot.config';
 
 export class AdminController extends CommandController {
   protected commandOptions: CommandOptions;
 
-  constructor() {
-    super();
+  constructor(bot: SchedulerBot) {
+    super(bot);
     this.commandOptions = {
       guildOnly: true,
       requirements: {

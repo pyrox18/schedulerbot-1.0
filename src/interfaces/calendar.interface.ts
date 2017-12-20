@@ -1,10 +1,9 @@
-import { Event } from './event.interface';
+import { EventDocument } from '../models/event.model';
 import { Perms } from './perms.interface';
 
 export interface Calendar {
-  _id: string,
   timezone: string,
-  events: Event[],
+  events: EventDocument[],
   prefix: string,
   defaultChannel: string,
   permissions: Perms[]

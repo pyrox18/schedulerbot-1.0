@@ -6,7 +6,7 @@ gulp.task("default", tsc);
 gulp.task("compile", tsc);
 
 gulp.task("build", ["compile"], function() {
-  gulp.src('./src/config/**/*.json')
+  gulp.src('./src/config/**/*.ts')
   .pipe(gulp.dest('./build/config'));
   gulp.src('./src/resources/**/*.json')
   .pipe(gulp.dest('./build/resources'));

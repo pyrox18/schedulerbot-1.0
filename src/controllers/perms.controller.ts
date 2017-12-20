@@ -7,7 +7,8 @@ import { Perms } from '../interfaces/perms.interface';
 import { FlagParser } from '../classes/flag-parser.class';
 import { CommandError } from '../classes/command-error.class';
 import { BotConfig } from '../interfaces/bot-config.interface';
-const config: BotConfig = require('../config/bot.config.json');
+import { SchedulerBot } from '../classes/schedulerbot.class';
+import { config } from '../config/bot.config';
 const STRINGS: any = require('../resources/strings.resource.json');
 
 export class PermsController extends CommandController {
@@ -24,8 +25,8 @@ export class PermsController extends CommandController {
     'perms.show'
   ];
 
-  constructor() {
-    super();
+  constructor(bot: SchedulerBot) {
+    super(bot);
   }
 
   public modifyPerms = async (msg: Message, args: string[]): Promise<string> => {

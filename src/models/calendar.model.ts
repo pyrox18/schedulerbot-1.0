@@ -2,17 +2,18 @@ import { Message, GuildChannel } from 'eris';
 import { Document, Schema, Model, model } from 'mongoose';
 import * as moment from 'moment-timezone';
 
+import { SchedulerBot } from '../classes/schedulerbot.class';
 import { Calendar } from '../interfaces/calendar.interface';
+import { Event as EventInterface } from '../interfaces/event.interface';
 import { EventDocument, EventSchema, EventModel as Event } from './event.model';
 import { PermsDocument, PermsSchema, PermsModel as Perms } from './perms.model';
-import { EventScheduler } from '../classes/event-scheduler.class';
 
 export interface CalendarDocument extends Calendar, Document {
   _id: string;
-  addEvent(eventName: string, startDate: moment.Moment, endDate: moment.Moment, eventDescription?: string, repeat?: string): Promise<any>;
-  deleteEvent(eventIndex: number): Promise<any>;
-  scheduledDeleteEvent(eventId: string): Promise<any>;
-  updateEvent(eventIndex: number, eventName?: string, startDate?: moment.Moment, endDate?: moment.Moment, eventDescription?: string, repeat?: string): Promise<EventDocument>;
+  addEvent(event: EventInterface): Promise<EventDocument>;
+  deleteEvent(eventIndex: number): Promise<EventDocument>;
+  scheduledDeleteEvent(eventId: string): Promise<boolean>;
+  updateEvent(eventIndex: number, event: EventInterface): Promise<EventDocument>;
   updatePrefix(prefix: string): Promise<any>;
   setTimezone(timezone: string): Promise<any>;
   denyRolePerm(roleId: string, node: string): Promise<any>;
@@ -33,13 +34,13 @@ export let CalendarSchema: Schema = new Schema({
   _id: false
 });
 
-CalendarSchema.methods.addEvent = function(eventName: string, startDate: moment.Moment, endDate: moment.Moment, eventDescription?: string, repeat?: string): Promise<any> {
-  let event: Document = new Event({
-    name: eventName,
-    startDate: startDate.toDate(),
-    endDate: endDate.toDate(),
-    description: eventDescription,
-    repeat: repeat
+CalendarSchema.methods.addEvent = async function(event: EventInterface): Promise<EventDocument> {
+  let newEvent: Document = new Event({
+    name: event.name,
+    startDate: event.startDate,
+    endDate: event.endDate,
+    description: event.description,
+    repeat: event.repeat
   });
 
   let eventIndex: number;
@@ -51,34 +52,34 @@ CalendarSchema.methods.addEvent = function(eventName: string, startDate: moment.
   else {
     for (let i = 0; i < this.events.length; i++) {
       let element = this.events[i];
-      if (moment(element.startDate).isSameOrAfter(startDate)) {
-        this.events.splice(i, 0, event);
+      if (moment(element.startDate).isSameOrAfter(event.startDate)) {
+        this.events.splice(i, 0, newEvent);
         eventIndex = i;
         break;
       }
       if (i == this.events.length - 1) {
-        this.events.push(event);
+        this.events.push(newEvent);
         eventIndex = this.events.length - 1;
         break;
       }
     }
   }
 
-  EventScheduler.getInstance().scheduleEvent(this, this.events[eventIndex]);
-
-  return this.save();
+  await this.save();
+  return this.events[eventIndex];
 }
 
-CalendarSchema.methods.deleteEvent = function(eventIndex: number): Promise<any> {
+CalendarSchema.methods.deleteEvent = async function(eventIndex: number): Promise<EventDocument> {
   if (eventIndex >= 0 && eventIndex < this.events.length) {
     let event: EventDocument = this.events.splice(eventIndex, 1);
-    EventScheduler.getInstance().unscheduleEvent(event[0]);
-    return this.save();
+    await this.save();
+    return event[0];
   }
   return Promise.reject("Event not found");
 }
 
-CalendarSchema.methods.scheduledDeleteEvent = function(eventId: string): Promise<any> {
+CalendarSchema.methods.scheduledDeleteEvent = async function(eventId: string): Promise<EventDocument> {
+  let repeatEvent: EventDocument = null;
   let index: number = this.events.findIndex((event) => {
     return event._id.toString() == eventId;
   });
@@ -86,51 +87,51 @@ CalendarSchema.methods.scheduledDeleteEvent = function(eventId: string): Promise
     this.events.splice(index, 1);
   }
   else {
-    this.repeatUpdateEvent(index);
+    repeatEvent = await this.repeatUpdateEvent(index);
   }
-  return this.save();
+  await this.save();
+  return repeatEvent;
 }
 
-CalendarSchema.methods.updateEvent = async function(eventIndex: number, eventName?: string, startDate?: moment.Moment, endDate?: moment.Moment, eventDescription?: string, repeat?: string): Promise<EventDocument> {
+CalendarSchema.methods.updateEvent = async function(eventIndex: number, event: EventInterface): Promise<EventDocument> {
   if (eventIndex >= 0 && eventIndex < this.events.length) {
     let eventArray: EventDocument[] = this.events.splice(eventIndex, 1);
-    let event: EventDocument = eventArray[0];
+    let existingEvent: EventDocument = eventArray[0];
 
-    event.name = eventName || event.name;
-    event.startDate = startDate ? startDate.toDate() : event.startDate;
-    event.endDate = endDate ? endDate.toDate() : event.endDate;
-    event.description = eventDescription || event.description;
-    if (repeat && repeat == "off") {
-      event.repeat = null;
+    existingEvent.name = event.name || existingEvent.name;
+    existingEvent.startDate = event.startDate ? event.startDate : existingEvent.startDate;
+    existingEvent.endDate = event.endDate ? event.endDate : existingEvent.endDate;
+    existingEvent.description = event.description || existingEvent.description;
+    if (event.repeat && event.repeat == "off") {
+      existingEvent.repeat = null;
     }
     else {
-      event.repeat = repeat || event.repeat;
+      existingEvent.repeat = event.repeat || existingEvent.repeat;
     }
 
     if (this.events.length == 0) {
-      this.events.push(event);
+      this.events.push(existingEvent);
     }
     else {
       for (let i = 0; i < this.events.length; i++) {
-        if (moment(this.events[i].startDate).isSameOrAfter(event.startDate)) {
-          this.events.splice(i, 0, event);
+        if (moment(this.events[i].startDate).isSameOrAfter(existingEvent.startDate)) {
+          this.events.splice(i, 0, existingEvent);
           break;
         }
         if (i == this.events.length - 1) {
-          this.events.push(event);
+          this.events.push(existingEvent);
           break;
         }
       }
     }
 
-    EventScheduler.getInstance().rescheduleEvent(this, event);
     await this.save();
-    return event;
+    return existingEvent;
   }
   return Promise.reject("Event not found");
 }
 
-CalendarSchema.methods.repeatUpdateEvent = async function(eventIndex: number) {
+CalendarSchema.methods.repeatUpdateEvent = async function(eventIndex: number): Promise<EventDocument> {
   if (eventIndex >= 0 && eventIndex < this.events.length) {
     let eventArray: EventDocument[] = this.events.splice(eventIndex, 1);
     let event: EventDocument = eventArray[0];
@@ -159,8 +160,7 @@ CalendarSchema.methods.repeatUpdateEvent = async function(eventIndex: number) {
         }
       }
     }
-
-    EventScheduler.getInstance().rescheduleEvent(this, event);
+    
     await this.save();
     return event;
   }

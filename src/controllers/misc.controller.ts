@@ -6,13 +6,15 @@ import { CalendarModel as Calendar, CalendarDocument } from '../models/calendar.
 import { CommandError } from '../classes/command-error.class';
 import { ParsedMS } from '../interfaces/parsed-ms.interface';
 import { BotConfig } from '../interfaces/bot-config.interface';
-const config: BotConfig = require('../config/bot.config.json');
+import { SchedulerBot } from '../classes/schedulerbot.class';
+import { Period } from '../classes/period.class';
+import { config } from '../config/bot.config';
 const version: string = require('../../package.json').version;
 const STRINGS: any = require('../resources/strings.resource.json');
 
 export class MiscController extends CommandController {
-  constructor() {
-    super();
+  constructor(bot: SchedulerBot) {
+    super(bot);
   }
 
   public ping = async (msg: Message, args: string[]): Promise<string> => {
@@ -48,7 +50,7 @@ export class MiscController extends CommandController {
   }
 
   public info = (msg: Message, args: string[]): void => {
-    let uptimeParsed = this.convertMS(this.bot.uptime);
+    let uptimeParsed: Period = new Period(this.bot.uptime);
     let embed: EmbedOptions = {
       description: "A Discord bot for scheduling events.",
       color: 13893595,
@@ -77,7 +79,7 @@ export class MiscController extends CommandController {
         },
         {
           name: "Uptime",
-          value: `${uptimeParsed.d} day(s), ${uptimeParsed.h} hour(s), ${uptimeParsed.m} minute(s), ${uptimeParsed.s} second(s)`
+          value: `${uptimeParsed.days} day(s), ${uptimeParsed.hours} hour(s), ${uptimeParsed.minutes} minute(s), ${uptimeParsed.seconds} second(s)`
         }
       ]
     }
@@ -91,23 +93,6 @@ export class MiscController extends CommandController {
 
   public invite(msg: Message, args: string[]): string {
     return STRINGS.commandResponses.botInviteLink;
-  }
-
-  private convertMS(ms: number): ParsedMS { // https://gist.github.com/remino/1563878
-    let parsedMS: ParsedMS = {
-      s: 0,
-      m: 0,
-      h: 0,
-      d: 0
-    }
-    parsedMS.s = Math.floor(ms / 1000);
-    parsedMS.m = Math.floor(parsedMS.s / 60);
-    parsedMS.s = parsedMS.s % 60;
-    parsedMS.h = Math.floor(parsedMS.m / 60);
-    parsedMS.m = parsedMS.m % 60;
-    parsedMS.d = Math.floor(parsedMS.h / 24);
-    parsedMS.h = parsedMS.h % 24;
-    return parsedMS;
   }
 
   public registerCommands(): boolean {
