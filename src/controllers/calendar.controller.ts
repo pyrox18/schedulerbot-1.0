@@ -12,7 +12,7 @@ import { BotConfig } from '../interfaces/bot-config.interface';
 import { CalendarLock } from '../classes/calendar-lock.class';
 import { SchedulerBot } from '../classes/schedulerbot.class';
 import { EventParser } from '../classes/event-parser.class';
-const config: BotConfig = require('../config/bot.config.json');
+import { config } from '../config/bot.config';
 const STRINGS: any = require('../resources/strings.resource.json');
 
 export class CalendarController extends CommandController {

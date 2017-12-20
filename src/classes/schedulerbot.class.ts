@@ -13,7 +13,7 @@ import { AdminController } from '../controllers/admin.controller';
 import { PermsController } from '../controllers/perms.controller';
 import { HelpController } from '../controllers/help.controller';
 import { CalendarLock } from './calendar-lock.class';
-const config: BotConfig = require('../config/bot.config.json');
+import { config } from '../config/bot.config';
 
 // Acts as a singleton
 export class SchedulerBot extends CommandClient {

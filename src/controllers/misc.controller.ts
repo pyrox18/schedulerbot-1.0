@@ -8,7 +8,7 @@ import { ParsedMS } from '../interfaces/parsed-ms.interface';
 import { BotConfig } from '../interfaces/bot-config.interface';
 import { SchedulerBot } from '../classes/schedulerbot.class';
 import { Period } from '../classes/period.class';
-const config: BotConfig = require('../config/bot.config.json');
+import { config } from '../config/bot.config';
 const version: string = require('../../package.json').version;
 const STRINGS: any = require('../resources/strings.resource.json');
 

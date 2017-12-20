@@ -5,7 +5,7 @@ import * as raven from 'raven';
 
 import { SchedulerBot } from './classes/schedulerbot.class';
 import { BotConfig } from './interfaces/bot-config.interface';
-const config: BotConfig = require('./config/bot.config.json');
+import { config } from './config/bot.config';
 
 dotenv.config();
 
@@ -13,7 +13,7 @@ dotenv.config();
 
 // Only setup Raven for prod
 if (process.env.NODE_ENV == "production") {
-  raven.config(process.env.SENTRY_DSN, config.ravenConfigOptions).install();
+  raven.config(process.env.SENTRY_DSN).install();
 }
 
 let bot: SchedulerBot = new SchedulerBot();

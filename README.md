@@ -42,7 +42,7 @@ The following fields in the `.env` file can be modified:
 - `SENTRY_DSN`: Unless you're in a production environment and use Sentry for error logging, this doesn't have to be configured.
 - `REDIS_PORT`: Defaults to port 6379 of a local redis-server instance. Replace this if you have a different configuration.
 
-Next, you will have to edit `src/config/bot.config.json`.
+Next, copy `src/config/bot-example.config.ts` into `src/config/bot.config.ts` and edit it.
 
 - `prefix`: Change this if the default prefix conflicts with other bots on your server.
 - `game.name`: Modify this if you want to change the bot's status.
