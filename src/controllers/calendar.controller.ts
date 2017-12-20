@@ -79,25 +79,25 @@ export class CalendarController extends CommandController {
             fields: [
               {
                 name: "Event Name",
-                value: parsedEvent.name
+                value: event.name
               },
               {
                 name: "Description",
-                value: parsedEvent.description || "*N/A*"
+                value: event.description || "*N/A*"
               },
               {
                 name: "Start Date",
-                value: moment(parsedEvent.startDate).tz(calendar.timezone).toString(),
+                value: moment(event.startDate).tz(calendar.timezone).toString(),
                 inline: true
               },
               {
                 name: "End Date",
-                value: moment(parsedEvent.endDate).tz(calendar.timezone).toString(),
+                value: moment(event.endDate).tz(calendar.timezone).toString(),
                 inline: true
               },
               {
                 name: "Repeat",
-                value: parsedEvent.repeat ? (parsedEvent.repeat == "d" ? "Daily" : (parsedEvent.repeat == "w" ? "Weekly" : "Monthly")) : "*N/A*"
+                value: event.repeat ? (event.repeat == "d" ? "Daily" : (event.repeat == "w" ? "Weekly" : "Monthly")) : "*N/A*"
               }
             ]
           }
