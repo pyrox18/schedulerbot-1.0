@@ -5,8 +5,8 @@ import { EventDocument } from "../models/event.model";
 
 export class EventEmbedFactory {
   public readonly colours = {
-    NEW_EVENT: 8171263,
     DELETE_EVENT: 16722731,
+    NEW_EVENT: 8171263,
     UPDATE_EVENT: 16775221
   };
 
@@ -33,10 +33,6 @@ export class EventEmbedFactory {
 
   private getBaseEmbed(event: EventDocument, timezone: string): EmbedBase {
     const embed: EmbedBase = {
-      author: {
-        name: "SchedulerBot",
-        icon_url: "https://cdn.discordapp.com/avatars/339019867325726722/e5fca7dbae7156e05c013766fa498fe1.png"
-      },
       fields: [
         {
           name: "Event Name",
@@ -62,7 +58,11 @@ export class EventEmbedFactory {
           (event.repeat === "d" ? "Daily" :
           (event.repeat === "w" ? "Weekly" : "Monthly")) : "*N/A*"
         }
-      ]
+      ],
+      author: {
+        name: "SchedulerBot",
+        icon_url: "https://cdn.discordapp.com/avatars/339019867325726722/e5fca7dbae7156e05c013766fa498fe1.png"
+      }
     };
     return embed;
   }

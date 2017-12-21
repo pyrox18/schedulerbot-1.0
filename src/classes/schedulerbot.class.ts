@@ -1,4 +1,4 @@
-import { CommandClient, GamePresence } from "eris";
+import { CommandClient } from "eris";
 import * as mongoose from "mongoose";
 import { createClient, RedisClient } from "redis";
 import * as winston from "winston";
@@ -10,7 +10,6 @@ import { CommandController } from "../controllers/command.controller";
 import { HelpController } from "../controllers/help.controller";
 import { MiscController } from "../controllers/misc.controller";
 import { PermsController } from "../controllers/perms.controller";
-import { BotConfig } from "../interfaces/bot-config.interface";
 import { CalendarDocument, CalendarModel as Calendar } from "../models/calendar.model";
 import { CalendarLock } from "./calendar-lock.class";
 import { EventScheduler } from "./event-scheduler.class";
@@ -25,15 +24,15 @@ export class SchedulerBot extends CommandClient {
 
   public constructor() {
     super(process.env.BOT_TOKEN, {}, {
+      defaultHelpCommand: false,
       description: "A Discord bot for scheduling events",
       owner: "Pyrox",
       prefix: [config.prefix, "@mention "],
-      defaultHelpCommand: false,
       defaultCommandOptions: {
         guildOnly: true,
         cooldown: 1000,
-        cooldownMessage: "Command is on cooldown.",
-        cooldownReturns: 1
+        cooldownReturns: 1,
+        cooldownMessage: "Command is on cooldown."
       }
     });
 

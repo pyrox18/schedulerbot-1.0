@@ -1,5 +1,4 @@
 import { GamePresence } from "eris";
-import { ConstructorOptions } from "raven";
 
 // This interface is used for the bot.config.ts file present in the config folder.
 export interface BotConfig {

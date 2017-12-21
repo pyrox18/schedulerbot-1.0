@@ -4,9 +4,7 @@ import { Types } from "mongoose";
 import { cancelJob, Job, scheduleJob } from "node-schedule";
 import * as winston from "winston";
 
-import { CalendarLock } from "../classes/calendar-lock.class";
 import { JobMap } from "../classes/job-map.class";
-import { Event } from "../interfaces/event.interface";
 import { CalendarDocument, CalendarModel as Calendar } from "../models/calendar.model";
 import { EventDocument } from "../models/event.model";
 import { SchedulerBot } from "./schedulerbot.class";
@@ -56,10 +54,6 @@ export class EventScheduler {
       const embed: EmbedBase = {
         title: "**Event starting now!**",
         color: 1376071,
-        author: {
-          name: "SchedulerBot",
-          icon_url: "https://cdn.discordapp.com/avatars/339019867325726722/e5fca7dbae7156e05c013766fa498fe1.png"
-        },
         fields: [
           {
             name: "Event Name",
@@ -85,7 +79,11 @@ export class EventScheduler {
             (event.repeat === "d" ? "Daily" :
             (event.repeat === "w" ? "Weekly" : "Monthly")) : "*N/A*"
           }
-        ]
+        ],
+        author: {
+          name: "SchedulerBot",
+          icon_url: "https://cdn.discordapp.com/avatars/339019867325726722/e5fca7dbae7156e05c013766fa498fe1.png"
+        }
       };
       this.bot.createMessage(calendar.defaultChannel, { embed });
     });

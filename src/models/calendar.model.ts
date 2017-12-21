@@ -2,7 +2,6 @@ import { GuildChannel, Message } from "eris";
 import * as moment from "moment-timezone";
 import { Document, Model, model, Schema } from "mongoose";
 
-import { SchedulerBot } from "../classes/schedulerbot.class";
 import { Calendar } from "../interfaces/calendar.interface";
 import { Event as EventInterface } from "../interfaces/event.interface";
 import { EventDocument, EventModel as Event, EventSchema } from "./event.model";
@@ -26,22 +25,22 @@ export interface CalendarDocument extends Calendar, Document {
 // tslint:disable-next-line
 export let CalendarSchema: Schema = new Schema({
   _id: String,
-  timezone: String,
-  events: [EventSchema],
-  prefix: String,
   defaultChannel: String,
-  permissions: [PermsSchema]
+  events: [EventSchema],
+  permissions: [PermsSchema],
+  prefix: String,
+  timezone: String
 }, {
   _id: false
 });
 
 CalendarSchema.methods.addEvent = async function(event: EventInterface): Promise<EventDocument> {
   const newEvent: Document = new Event({
-    name: event.name,
-    startDate: event.startDate,
-    endDate: event.endDate,
     description: event.description,
-    repeat: event.repeat
+    endDate: event.endDate,
+    name: event.name,
+    repeat: event.repeat,
+    startDate: event.startDate
   });
 
   let eventIndex: number;
@@ -189,9 +188,9 @@ CalendarSchema.methods.denyRolePerm = function(roleId: string, node: string): Pr
   });
   if (index < 0) {
     this.permissions.push(new Perms({
-      node,
       deniedRoles: [],
-      deniedUsers: []
+      deniedUsers: [],
+      node
     }));
     index = this.permissions.length - 1;
   }
@@ -209,9 +208,9 @@ CalendarSchema.methods.denyUserPerm = function(userId: string, node: string): Pr
   });
   if (index < 0) {
     this.permissions.push(new Perms({
-      node,
       deniedRoles: [],
-      deniedUsers: []
+      deniedUsers: [],
+      node
     }));
     index = this.permissions.length - 1;
   }

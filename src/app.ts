@@ -1,11 +1,8 @@
 import * as dotenv from "dotenv";
 import * as mongoose from "mongoose";
 import * as raven from "raven";
-import * as winston from "winston";
 
 import { SchedulerBot } from "./classes/schedulerbot.class";
-import { config } from "./config/bot.config";
-import { BotConfig } from "./interfaces/bot-config.interface";
 
 dotenv.config();
 

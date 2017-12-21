@@ -1,11 +1,9 @@
-import { Collection, Command, CommandOptions, GuildChannel, Member, Message, Role } from "eris";
+import { Collection, GuildChannel, Member, Message, Role } from "eris";
 import * as FuzzySet from "fuzzyset.js";
 
 import { CommandError } from "../classes/command-error.class";
 import { FlagParser } from "../classes/flag-parser.class";
 import { SchedulerBot } from "../classes/schedulerbot.class";
-import { config } from "../config/bot.config";
-import { BotConfig } from "../interfaces/bot-config.interface";
 import { Perms } from "../interfaces/perms.interface";
 import { CalendarDocument, CalendarModel as Calendar } from "../models/calendar.model";
 import { CommandController } from "./command.controller";

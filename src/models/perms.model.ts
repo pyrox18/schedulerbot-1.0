@@ -8,9 +8,9 @@ export interface PermsDocument extends Perms, Document {
 
 // tslint:disable-next-line
 export let PermsSchema: Schema = new Schema({
-  node: String,
   deniedRoles: [String],
-  deniedUsers: [String]
+  deniedUsers: [String],
+  node: String
 });
 
 // tslint:disable-next-line

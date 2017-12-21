@@ -1,12 +1,9 @@
-import { CommandOptions, EmbedOptions, GuildChannel, Message } from "eris";
+import { EmbedOptions, GuildChannel, Message } from "eris";
 import * as moment from "moment-timezone";
 
 import { CommandError } from "../classes/command-error.class";
 import { Period } from "../classes/period.class";
 import { SchedulerBot } from "../classes/schedulerbot.class";
-import { config } from "../config/bot.config";
-import { BotConfig } from "../interfaces/bot-config.interface";
-import { ParsedMS } from "../interfaces/parsed-ms.interface";
 import { CalendarDocument, CalendarModel as Calendar } from "../models/calendar.model";
 import { CommandController } from "./command.controller";
 /* tslint:disable */
@@ -54,15 +51,12 @@ export class MiscController extends CommandController {
   public info = (msg: Message, args: string[]): void => {
     const uptimeParsed: Period = new Period(this.bot.uptime);
     const embed: EmbedOptions = {
-      description: "A Discord bot for scheduling events.",
-      color: 13893595,
-      footer: {
-        text: "Powered by the Eris library (https://abal.moe/Eris)"
-      },
       author: {
         name: "SchedulerBot",
         icon_url: "https://cdn.discordapp.com/avatars/339019867325726722/e5fca7dbae7156e05c013766fa498fe1.png"
       },
+      color: 13893595,
+      description: "A Discord bot for scheduling events.",
       fields: [
         {
           name: "Version",
@@ -84,7 +78,10 @@ export class MiscController extends CommandController {
           // tslint:disable-next-line
           value: `${uptimeParsed.days} day(s), ${uptimeParsed.hours} hour(s), ${uptimeParsed.minutes} minute(s), ${uptimeParsed.seconds} second(s)`
         }
-      ]
+      ],
+      footer: {
+        text: "Powered by the Eris library (https://abal.moe/Eris)"
+      }
     };
 
     this.bot.createMessage(msg.channel.id, { embed });

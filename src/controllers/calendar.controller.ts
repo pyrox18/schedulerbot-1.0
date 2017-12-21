@@ -1,15 +1,11 @@
-import * as chrono from "chrono-node";
-import { Command, CommandOptions, EmbedBase, GuildChannel, Message } from "eris";
+import { Command, EmbedBase, GuildChannel, Message } from "eris";
 import * as moment from "moment-timezone";
 
-import { CalendarLock } from "../classes/calendar-lock.class";
 import { CommandError } from "../classes/command-error.class";
 import { EventEmbedFactory } from "../classes/event-embed-factory.class";
 import { EventParser } from "../classes/event-parser.class";
-import { FlagParser } from "../classes/flag-parser.class";
 import { SchedulerBot } from "../classes/schedulerbot.class";
 import { config } from "../config/bot.config";
-import { BotConfig } from "../interfaces/bot-config.interface";
 import { Event } from "../interfaces/event.interface";
 import { CalendarDocument, CalendarModel as Calendar } from "../models/calendar.model";
 import { EventDocument } from "../models/event.model";
@@ -35,8 +31,8 @@ export class CalendarController extends CommandController {
       if (!calendar) {
         const newCal: CalendarDocument = new Calendar({
           _id: (msg.channel as GuildChannel).guild.id,
-          prefix: config.prefix,
-          defaultChannel: msg.channel.id
+          defaultChannel: msg.channel.id,
+          prefix: config.prefix
         });
         calendar = await newCal.save();
       }
@@ -257,13 +253,6 @@ export class CalendarController extends CommandController {
     eventAddCommand.registerSubcommand("delete", this.deleteEvent);
     eventAddCommand.registerSubcommand("update", this.updateEvent);
     return true;
-  }
-
-  private getOffsetMoment(date: moment.Moment, timezone: string): moment.Moment {
-    const another = date.clone();
-    another.tz(timezone);
-    another.add(date.utcOffset() - another.utcOffset(), "minutes");
-    return another;
   }
 }
 

@@ -12,13 +12,13 @@ export class CommandError {
     this.message = msg;
     if (process.env.NODE_ENV === "production") {
       this.eventID = raven.captureException(error, {
-        user: {
-          id: msg.author.id,
-          username: `${msg.author.username}#${msg.author.discriminator}`
-        },
         extra: {
-          guildID: (msg.channel as GuildChannel).guild.id,
-          messageContent: msg.content
+          guildID: (this.message.channel as GuildChannel).guild.id,
+          messageContent: this.message.content
+        },
+        user: {
+          id: this.message.author.id,
+          username: `${this.message.author.username}#${this.message.author.discriminator}`
         }
       });
     }

@@ -8,11 +8,11 @@ export interface EventDocument extends Event, Document {
 
 // tslint:disable-next-line
 export let EventSchema: Schema = new Schema({
-  name: String,
-  startDate: Date,
-  endDate: Date,
   description: String,
-  repeat: String
+  endDate: Date,
+  name: String,
+  repeat: String,
+  startDate: Date
 });
 
 // tslint:disable-next-line

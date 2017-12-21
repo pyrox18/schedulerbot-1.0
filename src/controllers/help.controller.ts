@@ -1,4 +1,4 @@
-import { Command, CommandOptions, Message } from "eris";
+import { Command, Message } from "eris";
 
 import { SchedulerBot } from "../classes/schedulerbot.class";
 import { CommandController } from "./command.controller";

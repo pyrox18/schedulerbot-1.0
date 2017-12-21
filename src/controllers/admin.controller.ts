@@ -6,7 +6,6 @@ const execFile = promisify(require("child_process").execFile); // tslint:disable
 import { CommandError } from "../classes/command-error.class";
 import { SchedulerBot } from "../classes/schedulerbot.class";
 import { config } from "../config/bot.config";
-import { BotConfig } from "../interfaces/bot-config.interface";
 import { CommandController } from "./command.controller";
 
 export class AdminController extends CommandController {
