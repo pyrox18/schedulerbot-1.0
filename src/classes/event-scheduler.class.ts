@@ -1,15 +1,15 @@
-import { EmbedBase } from 'eris';
-import * as winston from 'winston';
-import * as moment from 'moment-timezone';
-import { Types } from 'mongoose';
-import { scheduleJob, cancelJob, Job } from 'node-schedule';
+import { EmbedBase } from "eris";
+import * as moment from "moment-timezone";
+import { Types } from "mongoose";
+import { cancelJob, Job, scheduleJob } from "node-schedule";
+import * as winston from "winston";
 
-import { SchedulerBot } from './schedulerbot.class';
-import { CalendarDocument, CalendarModel as Calendar } from '../models/calendar.model';
-import { EventDocument } from '../models/event.model';
-import { Event } from '../interfaces/event.interface';
-import { JobMap } from '../classes/job-map.class';
-import { CalendarLock } from '../classes/calendar-lock.class';
+import { CalendarLock } from "../classes/calendar-lock.class";
+import { JobMap } from "../classes/job-map.class";
+import { Event } from "../interfaces/event.interface";
+import { CalendarDocument, CalendarModel as Calendar } from "../models/calendar.model";
+import { EventDocument } from "../models/event.model";
+import { SchedulerBot } from "./schedulerbot.class";
 
 export class EventScheduler {
   private notifierJobs: JobMap;
@@ -23,8 +23,8 @@ export class EventScheduler {
   }
 
   public scheduleExistingEvents(calendar: CalendarDocument): void {
-    let now: moment.Moment = moment();
-    for (let event of calendar.events) {
+    const now: moment.Moment = moment();
+    for (const event of calendar.events) {
       if (now.diff(moment(event.startDate)) <= 0) {
         this.scheduleNotifierJob(calendar, event);
       }
@@ -51,9 +51,9 @@ export class EventScheduler {
   }
 
   private scheduleNotifierJob = (calendar: CalendarDocument, event: EventDocument): void => {
-    let eventID: Types.ObjectId = event._id;
-    let notifierJob: Job = scheduleJob(event.startDate, (): void => {
-      let embed: EmbedBase = {
+    const eventID: Types.ObjectId = event._id;
+    const notifierJob: Job = scheduleJob(event.startDate, (): void => {
+      const embed: EmbedBase = {
         title: "**Event starting now!**",
         color: 1376071,
         author: {
@@ -81,29 +81,31 @@ export class EventScheduler {
           },
           {
             name: "Repeat",
-            value: event.repeat ? (event.repeat == "d" ? "Daily" : (event.repeat == "w" ? "Weekly" : "Monthly")) : "*N/A*"
+            value: event.repeat ?
+            (event.repeat === "d" ? "Daily" :
+            (event.repeat === "w" ? "Weekly" : "Monthly")) : "*N/A*"
           }
         ]
-      }
-      this.bot.createMessage(calendar.defaultChannel, { embed: embed });
+      };
+      this.bot.createMessage(calendar.defaultChannel, { embed });
     });
 
     this.notifierJobs.set(eventID, notifierJob);
   }
 
   private scheduleDeleteJob(guildID: string, event: EventDocument): void {
-    let eventID = event._id;
-    let deleteJob: Job = scheduleJob(event.endDate, async (): Promise<void> => {
+    const eventID = event._id;
+    const deleteJob: Job = scheduleJob(event.endDate, async (): Promise<void> => {
       try {
-        let lock = await this.bot.calendarLock.acquire(guildID);
-        let calendar: CalendarDocument = await Calendar.findById(guildID).exec();
-        let repeatEvent = await calendar.scheduledDeleteEvent(eventID.toHexString());
+        const lock = await this.bot.calendarLock.acquire(guildID);
+        const calendar: CalendarDocument = await Calendar.findById(guildID).exec();
+        const repeatEvent = await calendar.scheduledDeleteEvent(eventID.toHexString());
         if (repeatEvent) {
           this.rescheduleEvent(calendar, event);
         }
         await lock.release();
       } catch (err) {
-        winston.log('error', err);
+        winston.log("error", err);
       }
     });
 
@@ -111,8 +113,8 @@ export class EventScheduler {
   }
 
   private unscheduleNotifierJob(event: EventDocument) {
-    let eventID = event._id;
-    let job: Job = this.notifierJobs.get(eventID);
+    const eventID = event._id;
+    const job: Job = this.notifierJobs.get(eventID);
     if (job) {
       cancelJob(job);
       this.notifierJobs.delete(eventID);
@@ -120,8 +122,8 @@ export class EventScheduler {
   }
 
   private unscheduleDeleteJob(event: EventDocument) {
-    let eventID = event._id;
-    let job: Job = this.deleteJobs.get(eventID);
+    const eventID = event._id;
+    const job: Job = this.deleteJobs.get(eventID);
     if (job) {
       cancelJob(job);
       this.deleteJobs.delete(eventID);

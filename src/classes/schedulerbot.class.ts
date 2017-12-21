@@ -1,19 +1,19 @@
-import { CommandClient, GamePresence } from 'eris';
-import * as mongoose from 'mongoose';
-import { RedisClient, createClient } from 'redis';
-import * as winston from 'winston';
+import { CommandClient, GamePresence } from "eris";
+import * as mongoose from "mongoose";
+import { createClient, RedisClient } from "redis";
+import * as winston from "winston";
 
-import { EventScheduler } from './event-scheduler.class';
-import { CalendarDocument, CalendarModel as Calendar } from '../models/calendar.model';
-import { BotConfig } from '../interfaces/bot-config.interface';
-import { CommandController } from '../controllers/command.controller';
-import { MiscController } from '../controllers/misc.controller';
-import { CalendarController } from '../controllers/calendar.controller';
-import { AdminController } from '../controllers/admin.controller';
-import { PermsController } from '../controllers/perms.controller';
-import { HelpController } from '../controllers/help.controller';
-import { CalendarLock } from './calendar-lock.class';
-import { config } from '../config/bot.config';
+import { config } from "../config/bot.config";
+import { AdminController } from "../controllers/admin.controller";
+import { CalendarController } from "../controllers/calendar.controller";
+import { CommandController } from "../controllers/command.controller";
+import { HelpController } from "../controllers/help.controller";
+import { MiscController } from "../controllers/misc.controller";
+import { PermsController } from "../controllers/perms.controller";
+import { BotConfig } from "../interfaces/bot-config.interface";
+import { CalendarDocument, CalendarModel as Calendar } from "../models/calendar.model";
+import { CalendarLock } from "./calendar-lock.class";
+import { EventScheduler } from "./event-scheduler.class";
 
 // Acts as a singleton
 export class SchedulerBot extends CommandClient {
@@ -44,21 +44,21 @@ export class SchedulerBot extends CommandClient {
       useMongoClient: true
     });
     this._db = mongoose.connection;
-    this._db.on('open', () => {
+    this._db.on("open", () => {
       console.log("Connected to database");
       // TODO: Add MongoDB transport for winston if fixed
     });
-    this._db.on('error', err => {
+    this._db.on("error", (err) => {
       console.log("Mongoose error: " + err);
       process.exit();
     });
 
-    let redisPort = process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT) : 6379;
+    const redisPort = process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT, 10) : 6379;
     this._redisClient = createClient(redisPort);
-    this._redisClient.on('ready', () => {
+    this._redisClient.on("ready", () => {
       console.log("Connected to Redis server");
     });
-    this._redisClient.on('error', err => {
+    this._redisClient.on("error", (err) => {
       console.log("Redis error: " + err);
       process.exit();
     });
@@ -66,18 +66,18 @@ export class SchedulerBot extends CommandClient {
     this._calendarLock = new CalendarLock(this._redisClient);
 
     // Emit 'dbconnect' event when both data stores are connected
-    let p1: Promise<boolean> = new Promise((resolve, reject) => {
-      this.db.on('open', () => { resolve(true) });
+    const p1: Promise<boolean> = new Promise((resolve, reject) => {
+      this.db.on("open", () => { resolve(true); });
     });
-    let p2: Promise<boolean> = new Promise((resolve, reject) => {
-      this.redisClient.on('ready', () => { resolve(true) });
+    const p2: Promise<boolean> = new Promise((resolve, reject) => {
+      this.redisClient.on("ready", () => { resolve(true); });
     });
-    Promise.all([p1, p2]).then(values => {
-      this.emit('dbconnect');
+    Promise.all([p1, p2]).then((values) => {
+      this.emit("dbconnect");
     });
 
     // Load controllers, event handlers and data when ready
-    this.on('ready', () => {
+    this.on("ready", () => {
       console.log("Loading command controllers... ");
       this.loadControllers([
         new MiscController(this),
@@ -113,16 +113,16 @@ export class SchedulerBot extends CommandClient {
   }
 
   public loadControllers(controllers: CommandController[]) {
-    for (let controller of controllers) {
+    for (const controller of controllers) {
       this.controllers.push(controller);
       controller.registerCommands();
     }
   }
 
   public loadEventHandlers(): void {
-    this.on("guildCreate", async guild => {
+    this.on("guildCreate", async (guild) => {
       try {
-        let newGuild: CalendarDocument = new Calendar({
+        const newGuild: CalendarDocument = new Calendar({
           _id: guild.id,
           prefix: config.prefix
         });
@@ -131,45 +131,45 @@ export class SchedulerBot extends CommandClient {
         winston.error("guildCreate handler error", err);
       }
     });
-  
-    this.on("guildDelete", async guild => {
+
+    this.on("guildDelete", async (guild) => {
       try {
-        let calendar: CalendarDocument = await Calendar.findByIdAndRemove(guild.id).exec();
-        let scheduler: EventScheduler = this.eventScheduler;
-        for (let event of calendar.events) {
+        const calendar: CalendarDocument = await Calendar.findByIdAndRemove(guild.id).exec();
+        const scheduler: EventScheduler = this.eventScheduler;
+        for (const event of calendar.events) {
           scheduler.unscheduleEvent(event);
         }
       } catch (err) {
         winston.error("guildDelete handler error", err);
       }
     });
-  
+
     this.on("guildMemberRemove", async (guild, member) => {
       try {
-        let calendar: CalendarDocument = await Calendar.findById(guild.id).exec();
-        for (let perm of calendar.permissions) {
-          let index: number = perm.deniedUsers.findIndex(id => { return id == member.id });
+        const calendar: CalendarDocument = await Calendar.findById(guild.id).exec();
+        for (const perm of calendar.permissions) {
+          const index: number = perm.deniedUsers.findIndex((id) => id === member.id);
           if (index >= 0) {
             perm.deniedUsers.splice(index, 1);
           }
         }
-    
+
         await calendar.save();
       } catch (err) {
         winston.error("guildMemberRemove handler error", err);
       }
     });
-  
+
     this.on("guildRoleDelete", async (guild, role) => {
       try {
-        let calendar: CalendarDocument = await Calendar.findById(guild.id).exec();
-        for (let perm of calendar.permissions) {
-          let index: number = perm.deniedRoles.findIndex(id => { return id == role.id });
+        const calendar: CalendarDocument = await Calendar.findById(guild.id).exec();
+        for (const perm of calendar.permissions) {
+          const index: number = perm.deniedRoles.findIndex((id) => id === role.id);
           if (index >= 0) {
             perm.deniedRoles.splice(index, 1);
           }
         }
-  
+
         await calendar.save();
       } catch (err) {
         winston.error("guildRoleDelete handler error", err);
@@ -179,18 +179,20 @@ export class SchedulerBot extends CommandClient {
 
   public async loadGuildData(): Promise<void> {
     try {
-      let clientGuildIDs: string[] = new Array<string>();
-      for (let guildID in this.guildShardMap) {
-        let shardID: number = this.guildShardMap[guildID];
-        if (shardID >= this.options.firstShardID && shardID <= this.options.lastShardID) {
-          clientGuildIDs.push(guildID);
+      const clientGuildIDs: string[] = new Array<string>();
+      for (const guildID in this.guildShardMap) {
+        if (this.guildShardMap.hasOwnProperty(guildID)) {
+          const shardID: number = this.guildShardMap[guildID];
+          if (shardID >= this.options.firstShardID && shardID <= this.options.lastShardID) {
+            clientGuildIDs.push(guildID);
+          }
         }
       }
-      let calendars: CalendarDocument[] = await Calendar.find({
+      const calendars: CalendarDocument[] = await Calendar.find({
         _id: { $in: clientGuildIDs }
       }).exec();
-      for (let calendar of calendars) {
-        let prefixes: string[] = [calendar.prefix, "@mention "];
+      for (const calendar of calendars) {
+        const prefixes: string[] = [calendar.prefix, "@mention "];
         this.registerGuildPrefix(calendar._id, prefixes);
         this.eventScheduler.scheduleExistingEvents(calendar);
       }

@@ -1,5 +1,5 @@
-import { CommandClient, CommandOptions } from 'eris';
-import { SchedulerBot } from '../classes/schedulerbot.class';
+import { CommandClient, CommandOptions } from "eris";
+import { SchedulerBot } from "../classes/schedulerbot.class";
 
 export abstract class CommandController {
   protected bot: SchedulerBot;
