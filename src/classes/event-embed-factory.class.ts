@@ -7,6 +7,7 @@ export class EventEmbedFactory {
   public readonly colours = {
     DELETE_EVENT: 16722731,
     NEW_EVENT: 8171263,
+    NOTIFY_EVENT: 1376071,
     UPDATE_EVENT: 16775221
   };
 
@@ -28,6 +29,13 @@ export class EventEmbedFactory {
     const embed: EmbedBase = this.getBaseEmbed(event, timezone);
     embed.title = "Update Event";
     embed.color = this.colours.UPDATE_EVENT;
+    return embed;
+  }
+
+  public getNotifyEventEmbed(event: EventDocument, timezone: string): EmbedBase {
+    const embed: EmbedBase = this.getBaseEmbed(event, timezone);
+    embed.title = "**Event starting now!**";
+    embed.color = this.colours.NOTIFY_EVENT;
     return embed;
   }
 
