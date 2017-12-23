@@ -87,8 +87,7 @@ export class SettingsController extends CommandController {
       const calendar: CalendarDocument = await Calendar.findById(guildID).exec();
 
       if (args.length !== 1 || msg.channelMentions.length !== 1) {
-        // TODO: perms
-        // if (!calendar.checkPerm("defaultChannel.show", msg)) { return STRINGS.commandResponses.permissionDenied; }
+        if (!calendar.checkPerm("defaultchannel.show", msg)) { return STRINGS.commandResponses.permissionDenied; }
         this.bot.createMessage(msg.channel.id, {
           embed: {
             title: "Settings: Default Channel",
@@ -109,7 +108,7 @@ export class SettingsController extends CommandController {
         });
       }
       else {
-        // TODO: perms
+        if (!calendar.checkPerm("defaultchannel.modify", msg)) { return STRINGS.commandResponses.permissionDenied; }
         await calendar.updateDefaultChannel(msg.channelMentions[0]);
         calendar.events.forEach((event) => {
           this.bot.eventScheduler.rescheduleEvent(calendar, event);
