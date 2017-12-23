@@ -4,6 +4,7 @@ import { Types } from "mongoose";
 import { cancelJob, Job, scheduleJob } from "node-schedule";
 import * as winston from "winston";
 
+import { EventEmbedFactory } from "../classes/event-embed-factory.class";
 import { JobMap } from "../classes/job-map.class";
 import { CalendarDocument, CalendarModel as Calendar } from "../models/calendar.model";
 import { EventDocument } from "../models/event.model";
@@ -13,11 +14,13 @@ export class EventScheduler {
   private notifierJobs: JobMap;
   private deleteJobs: JobMap;
   private bot: SchedulerBot;
+  private eventEmbedFactory: EventEmbedFactory;
 
   public constructor(bot: SchedulerBot) {
     this.notifierJobs = new JobMap();
     this.deleteJobs = new JobMap();
     this.bot = bot;
+    this.eventEmbedFactory = new EventEmbedFactory();
   }
 
   public scheduleExistingEvents(calendar: CalendarDocument): void {
@@ -51,40 +54,7 @@ export class EventScheduler {
   private scheduleNotifierJob = (calendar: CalendarDocument, event: EventDocument): void => {
     const eventID: Types.ObjectId = event._id;
     const notifierJob: Job = scheduleJob(event.startDate, (): void => {
-      const embed: EmbedBase = {
-        title: "**Event starting now!**",
-        color: 1376071,
-        fields: [
-          {
-            name: "Event Name",
-            value: event.name
-          },
-          {
-            name: "Description",
-            value: event.description || "*N/A*"
-          },
-          {
-            name: "Start Date",
-            value: moment(event.startDate).tz(calendar.timezone).toString(),
-            inline: true
-          },
-          {
-            name: "End Date",
-            value: moment(event.endDate).tz(calendar.timezone).toString(),
-            inline: true
-          },
-          {
-            name: "Repeat",
-            value: event.repeat ?
-            (event.repeat === "d" ? "Daily" :
-            (event.repeat === "w" ? "Weekly" : "Monthly")) : "*N/A*"
-          }
-        ],
-        author: {
-          name: "SchedulerBot",
-          icon_url: "https://cdn.discordapp.com/avatars/339019867325726722/e5fca7dbae7156e05c013766fa498fe1.png"
-        }
-      };
+      const embed: EmbedBase = this.eventEmbedFactory.getNotifyEventEmbed(event, calendar.timezone);
       this.bot.createMessage(calendar.defaultChannel, { embed });
     });
 
