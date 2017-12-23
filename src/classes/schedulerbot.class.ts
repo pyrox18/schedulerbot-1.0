@@ -10,6 +10,7 @@ import { CommandController } from "../controllers/command.controller";
 import { HelpController } from "../controllers/help.controller";
 import { MiscController } from "../controllers/misc.controller";
 import { PermsController } from "../controllers/perms.controller";
+import { SettingsController } from "../controllers/settings.controller";
 import { CalendarDocument, CalendarModel as Calendar } from "../models/calendar.model";
 import { CalendarLock } from "./calendar-lock.class";
 import { EventScheduler } from "./event-scheduler.class";
@@ -83,7 +84,8 @@ export class SchedulerBot extends CommandClient {
         new CalendarController(this),
         new AdminController(this),
         new PermsController(this),
-        new HelpController(this)
+        new HelpController(this),
+        new SettingsController(this)
       ]);
       console.log("Loading event handlers...");
       this.loadEventHandlers();
