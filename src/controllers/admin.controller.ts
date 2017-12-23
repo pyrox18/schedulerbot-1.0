@@ -1,12 +1,12 @@
-import { Message, CommandOptions } from 'eris';
-import { inspect, promisify } from 'util';
-const execFile = promisify(require('child_process').execFile);
+/* tslint:disable:no-eval */
+import { CommandOptions, Message } from "eris";
+import { inspect, promisify } from "util";
+const execFile = promisify(require("child_process").execFile); // tslint:disable-line
 
-import { CommandController } from './command.controller';
-import { CommandError } from '../classes/command-error.class';
-import { BotConfig } from '../interfaces/bot-config.interface';
-import { SchedulerBot } from '../classes/schedulerbot.class';
-import { config } from '../config/bot.config';
+import { CommandError } from "../classes/command-error.class";
+import { SchedulerBot } from "../classes/schedulerbot.class";
+import { config } from "../config/bot.config";
+import { CommandController } from "./command.controller";
 
 export class AdminController extends CommandController {
   protected commandOptions: CommandOptions;
@@ -18,7 +18,7 @@ export class AdminController extends CommandController {
       requirements: {
         userIDs: [config.adminId]
       }
-    }
+    };
   }
 
   public adminCheck(msg: Message, args: string[]): string {
@@ -34,7 +34,7 @@ export class AdminController extends CommandController {
   }
 
   public eval = (msg: Message, args: string[]): string => {
-    if (msg.author.id !== config.adminId) return; // safety
+    if (msg.author.id !== config.adminId) { return; } // safety
     try {
       const code = args.join(" ");
       let evaled = eval(code);
@@ -46,25 +46,25 @@ export class AdminController extends CommandController {
       let output: string = "```js\n" + this.clean(evaled) + "\n```";
       if (output.length > 1990) {
         output = output.substr(0, 1986);
-        output += "\nTruncated\n```"
+        output += "\nTruncated\n```";
       }
       return output;
     } catch (err) {
-      return `\`ERROR\` \`\`\`xl\n${this.clean(err)}\n\`\`\``
+      return `\`ERROR\` \`\`\`xl\n${this.clean(err)}\n\`\`\``;
     }
   }
 
   public shell = async (msg: Message, args: string[]): Promise<void> => {
-    if (msg.author.id !== config.adminId) return; // safety
-    let outputMessage: Message = await this.bot.createMessage(msg.channel.id, "Executing...");
+    if (msg.author.id !== config.adminId) { return; } // safety
+    const outputMessage: Message = await this.bot.createMessage(msg.channel.id, "Executing...");
     try {
       const { stdout, stderr } = await execFile(args[0], args.slice(1));
       let finalOutput: string = "";
-      if (stdout) finalOutput += "stdout:\n```bash\n" + this.clean(stdout) + "\n```";
-      if (stderr) finalOutput += "stderr:\n```bash\n" + this.clean(stderr) + "\n```";
+      if (stdout) { finalOutput += "stdout:\n```bash\n" + this.clean(stdout) + "\n```"; }
+      if (stderr) { finalOutput += "stderr:\n```bash\n" + this.clean(stderr) + "\n```"; }
       if (finalOutput.length > 1990) {
         finalOutput = finalOutput.substr(0, 1986);
-        finalOutput += "\nTruncated\n```"
+        finalOutput += "\nTruncated\n```";
       }
       outputMessage.edit(finalOutput);
     } catch (err) {

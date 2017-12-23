@@ -66,7 +66,7 @@ Build tasks are managed and run using [Gulp](https://gulpjs.com/). nodemon is us
 Instead of running the build and start commands every time you make a change, you can run
 
 ```bash
-$ npm run watch
+$ npm run dev
 ```
 
 to let Gulp observe for changes in the `src` folder, compile the source files, and restart the bot automatically.

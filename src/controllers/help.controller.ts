@@ -1,9 +1,11 @@
-import { Message, CommandOptions, Command } from 'eris';
+import { Command, Message } from "eris";
 
-import { CommandController } from './command.controller';
-import { SchedulerBot } from '../classes/schedulerbot.class';
-const STRINGS: any = require('../resources/strings.resource.json');
-const HELP_EMBEDS: any = require('../resources/help-embeds.resource.json');
+import { SchedulerBot } from "../classes/schedulerbot.class";
+import { CommandController } from "./command.controller";
+/* tslint:disable */
+const STRINGS: any = require("../resources/strings.resource.json");
+const HELP_EMBEDS: any = require("../resources/help-embeds.resource.json");
+/* tslint:enable */
 
 export class HelpController extends CommandController {
   constructor(bot: SchedulerBot) {
@@ -47,7 +49,7 @@ export class HelpController extends CommandController {
   }
 
   public registerCommands(): boolean {
-    let helpCommand: Command = this.bot.registerCommand("help", this.help);
+    const helpCommand: Command = this.bot.registerCommand("help", this.help);
     helpCommand.registerSubcommand("init", this.initHelp);
     helpCommand.registerSubcommand("event", this.eventHelp);
     helpCommand.registerSubcommand("perms", this.permsHelp);

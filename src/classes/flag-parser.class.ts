@@ -1,32 +1,30 @@
 export class FlagParser {
-  constructor() { }
-
   public static parse(args: string[]): any {
-    let flagData: any = {};
+    const flagData: any = {};
     let i: number = 0;
-    let body: string[] = [];
+    const body: string[] = [];
 
     // Push the arg as body text until the first flag is detected
-    while (i < args.length && !args[i].startsWith('--')) {
+    while (i < args.length && !args[i].startsWith("--")) {
       body.push(args[i]);
       i++;
     }
-    flagData._body = body.join(' ');
+    flagData._body = body.join(" ");
 
     // Parse the flags in args
     while (i < args.length) {
-      if (args[i].startsWith('--')) {
-        let key: string = args[i].slice(2);
-        let values: string[] = [];
+      if (args[i].startsWith("--")) {
+        const key: string = args[i].slice(2);
+        const values: string[] = [];
         i++;
-        while (i < args.length && !args[i].startsWith('--')) {
+        while (i < args.length && !args[i].startsWith("--")) {
           values.push(args[i]);
           i++;
         }
-        flagData[key] = values.join(' ');
+        flagData[key] = values.join(" ");
         i--;
       }
-      i++
+      i++;
     }
 
     return flagData;

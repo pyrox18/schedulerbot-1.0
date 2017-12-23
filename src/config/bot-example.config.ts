@@ -1,5 +1,5 @@
-import { BotConfig } from '../interfaces/bot-config.interface';
-const packageFile: any = require('../../package.json');
+import { BotConfig } from "../interfaces/bot-config.interface";
+const packageFile: any = require("../../package.json"); // tslint:disable-line
 
 export const config: BotConfig = {
   prefix: "+",
@@ -7,6 +7,6 @@ export const config: BotConfig = {
     name: `+help | v${packageFile.version}`
   },
   adminId: "1234567890123456"
-}
+};
 
 export default config;

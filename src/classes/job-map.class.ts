@@ -1,9 +1,9 @@
-import { Types } from 'mongoose';
-import { Job } from 'node-schedule';
+import { Types } from "mongoose";
+import { Job } from "node-schedule";
 
 export class JobMap {
   private jobs: Map<string, Job>;
-  
+
   constructor() {
     this.jobs = new Map<string, Job>();
   }
@@ -13,7 +13,7 @@ export class JobMap {
   }
 
   public set(key: Types.ObjectId, value: Job): boolean {
-    if (this.jobs.set(key.toHexString(), value)) return true;
+    if (this.jobs.set(key.toHexString(), value)) { return true; }
     return false;
   }
 
