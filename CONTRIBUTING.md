@@ -15,3 +15,4 @@ If you're interested in making changes to the code yourself, fork the repository
 - [Standard Git commit message conventions](https://chris.beams.io/posts/git-commit/) apply. Please adhere to these conventions.
 - Pull requests should always target the dev branch, and not the master branch.
 - Check the dev branch first to see if someone else had already made the same changes that you want to make.
+- Make sure you run your changes through tslint by running `npm run lint`.
