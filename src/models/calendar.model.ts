@@ -15,6 +15,7 @@ export interface CalendarDocument extends Calendar, Document {
   updateEvent(eventIndex: number, event: EventInterface): Promise<EventDocument>;
   repeatUpdateEvent(eventIndex: number): Promise<EventDocument>;
   updatePrefix(prefix: string): Promise<any>;
+  updateDefaultChannel(channelID: string): Promise<any>;
   setTimezone(timezone: string): Promise<any>;
   denyRolePerm(roleId: string, node: string): Promise<any>;
   denyUserPerm(userId: string, node: string): Promise<any>;
@@ -170,6 +171,11 @@ CalendarSchema.methods.repeatUpdateEvent = async function(eventIndex: number): P
 
 CalendarSchema.methods.updatePrefix = function(prefix: string): Promise<any> {
   this.prefix = prefix;
+  return this.save();
+};
+
+CalendarSchema.methods.updateDefaultChannel = function(channelID: string): Promise<any> {
+  this.defaultChannel = channelID;
   return this.save();
 };
 
