@@ -13,6 +13,7 @@ export interface CalendarDocument extends Calendar, Document {
   deleteEvent(eventIndex: number): Promise<EventDocument>;
   scheduledDeleteEvent(eventId: string): Promise<boolean>;
   updateEvent(eventIndex: number, event: EventInterface): Promise<EventDocument>;
+  repeatUpdateEvent(eventIndex: number): Promise<EventDocument>;
   updatePrefix(prefix: string): Promise<any>;
   setTimezone(timezone: string): Promise<any>;
   denyRolePerm(roleId: string, node: string): Promise<any>;
