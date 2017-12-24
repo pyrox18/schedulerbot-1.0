@@ -110,7 +110,7 @@
       "fields": [
         {
           "name": "Usage: Modifying permissions",
-          "value": "`perms <allow | deny> <permNode> [--role <role> | --user <user>]`\n- `allow | deny` Allow or deny the specified permission node.\n- `permNode` The permission node you want to modify. Run `perms nodes` for a list of nodes.\n- `role` The role that you want to modify the permission for.\n- `user` The user that you want to modify the permission for."
+          "value": "`perms <allow | deny> <permNode> [--role <role> | --user <user>]`\n- `allow | deny` Allow or deny the specified permission node.\n- `permNode` The permission node you want to modify. Run `perms nodes` for a list of nodes.\n- `role` The role that you want to modify the permission for.\n- `user` The user that you want to modify the permission for.\nExamples:\n`perms deny event.delete --role Normal Users`\n`perms allow ping --user Andy`"
         },
         {
           "name": "Usage: Listing available permission nodes",
@@ -118,7 +118,7 @@
         },
         {
           "name": "Usage: Showing current permissions",
-          "value": "`perms show [--node <permNode> | --role <role> | --user <user>]`\n- `permNode` The permission node that you want to show permissions for.\n- `role` The role that you want to show permissions for.\n- `user` The user that you want to show permissions for."
+          "value": "`perms show [--node <permNode> | --role <role> | --user <user>]`\n- `permNode` The permission node that you want to show permissions for.\n- `role` The role that you want to show permissions for.\n- `user` The user that you want to show permissions for.\nExamples:\n`perms show --node ping`\n`perms show --role Normal Users`\n`perms show --user andy`"
         }
       ]
     },
