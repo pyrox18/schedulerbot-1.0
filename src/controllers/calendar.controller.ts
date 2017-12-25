@@ -42,10 +42,10 @@ export class CalendarController extends CommandController {
       }
       else {
         if (!moment.tz.zone(args[0])) { return STRINGS.commandResponses.timezoneNotFound; }
-        const savedCalendar: CalendarDocument = await calendar.setTimezone(args[0]);
-        savedCalendar.defaultChannel = msg.channel.id;
-        await savedCalendar.save();
-        return `Set calendar timezone to ${savedCalendar.timezone}.`;
+        calendar.timezone = args[0];
+        calendar.defaultChannel = msg.channel.id;
+        await calendar.save();
+        return `Set calendar timezone to ${calendar.timezone}.`;
       }
     } catch (err) {
       return new CommandError(err, msg).toString();
