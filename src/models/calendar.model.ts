@@ -16,7 +16,7 @@ export interface CalendarDocument extends Calendar, Document {
   repeatUpdateEvent(eventIndex: number): Promise<EventDocument>;
   updatePrefix(prefix: string): Promise<any>;
   updateDefaultChannel(channelID: string): Promise<any>;
-  setTimezone(timezone: string): Promise<any>;
+  updateTimezone(timezone: string): Promise<any>;
   denyRolePerm(roleId: string, node: string): Promise<any>;
   denyUserPerm(userId: string, node: string): Promise<any>;
   allowRolePerm(roleId: string, node: string): Promise<any>;
@@ -179,7 +179,7 @@ CalendarSchema.methods.updateDefaultChannel = function(channelID: string): Promi
   return this.save();
 };
 
-CalendarSchema.methods.setTimezone = function(timezone: string) {
+CalendarSchema.methods.updateTimezone = function(timezone: string): Promise<any> {
   if (moment.tz.zone(timezone) === null) {
     return Promise.reject("Timezone not found");
   }
