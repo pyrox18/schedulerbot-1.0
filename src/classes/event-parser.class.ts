@@ -39,7 +39,7 @@ export class EventParser {
     return event;
   }
 
-  private static getOffsetMoment(date: moment.Moment, timezone: string): moment.Moment {
+  public static getOffsetMoment(date: moment.Moment, timezone: string): moment.Moment {
     const another = date.clone();
     another.tz(timezone);
     another.add(date.utcOffset() - another.utcOffset(), "minutes");
