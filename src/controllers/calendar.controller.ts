@@ -45,7 +45,7 @@ export class CalendarController extends CommandController {
         calendar.timezone = args[0];
         calendar.defaultChannel = msg.channel.id;
         await calendar.save();
-        return `Set calendar timezone to ${calendar.timezone}.`;
+        return `Set calendar timezone to ${calendar.timezone} and default channel to <#${calendar.defaultChannel}>.`;
       }
     } catch (err) {
       return new CommandError(err, msg).toString();
