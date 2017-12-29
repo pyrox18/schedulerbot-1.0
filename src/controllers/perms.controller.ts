@@ -42,8 +42,7 @@ export class PermsController extends CommandController {
       if (!PermsController.nodes.find((node) => args[1] === node)) { return STRINGS.commandResponses.nodeNotFound; }
 
       const flags: any = FlagParser.parse(args);
-      if ((!flags.role && !flags.user && msg.roleMentions.length < 1 && msg.mentions.length < 1) ||
-          Object.keys(flags).length < 2) {
+      if ((!flags.role && !flags.user) || Object.keys(flags).length < 2) {
         return `Usage: ${STRINGS.commandUsage.perms.modify}`;
       }
 
@@ -172,14 +171,21 @@ export class PermsController extends CommandController {
       }
       else {
         let results;
-        if (flags.role) {
+        if (flags.role && msg.roleMentions.length < 1) {
           results = this.findEntityNames((msg.channel as GuildChannel).guild.roles, flags.role);
         }
-        else {
+        else if (flags.user && msg.mentions.length < 1) {
           results = this.findEntityNames((msg.channel as GuildChannel).guild.members, flags.user);
         }
-        if (results.length < 1) { return STRINGS.commandResponses.roleOrUserNotFound; }
-        if (results.length > 1) {
+
+        if (flags.role && msg.roleMentions.length > 0) {
+          return this.displayRolePermissionsById(calendar, msg, msg.roleMentions[0]);
+        }
+        else if (flags.user && msg.mentions.length > 0) {
+          return this.displayUserPermissionsById(calendar, msg, msg.mentions[0].id);
+        }
+        else if (results.length < 1) { return STRINGS.commandResponses.roleOrUserNotFound; }
+        else if (results.length > 1) {
           let resultString: string = "```css\n";
           for (let i = 0; i < results.length; i++) {
             resultString = resultString + `${i + 1} : ${results[i][1]}\n`;
@@ -346,9 +352,59 @@ export class PermsController extends CommandController {
     return resultString;
   }
 
+  private displayRolePermissionsById = (calendar: CalendarDocument, msg: Message, roleId: string): string => {
+    let resultString: string = "```css\nRole ID: " + roleId + "\nDenied Nodes: ";
+    const deniedNodes = [];
+    for (const perm of calendar.permissions) {
+      if (perm.deniedRoles.find((id) => id === roleId)) {
+        deniedNodes.push(perm.node);
+      }
+    }
+
+    if (deniedNodes.length === 0) {
+      resultString = resultString + "None";
+    }
+    else {
+      for (let i = 0; i < deniedNodes.length; i++) {
+        resultString = resultString + deniedNodes[i];
+        if (i < deniedNodes.length - 1) {
+          resultString = resultString + ", ";
+        }
+      }
+    }
+    resultString = resultString + "\n```";
+
+    return resultString;
+  }
+
   private displayUserPermissions = (calendar: CalendarDocument, msg: Message, username: string): string => {
     const userId: string = this.getUserIdByName((msg.channel as GuildChannel).guild.members, username);
     let resultString: string = "```css\nRole: " + username + "\nDenied Nodes: ";
+    const deniedNodes = [];
+    for (const perm of calendar.permissions) {
+      if (perm.deniedUsers.find((id) => id === userId)) {
+        deniedNodes.push(perm.node);
+      }
+    }
+
+    if (deniedNodes.length === 0) {
+      resultString = resultString + "None";
+    }
+    else {
+      for (let i = 0; i < deniedNodes.length; i++) {
+        resultString = resultString + deniedNodes[i];
+        if (i < deniedNodes.length - 1) {
+          resultString = resultString + ", ";
+        }
+      }
+    }
+    resultString = resultString + "\n```";
+
+    return resultString;
+  }
+
+  private displayUserPermissionsById = (calendar: CalendarDocument, msg: Message, userId: string): string => {
+    let resultString: string = "```css\nUser ID: " + userId + "\nDenied Nodes: ";
     const deniedNodes = [];
     for (const perm of calendar.permissions) {
       if (perm.deniedUsers.find((id) => id === userId)) {
