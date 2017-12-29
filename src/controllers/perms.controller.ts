@@ -379,7 +379,7 @@ export class PermsController extends CommandController {
 
   private displayUserPermissions = (calendar: CalendarDocument, msg: Message, username: string): string => {
     const userId: string = this.getUserIdByName((msg.channel as GuildChannel).guild.members, username);
-    let resultString: string = "```css\nRole: " + username + "\nDenied Nodes: ";
+    let resultString: string = "```css\nUser: " + username + "\nDenied Nodes: ";
     const deniedNodes = [];
     for (const perm of calendar.permissions) {
       if (perm.deniedUsers.find((id) => id === userId)) {
