@@ -21,6 +21,8 @@ export class PermsController extends CommandController {
     "prefix.modify",
     "defaultchannel.show",
     "defaultchannel.modify",
+    "timezone.show",
+    "timezone.modify",
     "perms.modify",
     "perms.nodes",
     "perms.show"

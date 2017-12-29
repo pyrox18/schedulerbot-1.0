@@ -132,7 +132,7 @@ export class SettingsController extends CommandController {
       const calendar: CalendarDocument = await Calendar.findById(guildID).exec();
 
       if (args.length !== 1) {
-        // if (!calendar.checkPerm("timezone.show", msg)) { return STRINGS.commandResponses.permissionDenied; }
+        if (!calendar.checkPerm("timezone.show", msg)) { return STRINGS.commandResponses.permissionDenied; }
         this.bot.createMessage(msg.channel.id, {
           embed: {
             title: "Settings: Timezone",
@@ -156,7 +156,7 @@ export class SettingsController extends CommandController {
         return STRINGS.commandResponses.timezoneNotFound;
       }
       else {
-        // if (!calendar.checkPerm("timezone.modify", msg)) { return STRINGS.commandResponses.permissionDenied; }
+        if (!calendar.checkPerm("timezone.modify", msg)) { return STRINGS.commandResponses.permissionDenied; }
         const updateSuccess: boolean = await calendar.updateTimezone(args[0]);
         if (!updateSuccess) {
           // tslint:disable-next-line
