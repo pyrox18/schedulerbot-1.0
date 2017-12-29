@@ -32,6 +32,10 @@ export class HelpController extends CommandController {
     this.bot.createMessage(msg.channel.id, { embed: HELP_EMBEDS.commands.prefix });
   }
 
+  public settingsHelp = (msg: Message, args: string[]): void => {
+    this.bot.createMessage(msg.channel.id, { embed: HELP_EMBEDS.commands.settings });
+  }
+
   public pingHelp = (msg: Message, args: string[]): string => {
     return `Usage: ${STRINGS.commandUsage.ping}`;
   }
@@ -54,6 +58,7 @@ export class HelpController extends CommandController {
     helpCommand.registerSubcommand("event", this.eventHelp);
     helpCommand.registerSubcommand("perms", this.permsHelp);
     helpCommand.registerSubcommand("prefix", this.prefixHelp);
+    helpCommand.registerSubcommand("settings", this.settingsHelp);
     helpCommand.registerSubcommand("ping", this.pingHelp);
     helpCommand.registerSubcommand("info", this.infoHelp);
     helpCommand.registerSubcommand("support", this.supportHelp);

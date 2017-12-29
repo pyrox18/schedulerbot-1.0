@@ -25,7 +25,11 @@
       },
       {
         "name": "prefix",
-        "value": "View or change the bot's current prefix for your guild."
+        "value": "View the bot's current prefix for your guild."
+      },
+      {
+        "name": "settings",
+        "value": "Change the bot's prefix, timezone and channel settings."
       },
       {
         "name": "ping",
@@ -124,7 +128,7 @@
     },
     "prefix": {
       "title": "**Help**: prefix",
-      "description": "View or set the bot's prefix for your guild.",
+      "description": "View the bot's prefix for your guild.",
       "color": 13893595,
       "author": {
         "name": "SchedulerBot",
@@ -136,7 +140,33 @@
       "fields": [
         {
           "name": "Usage",
-          "value": "`prefix [new prefix]`\n- `new prefix` The new prefix that you want to set for the bot."
+          "value": "`prefix`"
+        }
+      ]
+    },
+    "settings": {
+      "title": "**Help**: settings",
+      "description": "Change the bot's prefix, timezone and default channel settings.",
+      "color": 13893595,
+      "author": {
+        "name": "SchedulerBot",
+        "icon_url": "https://cdn.discordapp.com/avatars/339019867325726722/e5fca7dbae7156e05c013766fa498fe1.png"
+      },
+      "footer": {
+        "text": "Syntax: <> = required field, [] = optional field, | = select one. You're not supposed to type these characters in the actual command."
+      },
+      "fields": [
+        {
+          "name": "Prefix setting",
+          "value": "`settings prefix [new prefix]`\n- `new prefix` The new prefix that you want to change to.\nExamples:\n`settings prefix` - displays the current prefix setting\n`settings prefix ++` - change the prefix to `++`"
+        },
+        {
+          "name": "Default channel setting",
+          "value": "`settings defaultchannel #new-channel`\n- `#new-channel` The new default channel (as a mention) that you want to change to.\nExamples:\n`settings defaultchannel` - displays the current default channel setting\n`settings defaultchannel #general` - change the default channel to #general"
+        },
+        {
+          "name": "Timezone setting",
+          "value": "`settings timezone [new timezone]`\n- `new timezone` The new timezone that you want to change to.\nExamples:\n`settings timezone` - displays the current timezone setting\n`settings timezone Asia/Tokyo` - change the timezone to Asia/Tokyo"
         }
       ]
     }
