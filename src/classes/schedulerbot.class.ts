@@ -15,7 +15,6 @@ import { CalendarDocument, CalendarModel as Calendar } from "../models/calendar.
 import { CalendarLock } from "./calendar-lock.class";
 import { EventScheduler } from "./event-scheduler.class";
 
-// Acts as a singleton
 export class SchedulerBot extends CommandClient {
   private _redisClient: RedisClient;
   private _db: mongoose.Connection;
