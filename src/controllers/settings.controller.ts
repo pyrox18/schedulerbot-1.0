@@ -19,13 +19,12 @@ export class SettingsController extends CommandController {
 
       this.bot.createMessage(msg.channel.id, {
         embed: {
-          title: "Settings",
-          color: 13893595,
-          description: "Run `settings <setting>` to view more details. e.g. `settings prefix`",
           author: {
             name: "SchedulerBot",
             icon_url: "https://cdn.discordapp.com/avatars/339019867325726722/e5fca7dbae7156e05c013766fa498fe1.png"
           },
+          color: 13893595,
+          description: "Run `settings <setting>` to view more details. e.g. `settings prefix`",
           fields: [
             {
               name: "prefix",
@@ -42,7 +41,8 @@ export class SettingsController extends CommandController {
               value: `Current value: ${calendar.timezone}`,
               inline: true
             }
-          ]
+          ],
+          title: "Settings"
         }
       });
     } catch (err) {
@@ -58,20 +58,20 @@ export class SettingsController extends CommandController {
         if (!calendar.checkPerm("prefix.show", msg)) { return STRINGS.commandResponses.permissionDenied; }
         this.bot.createMessage(msg.channel.id, {
           embed: {
-            title: "Settings: Prefix",
-            color: 13893595,
-            description: "Run `settings prefix <newPrefix>` to change the prefix. e.g. `settings prefix ++`",
             author: {
               name: "SchedulerBot",
               icon_url: "https://cdn.discordapp.com/avatars/339019867325726722/e5fca7dbae7156e05c013766fa498fe1.png"
             },
+            color: 13893595,
+            description: "Run `settings prefix <newPrefix>` to change the prefix. e.g. `settings prefix ++`",
             fields: [
               {
                 name: "Current Value",
                 value: `\`${calendar.prefix}\``,
                 inline: true
               }
-            ]
+            ],
+            title: "Settings: Prefix"
           }
         });
       }
@@ -96,20 +96,20 @@ export class SettingsController extends CommandController {
         if (!calendar.checkPerm("defaultchannel.show", msg)) { return STRINGS.commandResponses.permissionDenied; }
         this.bot.createMessage(msg.channel.id, {
           embed: {
-            title: "Settings: Default Channel",
-            color: 13893595,
-            description: "Run `settings defaultchannel #newchannel` to change the prefix. e.g. `settings defaultchannel #general`", // tslint:disable-line
             author: {
               name: "SchedulerBot",
               icon_url: "https://cdn.discordapp.com/avatars/339019867325726722/e5fca7dbae7156e05c013766fa498fe1.png"
             },
+            color: 13893595,
+            description: "Run `settings defaultchannel #newchannel` to change the prefix. e.g. `settings defaultchannel #general`", // tslint:disable-line
             fields: [
               {
                 name: "Current Value",
                 value: `<#${calendar.defaultChannel}>`,
                 inline: true
               }
-            ]
+            ],
+            title: "Settings: Default Channel"
           }
         });
       }
@@ -135,20 +135,20 @@ export class SettingsController extends CommandController {
         if (!calendar.checkPerm("timezone.show", msg)) { return STRINGS.commandResponses.permissionDenied; }
         this.bot.createMessage(msg.channel.id, {
           embed: {
-            title: "Settings: Timezone",
-            color: 13893595,
-            description: "Run `settings timezone <new timezone>` to change the prefix. e.g. `settings timezone America/Los_Angeles`\nSee https://goo.gl/NzNMon under the TZ column for a list of valid timezones.", // tslint:disable-line
             author: {
               name: "SchedulerBot",
               icon_url: "https://cdn.discordapp.com/avatars/339019867325726722/e5fca7dbae7156e05c013766fa498fe1.png"
             },
+            color: 13893595,
+            description: "Run `settings timezone <new timezone>` to change the prefix. e.g. `settings timezone America/Los_Angeles`\nSee https://goo.gl/NzNMon under the TZ column for a list of valid timezones.", // tslint:disable-line
             fields: [
               {
                 name: "Current Value",
                 value: `${calendar.timezone}`,
                 inline: true
               }
-            ]
+            ],
+            title: "Settings: Timezone"
           }
         });
       }
