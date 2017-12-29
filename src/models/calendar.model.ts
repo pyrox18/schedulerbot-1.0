@@ -189,7 +189,9 @@ CalendarSchema.methods.updateTimezone = async function(timezone: string): Promis
     if (this.events.length > 0) {
       const now = moment();
       const earliestEvent: EventDocument = this.events[0];
-      const newStartMoment: moment.Moment = EventParser.getOffsetMoment(moment(earliestEvent.startDate), timezone, this.timezone);
+      const newStartMoment: moment.Moment = EventParser.getOffsetMoment(moment(earliestEvent.startDate),
+                                                                        timezone,
+                                                                        this.timezone);
       if (now.diff(newStartMoment) > 0) {
         return false;
       }
