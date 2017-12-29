@@ -42,19 +42,27 @@ export class PermsController extends CommandController {
       if (!PermsController.nodes.find((node) => args[1] === node)) { return STRINGS.commandResponses.nodeNotFound; }
 
       const flags: any = FlagParser.parse(args);
-      if ((!flags.role && !flags.user) || Object.keys(flags).length < 2) {
+      if ((!flags.role && !flags.user && msg.roleMentions.length < 1 && msg.mentions.length < 1) ||
+          Object.keys(flags).length < 2) {
         return `Usage: ${STRINGS.commandUsage.perms.modify}`;
       }
 
       let results: any[];
-      if (flags.role) {
+      if (flags.role && msg.roleMentions.length < 1) {
         results = this.findEntityNames((msg.channel as GuildChannel).guild.roles, flags.role);
       }
-      else {
+      else if (flags.user && msg.mentions.length < 1) {
         results = this.findEntityNames((msg.channel as GuildChannel).guild.members, flags.user);
       }
-      if (results.length < 1) { return STRINGS.commandResponses.roleOrUserNotFound; }
-      if (results.length > 1) {
+
+      if (flags.role && msg.roleMentions.length > 0) {
+        this.setRolePermissionById(calendar, args[1], msg.roleMentions[0], args[0], msg);
+      }
+      else if (flags.user && msg.mentions.length > 0) {
+        this.setUserPermissionById(calendar, args[1], msg.mentions[0].id, args[0], msg);
+      }
+      else if (results.length < 1) { return STRINGS.commandResponses.roleOrUserNotFound; }
+      else if (results.length > 1) {
         let resultString: string = "```css\n";
         for (let i = 0; i < results.length; i++) {
           resultString = resultString + `${i + 1} : ${results[i][1]}\n`;
@@ -269,12 +277,40 @@ export class PermsController extends CommandController {
     return true;
   }
 
+  private setRolePermissionById = async (calendar: CalendarDocument,
+                                         node: string,
+                                         roleID: string,
+                                         perm: string,
+                                         msg: Message): Promise<boolean> => {
+    if (perm === "deny") {
+      await calendar.denyRolePerm(roleID, node);
+    }
+    else {
+      await calendar.allowRolePerm(roleID, node);
+    }
+    return true;
+  }
+
   private setUserPermission = async (calendar: CalendarDocument,
                                      node: string,
                                      username: string,
                                      perm: string,
                                      msg: Message): Promise<boolean> => {
     const userID: string = this.getUserIdByName((msg.channel as GuildChannel).guild.members, username);
+    if (perm === "deny") {
+      await calendar.denyUserPerm(userID, node);
+    }
+    else {
+      await calendar.allowUserPerm(userID, node);
+    }
+    return true;
+  }
+
+  private setUserPermissionById = async (calendar: CalendarDocument,
+                                         node: string,
+                                         userID: string,
+                                         perm: string,
+                                         msg: Message): Promise<boolean> => {
     if (perm === "deny") {
       await calendar.denyUserPerm(userID, node);
     }
