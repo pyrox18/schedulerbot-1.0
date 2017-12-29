@@ -94,6 +94,8 @@ export class SchedulerBot extends CommandClient {
       console.log("Configuring bot status... ");
       this.editStatus("online", config.game);
       console.log("Bot ready!");
+
+      setTimeout(this.runScheduler, 60*60*1000);
     });
   }
 
@@ -195,10 +197,32 @@ export class SchedulerBot extends CommandClient {
       for (const calendar of calendars) {
         const prefixes: string[] = [calendar.prefix, "@mention "];
         this.registerGuildPrefix(calendar._id, prefixes);
-        this.eventScheduler.scheduleExistingEvents(calendar);
+        this.eventScheduler.scheduleUpcomingEvents(calendar);
       }
     } catch (err) {
       winston.error("Prefix load error", err);
+    }
+  }
+
+  public async runScheduler(): Promise<void> {
+    try {
+      const clientGuildIDs: string[] = new Array<string>();
+      for (const guildID in this.guildShardMap) {
+        if (this.guildShardMap.hasOwnProperty(guildID)) {
+          const shardID: number = this.guildShardMap[guildID];
+          if (shardID >= this.options.firstShardID && shardID <= this.options.lastShardID) {
+            clientGuildIDs.push(guildID);
+          }
+        }
+      }
+      const calendars: CalendarDocument[] = await Calendar.find({
+        _id: { $in: clientGuildIDs }
+      }).exec();
+      for (const calendar of calendars) {
+        this.eventScheduler.scheduleUpcomingEvents(calendar);
+      }
+    } catch (err) {
+      winston.error("Timed scheduler run error", err);
     }
   }
 }
