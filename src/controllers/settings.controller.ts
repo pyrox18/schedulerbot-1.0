@@ -1,4 +1,5 @@
 import { GuildChannel, Message } from "eris";
+import * as moment from "moment-timezone";
 
 import { CommandError } from "../classes/command-error.class";
 import { SchedulerBot } from "../classes/schedulerbot.class";
@@ -34,6 +35,11 @@ export class SettingsController extends CommandController {
             {
               name: "defaultchannel",
               value: `Current value: <#${calendar.defaultChannel}>`,
+              inline: true
+            },
+            {
+              name: "timezone",
+              value: `Current value: ${calendar.timezone}`,
               inline: true
             }
           ]
@@ -120,10 +126,57 @@ export class SettingsController extends CommandController {
     }
   }
 
+  public timezoneSetting = async (msg: Message, args: string[]): Promise<string> => {
+    try {
+      const guildID = (msg.channel as GuildChannel).guild.id;
+      const calendar: CalendarDocument = await Calendar.findById(guildID).exec();
+
+      if (args.length !== 1) {
+        // if (!calendar.checkPerm("timezone.show", msg)) { return STRINGS.commandResponses.permissionDenied; }
+        this.bot.createMessage(msg.channel.id, {
+          embed: {
+            title: "Settings: Timezone",
+            color: 13893595,
+            description: "Run `settings timezone <new timezone>` to change the prefix. e.g. `settings timezone America/Los_Angeles`\nSee https://goo.gl/NzNMon under the TZ column for a list of valid timezones.", // tslint:disable-line
+            author: {
+              name: "SchedulerBot",
+              icon_url: "https://cdn.discordapp.com/avatars/339019867325726722/e5fca7dbae7156e05c013766fa498fe1.png"
+            },
+            fields: [
+              {
+                name: "Current Value",
+                value: `${calendar.timezone}`,
+                inline: true
+              }
+            ]
+          }
+        });
+      }
+      else if (!moment.tz.zone(args[0])) {
+        return STRINGS.commandResponses.timezoneNotFound;
+      }
+      else {
+        // if (!calendar.checkPerm("timezone.modify", msg)) { return STRINGS.commandResponses.permissionDenied; }
+        const updateSuccess: boolean = await calendar.updateTimezone(args[0]);
+        if (!updateSuccess) {
+          // tslint:disable-next-line
+          return `Cannot update timezone, due to events starting or ending in the past if the timezone is changed to ${args[0]}.`;
+        }
+        for (const event of calendar.events) {
+          this.bot.eventScheduler.rescheduleEvent(calendar, event);
+        }
+        return `Updated timezone to ${calendar.timezone}.`;
+      }
+    } catch (err) {
+      return new CommandError(err, msg).toString();
+    }
+  }
+
   public registerCommands(): boolean {
     const settingsCommand = this.bot.registerCommand("settings", this.viewSettings);
     settingsCommand.registerSubcommand("prefix", this.prefixSetting);
     settingsCommand.registerSubcommand("defaultchannel", this.defaultChannelSetting);
+    settingsCommand.registerSubcommand("timezone", this.timezoneSetting);
     return true;
   }
 }

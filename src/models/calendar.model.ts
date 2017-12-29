@@ -2,6 +2,7 @@ import { GuildChannel, Message } from "eris";
 import * as moment from "moment-timezone";
 import { Document, Model, model, Schema } from "mongoose";
 
+import { EventParser } from "../classes/event-parser.class";
 import { Calendar } from "../interfaces/calendar.interface";
 import { Event as EventInterface } from "../interfaces/event.interface";
 import { EventDocument, EventModel as Event, EventSchema } from "./event.model";
@@ -16,7 +17,7 @@ export interface CalendarDocument extends Calendar, Document {
   repeatUpdateEvent(eventIndex: number): Promise<EventDocument>;
   updatePrefix(prefix: string): Promise<any>;
   updateDefaultChannel(channelID: string): Promise<any>;
-  updateTimezone(timezone: string): Promise<any>;
+  updateTimezone(timezone: string): Promise<boolean>;
   denyRolePerm(roleId: string, node: string): Promise<any>;
   denyUserPerm(userId: string, node: string): Promise<any>;
   allowRolePerm(roleId: string, node: string): Promise<any>;
@@ -179,13 +180,29 @@ CalendarSchema.methods.updateDefaultChannel = function(channelID: string): Promi
   return this.save();
 };
 
-CalendarSchema.methods.updateTimezone = function(timezone: string): Promise<any> {
+CalendarSchema.methods.updateTimezone = async function(timezone: string): Promise<boolean> {
   if (moment.tz.zone(timezone) === null) {
     return Promise.reject("Timezone not found");
   }
   else {
+    // Check if events end up in the past in the new timezone
+    if (this.events.length > 0) {
+      const now = moment();
+      const earliestEvent: EventDocument = this.events[0];
+      const newStartMoment: moment.Moment = EventParser.getOffsetMoment(moment(earliestEvent.startDate), timezone, this.timezone);
+      if (now.diff(newStartMoment) > 0) {
+        return false;
+      }
+      // Adjust all event dates
+      for (const event of this.events) {
+        event.startDate = EventParser.getOffsetMoment(moment(event.startDate), timezone, this.timezone).toDate();
+        event.endDate = EventParser.getOffsetMoment(moment(event.endDate), timezone, this.timezone).toDate();
+      }
+    }
     this.timezone = timezone;
-    return this.save();
+    await this.save();
+    return true;
+    // NOTE: The event scheduler should reschedule all events after calling this method
   }
 };
 
