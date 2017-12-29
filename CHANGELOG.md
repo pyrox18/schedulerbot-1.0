@@ -2,6 +2,29 @@
 
 This changelog is formatted based on [Keep a Changelog](http://keepachangelog.com/) and this project attempts to adhere to [Semantic Versioning](http://semver.org) as much as possible.
 
+## v1.0.0 - 2017-12-30
+
+### Added
+
+- A `settings` command has been added, where a user can change the bot's prefix, default channel and timezone for their guild. ([`14de7cf`](https://github.com/pyrox18/schedulerbot/commit/14de7cf7358911a35f7d87e7fe4635c5de58685d))
+- Permissions can now be assigned and viewed by mentioning a role or user directly. ([`e7e0ded`](https://github.com/pyrox18/schedulerbot/commit/e7e0dedb653018bab112149ef0371b312c3d411a))
+
+### Changed
+
+- Updated bot dependencies. ([`f1c6c6b`](https://github.com/pyrox18/schedulerbot/commit/f1c6c6bb23dfdf4f8c34371ef337d9ca9a83bb56))
+- Performed a major refactoring exercise to make the source code cleaner and more modular. ([`6161191`](https://github.com/pyrox18/schedulerbot/commit/6161191e367a982f144534e07646c5d8afcf94e7))
+  - **BREAKING CHANGE**: The bot token, MongoDB URI, Sentry DSN and Redis port variables are now loaded from an `.env` file.
+  - **BREAKING CHANGE**: `bot.config.json` has been replaced with a `bot.config.ts` file to allow for external variable loading. With the changes made to the `.env` file, this config file now only stores the bot's default prefix, game data, and admin ID.
+- Event embeds are now produced by a factory class. ([`d432fef`](https://github.com/pyrox18/schedulerbot/commit/d432fef9d3b8116ffa6a0dfc4344228ce5fb9138))
+- Modified `help` commands to provide command examples. ([`ca83cf8`](https://github.com/pyrox18/schedulerbot/commit/ca83cf8dc05db4db7eb6ab11c2c3ade810cd2b99))
+- The event scheduler now schedules events that will occur in 2 hours from whenever the scheduler checks for events. The scheduler will check for events every one hour. ([`5aab293`](https://github.com/pyrox18/schedulerbot/commit/5aab2934de1b74c11add85096cb9ed49c32df634))
+- The `prefix` command can no longer be used to set the bot's prefix for a guild. The functionality is succeeded by the `settings` command. ([`6e3c515`](https://github.com/pyrox18/schedulerbot/commit/6e3c51528a918184dceb173c368a0f4c4ea4cca8))
+- Added tslint for code linting. ([`f773d3a`](https://github.com/pyrox18/schedulerbot/commit/f773d3a95eed1f0ca535a25e4e72e9be2f70d24f))
+
+### Fixed
+
+- `perms show --user <user>` now correctly displays the "User" label in the result. ([`848856c`](https://github.com/pyrox18/schedulerbot/commit/848856c5725f620611ad15901d2788fd1fab73a1))
+
 ## v0.6.4 - 2017-11-16
 
 ### Fixed
