@@ -29,20 +29,10 @@ export class MiscController extends CommandController {
   }
 
   public prefix = async (msg: Message, args: string[]): Promise<string> => {
-    if (args.length > 1) { return `Usage: ${STRINGS.commandUsage.prefix}`; }
     try {
       const calendar: CalendarDocument = await Calendar.findById((msg.channel as GuildChannel).guild.id).exec();
-      if (args.length < 1) {
-        if (!calendar.checkPerm("prefix.show", msg)) { return STRINGS.commandResponses.permissionDenied; }
-        return calendar.prefix;
-      }
-      else {
-        if (!calendar.checkPerm("prefix.modify", msg)) { return STRINGS.commandResponses.permissionDenied; }
-        await calendar.updatePrefix(args[0]);
-        const prefixes: string[] = [args[0], "@mention "];
-        this.bot.registerGuildPrefix((msg.channel as GuildChannel).guild.id, prefixes);
-        return `Prefix set to \`${prefixes[0]}\`.`;
-      }
+      if (!calendar.checkPerm("prefix.show", msg)) { return STRINGS.commandResponses.permissionDenied; }
+      return `Prefix: ${calendar.prefix}\nRun \`settings prefix <newPrefix>\` to change the prefix.`;
     } catch (err) {
       return new CommandError(err, msg).toString();
     }

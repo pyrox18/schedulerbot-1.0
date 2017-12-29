@@ -19,6 +19,8 @@ export class PermsController extends CommandController {
     "ping",
     "prefix.show",
     "prefix.modify",
+    "defaultchannel.show",
+    "defaultchannel.modify",
     "perms.modify",
     "perms.nodes",
     "perms.show"
