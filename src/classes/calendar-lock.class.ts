@@ -1,13 +1,18 @@
-import * as redisLock from 'redislock';
-
-import { SchedulerBot } from './schedulerbot.class';
+import { RedisClient } from "redis";
+import * as redisLock from "redislock";
 
 export class CalendarLock {
-  public static async acquire(guildID: string): Promise<any> {
-    let lock = redisLock.createLock(SchedulerBot.getInstance().redisClient, {
-      timeout: 5000,
+  private redisClient: RedisClient;
+
+  public constructor(redisClient: RedisClient) {
+    this.redisClient = redisClient;
+  }
+
+  public async acquire(guildID: string): Promise<any> {
+    const lock = redisLock.createLock(this.redisClient, {
+      delay: 50,
       retries: -1,
-      delay: 50
+      timeout: 5000
     });
     await lock.acquire(guildID);
     return lock;
