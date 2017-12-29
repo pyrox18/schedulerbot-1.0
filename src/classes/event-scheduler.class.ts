@@ -23,22 +23,22 @@ export class EventScheduler {
     this.eventEmbedFactory = new EventEmbedFactory();
   }
 
-  public scheduleExistingEvents(calendar: CalendarDocument): void {
+  public scheduleUpcomingEvents(calendar: CalendarDocument): void {
     const now: moment.Moment = moment();
     for (const event of calendar.events) {
-      if (now.diff(moment(event.startDate)) <= 0) {
-        this.scheduleNotifierJob(calendar, event);
-      }
-
-      if (now.diff(moment(event.endDate)) <= 0) {
-        this.scheduleDeleteJob(calendar._id, event);
-      }
+      this.scheduleEvent(calendar, event, now);
     }
   }
 
-  public scheduleEvent(calendar: CalendarDocument, event: EventDocument): void {
-    this.scheduleNotifierJob(calendar, event);
-    this.scheduleDeleteJob(calendar._id, event);
+  public scheduleEvent(calendar: CalendarDocument, event: EventDocument, currentMoment?: moment.Moment): void {
+    const now: moment.Moment = currentMoment || moment();
+    if (moment(event.startDate).diff(now, "hours") < 2) {
+      this.scheduleNotifierJob(calendar, event);
+    }
+
+    if (moment(event.endDate).diff(now, "hours") < 2) {
+      this.scheduleDeleteJob(calendar._id, event);
+    }
   }
 
   public unscheduleEvent(event: EventDocument) {
@@ -53,31 +53,35 @@ export class EventScheduler {
 
   private scheduleNotifierJob = (calendar: CalendarDocument, event: EventDocument): void => {
     const eventID: Types.ObjectId = event._id;
-    const notifierJob: Job = scheduleJob(event.startDate, (): void => {
-      const embed: EmbedBase = this.eventEmbedFactory.getNotifyEventEmbed(event, calendar.timezone);
-      this.bot.createMessage(calendar.defaultChannel, { embed });
-    });
+    if (!this.notifierJobs.get(eventID)) {
+      const notifierJob: Job = scheduleJob(event.startDate, (): void => {
+        const embed: EmbedBase = this.eventEmbedFactory.getNotifyEventEmbed(event, calendar.timezone);
+        this.bot.createMessage(calendar.defaultChannel, { embed });
+      });
 
-    this.notifierJobs.set(eventID, notifierJob);
+      this.notifierJobs.set(eventID, notifierJob);
+    }
   }
 
   private scheduleDeleteJob(guildID: string, event: EventDocument): void {
     const eventID = event._id;
-    const deleteJob: Job = scheduleJob(event.endDate, async (): Promise<void> => {
-      try {
-        const lock = await this.bot.calendarLock.acquire(guildID);
-        const calendar: CalendarDocument = await Calendar.findById(guildID).exec();
-        const repeatEvent = await calendar.scheduledDeleteEvent(eventID.toHexString());
-        if (repeatEvent) {
-          this.rescheduleEvent(calendar, event);
+    if (!this.deleteJobs.get(eventID)) {
+      const deleteJob: Job = scheduleJob(event.endDate, async (): Promise<void> => {
+        try {
+          const lock = await this.bot.calendarLock.acquire(guildID);
+          const calendar: CalendarDocument = await Calendar.findById(guildID).exec();
+          const repeatEvent = await calendar.scheduledDeleteEvent(eventID.toHexString());
+          if (repeatEvent) {
+            this.rescheduleEvent(calendar, event);
+          }
+          await lock.release();
+        } catch (err) {
+          winston.log("error", err);
         }
-        await lock.release();
-      } catch (err) {
-        winston.log("error", err);
-      }
-    });
+      });
 
-    this.deleteJobs.set(eventID, deleteJob);
+      this.deleteJobs.set(eventID, deleteJob);
+    }
   }
 
   private unscheduleNotifierJob(event: EventDocument) {
