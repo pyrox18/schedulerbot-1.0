@@ -2,6 +2,12 @@
 
 This changelog is formatted based on [Keep a Changelog](http://keepachangelog.com/) and this project attempts to adhere to [Semantic Versioning](http://semver.org) as much as possible.
 
+## v1.0.1 - 2017-12-30
+
+### Fixed
+
+- Replace the misused `setTimeout` function with `setInterval`. ([`2e77668`](https://github.com/pyrox18/schedulerbot/commit/2e776686ff729277bf8cfd0ebd66d3540d662201))
+
 ## v1.0.0 - 2017-12-30
 
 ### Added
