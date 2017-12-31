@@ -2,6 +2,12 @@
 
 This changelog is formatted based on [Keep a Changelog](http://keepachangelog.com/) and this project attempts to adhere to [Semantic Versioning](http://semver.org) as much as possible.
 
+## v1.0.2 - 2017-12-31
+
+### Fixed
+
+- Fixed a scoping issue with `this` which caused the event scheduler to not be called in intervals to check for events. ([`14bab46`](https://github.com/pyrox18/schedulerbot/commit/14bab46b4d3862ddba9b00353b6a0aeff4c3dfb4))
+
 ## v1.0.1 - 2017-12-30
 
 ### Fixed
