@@ -203,7 +203,7 @@ export class SchedulerBot extends CommandClient {
     }
   }
 
-  public async runScheduler(): Promise<void> {
+  public runScheduler = async (): Promise<void> => {
     try {
       const clientGuildIDs: string[] = new Array<string>();
       for (const guildID in this.guildShardMap) {
