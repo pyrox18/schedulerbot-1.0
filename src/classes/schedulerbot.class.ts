@@ -92,7 +92,7 @@ export class SchedulerBot extends CommandClient {
       this.editStatus("online", config.game);
       console.log("Bot ready!");
 
-      setInterval(this.runScheduler, 60*60*1000);
+      setInterval(this.runScheduler, 60 * 60 * 1000);
     });
   }
 
