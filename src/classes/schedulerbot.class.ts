@@ -39,9 +39,7 @@ export class SchedulerBot extends CommandClient {
     this.controllers = [];
     this._eventScheduler = new EventScheduler(this);
 
-    mongoose.connect(process.env.MONGODB_URI, {
-      useMongoClient: true
-    });
+    mongoose.connect(process.env.MONGODB_URI);
     this._db = mongoose.connection;
     this._db.on("open", () => {
       console.log("Connected to database");
@@ -94,7 +92,7 @@ export class SchedulerBot extends CommandClient {
       this.editStatus("online", config.game);
       console.log("Bot ready!");
 
-      setInterval(this.runScheduler, 60*60*1000);
+      setInterval(this.runScheduler, 60 * 60 * 1000);
     });
   }
 
