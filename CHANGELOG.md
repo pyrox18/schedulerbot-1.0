@@ -2,6 +2,14 @@
 
 This changelog is formatted based on [Keep a Changelog](http://keepachangelog.com/) and this project attempts to adhere to [Semantic Versioning](http://semver.org) as much as possible.
 
+## v1.0.3 - 2018-05-24
+
+### Fixed
+
+- Fixed a deprecation issue with MongoDB v3.6, where the `$pushAll` operator used by Mongoose is no longer available. The Mongoose package has been updated to resolve this. ([`8c1d035`](https://github.com/pyrox18/schedulerbot/commit/8c1d03525dbd68d612a3202fae8e4040d5a165cf)) ([Sentry issue link](https://sentry.io/share/issue/354a8ba8275843f384742dd3778d6257/))
+- Removed the `useMongoClient` option when initialising Mongoose, as it is no longer required with v5. ([`6a3a245`](https://github.com/pyrox18/schedulerbot/commit/6a3a245dbcd1079c2b6d65f225d80406e7116a2a))
+- Updated dependencies. ([`22be158`](https://github.com/pyrox18/schedulerbot/commit/22be15849705efe202706783eb5241538d21b860))
+
 ## v1.0.2 - 2017-12-31
 
 ### Fixed
