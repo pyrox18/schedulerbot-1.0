@@ -1,3 +1,5 @@
+**This repository is no longer maintained.** The new version of SchedulerBot can be found [here](https://github.com/pyrox18/SchedulerBot).
+
 # SchedulerBot
 
 A Discord bot for scheduling events.
